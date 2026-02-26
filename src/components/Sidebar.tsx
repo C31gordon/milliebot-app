@@ -47,7 +47,7 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle }:
         {!collapsed && (
           <div className="flex-1 min-w-0">
             <div className="text-sm font-bold truncate" style={{ color: 'var(--text)' }}>Milliebot</div>
-            <div className="text-[10px] font-medium" style={{ color: 'var(--text4)' }}>Command Center</div>
+            <div className="text-[11px] font-medium" style={{ color: 'var(--text4)' }}>Command Center</div>
           </div>
         )}
         <button
@@ -68,7 +68,7 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle }:
           return (
             <div key={item.id}>
               {showSection && (
-                <div className="text-[10px] font-bold uppercase tracking-wider mt-4 mb-1 px-3"
+                <div className="text-[11px] font-bold uppercase tracking-wider mt-4 mb-1 px-3"
                   style={{ color: 'var(--text4)' }}>
                   {item.section}
                 </div>
@@ -103,7 +103,7 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle }:
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-semibold truncate" style={{ color: 'var(--text)' }}>Courtney Gordon</div>
-              <div className="text-[10px]" style={{ color: 'var(--text4)' }}>Owner • RISE</div>
+              <div className="text-[11px]" style={{ color: 'var(--text4)' }}>Owner • RISE</div>
             </div>
           </div>
         </div>

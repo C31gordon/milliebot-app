@@ -87,7 +87,7 @@ function InputField({ label, value, placeholder, type = 'text', disabled = false
         defaultValue={value}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full px-3 py-2 rounded-lg text-sm disabled:opacity-50"
+        className="w-full px-3 py-2.5 rounded-lg text-sm disabled:opacity-50"
         style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
       />
     </div>
@@ -100,7 +100,7 @@ function Toggle({ label, description, defaultChecked = false }: { label: string;
     <div className="flex items-center justify-between py-2">
       <div>
         <div className="text-sm" style={{ color: 'var(--text)' }}>{label}</div>
-        <div className="text-xs" style={{ color: 'var(--text4)' }}>{description}</div>
+        <div className="text-xs leading-relaxed" style={{ color: 'var(--text4)' }}>{description}</div>
       </div>
       <button
         onClick={() => setChecked(!checked)}
@@ -369,8 +369,8 @@ function BillingSettings() {
           ].map((item, i) => (
             <div key={i}>
               <div className="flex justify-between text-xs mb-1">
-                <span style={{ color: 'var(--text2)' }}>{item.label}</span>
-                <span style={{ color: 'var(--text4)' }}>{item.used.toLocaleString()} / {item.limit.toLocaleString()} {item.unit}</span>
+                <span className="whitespace-nowrap" style={{ color: 'var(--text2)' }}>{item.label}</span>
+                <span className="whitespace-nowrap" style={{ color: 'var(--text4)' }}>{item.used.toLocaleString()} / {item.limit.toLocaleString()} {item.unit}</span>
               </div>
               <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg4)' }}>
                 <div className="h-full rounded-full transition-all" style={{
@@ -413,9 +413,9 @@ function DangerZone() {
             <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
               <div>
                 <div className="text-sm" style={{ color: 'var(--text)' }}>Reset All Agent Memory</div>
-                <div className="text-xs" style={{ color: 'var(--text4)' }}>Wipe all stored knowledge and conversation history for all agents</div>
+                <div className="text-xs leading-relaxed" style={{ color: 'var(--text4)' }}>Wipe all stored knowledge and conversation history for all agents</div>
               </div>
-              <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+              <button className="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
                 style={{ background: 'var(--red)15', color: 'var(--red)' }}>
                 Reset Memory
               </button>
@@ -423,9 +423,9 @@ function DangerZone() {
             <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
               <div>
                 <div className="text-sm" style={{ color: 'var(--text)' }}>Delete All Workflows</div>
-                <div className="text-xs" style={{ color: 'var(--text4)' }}>Remove all workflows including active ones. This will stop all automations.</div>
+                <div className="text-xs leading-relaxed" style={{ color: 'var(--text4)' }}>Remove all workflows including active ones. This will stop all automations.</div>
               </div>
-              <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+              <button className="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
                 style={{ background: 'var(--red)15', color: 'var(--red)' }}>
                 Delete Workflows
               </button>
@@ -433,9 +433,9 @@ function DangerZone() {
             <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
               <div>
                 <div className="text-sm" style={{ color: 'var(--text)' }}>Delete Organization</div>
-                <div className="text-xs" style={{ color: 'var(--text4)' }}>Permanently delete this organization and all its data. Cannot be undone.</div>
+                <div className="text-xs leading-relaxed" style={{ color: 'var(--text4)' }}>Permanently delete this organization and all its data. Cannot be undone.</div>
               </div>
-              <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+              <button className="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
                 style={{ background: 'var(--red)15', color: 'var(--red)' }}>
                 Delete Organization
               </button>

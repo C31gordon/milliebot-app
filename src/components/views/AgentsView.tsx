@@ -145,20 +145,20 @@ export default function AgentsView() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-base font-bold" style={{ color: 'var(--text)' }}>{agent.name}</h3>
-                      <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium"
+                      <span className="inline-flex items-center gap-1 text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full font-medium"
                         style={{ background: `${statusColors[agent.status]}15`, color: statusColors[agent.status] }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusColors[agent.status] }} />
                         {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
                       </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full"
+                      <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                         style={{ background: 'var(--bg3)', color: 'var(--text4)' }}>
                         {agent.model}
                       </span>
                     </div>
-                    <p className="text-xs mb-2" style={{ color: 'var(--text3)' }}>{agent.description}</p>
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-xs mb-2 leading-relaxed" style={{ color: 'var(--text3)' }}>{agent.description}</p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       {agent.capabilities.map((cap, i) => (
-                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span key={i} className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                           style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
                           {cap}
                         </span>
@@ -167,7 +167,7 @@ export default function AgentsView() {
                   </div>
                 </div>
                 <div className="text-right shrink-0 ml-4">
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
                     <span style={{ color: 'var(--text4)' }}>Queries:</span>
                     <span style={{ color: 'var(--text2)' }}>{agent.totalQueries.toLocaleString()}</span>
                     <span style={{ color: 'var(--text4)' }}>Memory:</span>
@@ -193,9 +193,9 @@ export default function AgentsView() {
                   <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text4)' }}>
                     Support Bots ({agent.bots.length})
                   </span>
-                  <div className="flex items-center gap-2 text-[10px]" style={{ color: 'var(--text4)' }}>
+                  <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text4)' }}>
                     Connected: {agent.connectedSystems.map((s, i) => (
-                      <span key={i} className="px-1.5 py-0.5 rounded" style={{ background: 'var(--bg3)' }}>{s}</span>
+                      <span key={i} className="px-2 py-0.5 rounded whitespace-nowrap" style={{ background: 'var(--bg3)' }}>{s}</span>
                     ))}
                   </div>
                 </div>
@@ -215,7 +215,7 @@ export default function AgentsView() {
                               style={{ background: statusColors[bot.status], boxShadow: bot.status === 'active' ? `0 0 4px ${statusColors[bot.status]}` : 'none' }} />
                           </div>
                           <p className="text-[11px] mb-2" style={{ color: 'var(--text4)' }}>{bot.description}</p>
-                          <div className="flex items-center gap-3 text-[10px]">
+                          <div className="flex items-center gap-3 text-[11px]">
                             {bot.queriesHandled > 0 ? (
                               <>
                                 <span style={{ color: 'var(--text3)' }}>{bot.queriesHandled.toLocaleString()} queries</span>
@@ -255,8 +255,8 @@ export default function AgentsView() {
             <div key={i} className="p-4 text-center">
               <span className="text-2xl">{dept.icon}</span>
               <div className="text-sm font-semibold mt-2" style={{ color: 'var(--text)' }}>{dept.name}</div>
-              <div className="text-[10px] mt-0.5" style={{ color: 'var(--text4)' }}>{dept.owner}</div>
-              <div className="text-[10px] mt-1 px-2 py-0.5 rounded-full inline-block"
+              <div className="text-[11px] mt-0.5" style={{ color: 'var(--text4)' }}>{dept.owner}</div>
+              <div className="text-[11px] mt-1 px-2.5 py-1 rounded-full inline-block whitespace-nowrap"
                 style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
                 {dept.planned}
               </div>

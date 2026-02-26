@@ -173,7 +173,7 @@ export default function ChatView() {
             <div className={`max-w-[75%] ${msg.role === 'user' ? '' : ''}`}>
               {/* Detection banner */}
               {msg.detectedAs && (
-                <div className="text-[10px] px-2 py-1 rounded-t-lg mb-0" style={{
+                <div className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-t-lg mb-0" style={{
                   background: msg.detectedAs === 'suggestion' ? 'rgba(139,92,246,0.2)' :
                     msg.detectedAs === 'ticket' ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.2)',
                   color: msg.detectedAs === 'suggestion' ? 'var(--purple)' :
@@ -195,7 +195,7 @@ export default function ChatView() {
               }}>
                 {/* Mock data warning */}
                 {msg.isMock && (
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded mb-2 text-[10px]"
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded mb-2 text-[11px] whitespace-nowrap"
                     style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--orange)', border: '1px dashed rgba(245,158,11,0.3)' }}>
                     ⚠️ PROJECTED — Contains estimated values
                   </div>
@@ -216,7 +216,7 @@ export default function ChatView() {
 
                 {/* Financial data notice */}
                 {msg.isFinancial && (
-                  <div className="mt-2 pt-2 text-[10px]" style={{ borderTop: '1px solid var(--border)', color: 'var(--text4)' }}>
+                  <div className="mt-2 pt-2 text-[11px]" style={{ borderTop: '1px solid var(--border)', color: 'var(--text4)' }}>
                     💰 Financial data — double-verified against source system
                   </div>
                 )}
@@ -224,12 +224,12 @@ export default function ChatView() {
 
               {/* Message metadata */}
               <div className="flex items-center gap-3 mt-1.5 px-1">
-                <span className="text-[10px]" style={{ color: 'var(--text4)' }}>
+                <span className="text-[11px]" style={{ color: 'var(--text4)' }}>
                   {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
 
                 {msg.confidence !== undefined && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded" style={{
+                  <span className="text-[11px] whitespace-nowrap px-2 py-1 rounded" style={{
                     background: msg.confidence >= 90 ? 'rgba(16,185,129,0.15)' :
                       msg.confidence >= 70 ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
                     color: msg.confidence >= 90 ? 'var(--green)' :
@@ -240,7 +240,7 @@ export default function ChatView() {
                 )}
 
                 {msg.freshness && freshnessLabels[msg.freshness] && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded" style={{
+                  <span className="text-[11px] whitespace-nowrap px-2 py-1 rounded" style={{
                     background: `${freshnessLabels[msg.freshness].color}15`,
                     color: freshnessLabels[msg.freshness].color,
                   }}>
@@ -252,9 +252,9 @@ export default function ChatView() {
               {/* Sources */}
               {msg.sources && msg.sources.length > 0 && (
                 <div className="flex items-center gap-2 mt-1 px-1">
-                  <span className="text-[10px]" style={{ color: 'var(--text4)' }}>Sources:</span>
+                  <span className="text-[11px]" style={{ color: 'var(--text4)' }}>Sources:</span>
                   {msg.sources.map((s, i) => (
-                    <a key={i} href={s.url} className="text-[10px] hover:underline" style={{ color: 'var(--blue)' }}>
+                    <a key={i} href={s.url} className="text-[11px] hover:underline" style={{ color: 'var(--blue)' }}>
                       {s.label}
                     </a>
                   ))}
@@ -285,7 +285,7 @@ export default function ChatView() {
           {quickActions.map((action, i) => (
             <button key={i}
               onClick={() => { setInput(action); inputRef.current?.focus() }}
-              className="px-3 py-1.5 rounded-full text-xs transition-all hover:scale-[1.02]"
+              className="px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-all hover:scale-[1.02]"
               style={{ background: 'var(--bg3)', color: 'var(--text3)', border: '1px solid var(--border)' }}>
               {action}
             </button>
@@ -305,10 +305,10 @@ export default function ChatView() {
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="Ask anything, start with 'I wish...' for suggestions or 'I need...' for tickets"
               disabled={isTyping}
-              className="w-full px-4 py-3 pr-12 rounded-xl text-sm disabled:opacity-50"
+              className="w-full px-4 py-3.5 pr-14 rounded-xl text-sm disabled:opacity-50"
               style={{ background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)' }}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: 'var(--text4)' }}>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px]" style={{ color: 'var(--text4)' }}>
               ↵
             </span>
           </div>
@@ -321,12 +321,12 @@ export default function ChatView() {
           </button>
         </div>
         <div className="flex items-center justify-between mt-2 px-1">
-          <div className="flex items-center gap-3 text-[10px]" style={{ color: 'var(--text4)' }}>
+          <div className="flex items-center gap-3 text-[11px]" style={{ color: 'var(--text4)' }}>
             <span>💡 "I wish..." → Suggestion</span>
             <span>🎫 "I need..." → Ticket</span>
             <span>🏗️ "Build me..." → Planning Mode</span>
           </div>
-          <span className="text-[10px]" style={{ color: 'var(--text4)' }}>
+          <span className="text-[11px]" style={{ color: 'var(--text4)' }}>
             Zero hallucination mode active
           </span>
         </div>

@@ -337,12 +337,12 @@ export default function WorkflowsView() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold" style={{ color: 'var(--text)' }}>{wf.name}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                      <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full font-medium"
                         style={{ background: `${statusColors[wf.status]}22`, color: statusColors[wf.status] }}>
                         {statusLabels[wf.status]}
                       </span>
                       {wf.complexity === 'complex' && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                           style={{ background: 'var(--orange)22', color: 'var(--orange)' }}>
                           Complex → n8n
                         </span>
@@ -379,7 +379,7 @@ export default function WorkflowsView() {
                 <div className="flex items-center gap-2 flex-wrap mb-4">
                   {wf.steps.map((step, i) => (
                     <div key={step.id} className="flex items-center gap-2">
-                      <div className="px-3 py-2 rounded-lg text-xs" style={{
+                      <div className="px-3 py-2 rounded-lg text-xs min-w-[120px]" style={{
                         background: `${stepTypeColors[step.type]}15`,
                         border: `1px solid ${stepTypeColors[step.type]}40`,
                       }}>

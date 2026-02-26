@@ -271,12 +271,12 @@ export default function AuditView() {
                   <span className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>
                     {entry.action}
                   </span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded shrink-0"
+                  <span className="text-[11px] whitespace-nowrap px-2 py-1 rounded shrink-0"
                     style={{ background: `${eventTypeColors[entry.eventType]}22`, color: eventTypeColors[entry.eventType] }}>
                     {eventTypeLabels[entry.eventType]}
                   </span>
                   {entry.severity !== 'info' && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded shrink-0"
+                    <span className="text-[11px] whitespace-nowrap px-2 py-1 rounded shrink-0"
                       style={{ background: `${severityColors[entry.severity]}22`, color: severityColors[entry.severity] }}>
                       {entry.severity.toUpperCase()}
                     </span>
@@ -299,7 +299,7 @@ export default function AuditView() {
                 <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
                     <span style={{ color: 'var(--text4)' }}>Details:</span>
-                    <p className="mt-1" style={{ color: 'var(--text2)' }}>{entry.details}</p>
+                    <p className="mt-1 leading-relaxed" style={{ color: 'var(--text2)' }}>{entry.details}</p>
                   </div>
                   <div className="space-y-1">
                     <div><span style={{ color: 'var(--text4)' }}>Actor:</span> <span style={{ color: 'var(--text2)' }}>{entry.actor} ({entry.actorType})</span></div>

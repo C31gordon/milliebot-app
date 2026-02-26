@@ -34,24 +34,24 @@ export default function SuggestionsView() {
         {suggestions.sort((a, b) => b.votes - a.votes).map((s) => (
           <div key={s.id} className="glass-card p-4 flex items-center gap-4 cursor-pointer">
             {/* Vote count */}
-            <div className="flex flex-col items-center gap-1 px-3">
+            <div className="flex flex-col items-center gap-1 px-3 min-w-[60px]">
               <button className="text-xs" style={{ color: 'var(--text4)' }}>▲</button>
               <span className="text-lg font-extrabold" style={{ color: s.votes >= 5 ? 'var(--blue)' : 'var(--text3)' }}>
                 {s.votes}
               </span>
-              <span className="text-[10px]" style={{ color: 'var(--text4)' }}>votes</span>
+              <span className="text-[11px]" style={{ color: 'var(--text4)' }}>votes</span>
             </div>
 
             {/* Content */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-mono font-bold" style={{ color: 'var(--text4)' }}>{s.id}</span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                <span className="text-[11px] font-semibold whitespace-nowrap px-2.5 py-1 rounded-full"
                   style={{ background: statusConfig[s.status].bg, color: statusConfig[s.status].color }}>
                   {statusConfig[s.status].label}
                 </span>
               </div>
-              <h3 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{s.title}</h3>
+              <h3 className="text-sm font-semibold leading-relaxed" style={{ color: 'var(--text)' }}>{s.title}</h3>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-xs" style={{ color: 'var(--text4)' }}>{s.submitter} • {s.dept}</span>
                 <span className="text-xs" style={{ color: 'var(--text4)' }}>{s.created}</span>

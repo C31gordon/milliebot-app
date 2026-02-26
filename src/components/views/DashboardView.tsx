@@ -91,7 +91,7 @@ export default function DashboardView() {
             </div>
             <div className="text-3xl font-bold mb-1" style={{ color: card.color }}>{card.value}</div>
             <div className="text-xs mb-2" style={{ color: 'var(--text3)' }}>{card.sub}</div>
-            <div className="text-[10px] font-medium" style={{ color: card.trendUp ? 'var(--green)' : 'var(--orange)' }}>
+            <div className="text-[11px] font-medium" style={{ color: card.trendUp ? 'var(--green)' : 'var(--orange)' }}>
               {card.trend}
             </div>
           </div>
@@ -110,8 +110,8 @@ export default function DashboardView() {
               <div key={i} className="px-5 py-3 flex items-start gap-3 transition-colors hover:bg-white/[0.02]">
                 <span className="text-base mt-0.5">{item.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm" style={{ color: 'var(--text2)' }}>{item.text}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'var(--text4)' }}>{item.time}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text2)' }}>{item.text}</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: 'var(--text4)' }}>{item.time}</p>
                 </div>
               </div>
             ))}
@@ -122,7 +122,7 @@ export default function DashboardView() {
         <div className="glass-card-static rounded-xl overflow-hidden">
           <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
             <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🛡️ Security Alerts</h3>
-            <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.15)', color: 'var(--red)' }}>
+            <span className="text-[11px] px-2.5 py-1 rounded-full whitespace-nowrap" style={{ background: 'rgba(239,68,68,0.15)', color: 'var(--red)' }}>
               1 critical
             </span>
           </div>
@@ -135,8 +135,8 @@ export default function DashboardView() {
                 <div className="flex items-start gap-2">
                   <span className="text-xs">{alert.icon}</span>
                   <div className="flex-1">
-                    <p className="text-xs" style={{ color: 'var(--text2)' }}>{alert.text}</p>
-                    <button className="text-[10px] font-medium mt-1" style={{ color: 'var(--blue)' }}>{alert.action} →</button>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text2)' }}>{alert.text}</p>
+                    <button className="text-[11px] font-medium mt-1" style={{ color: 'var(--blue)' }}>{alert.action} →</button>
                   </div>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function DashboardView() {
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 {['Department', 'Status', 'Agents', 'Bots', 'Memory', 'Tickets', 'Health'].map(h => (
-                  <th key={h} className="text-left px-5 py-3 font-semibold" style={{ color: 'var(--text4)' }}>{h}</th>
+                  <th key={h} className="text-left px-5 py-3 font-semibold whitespace-nowrap" style={{ color: 'var(--text4)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -212,7 +212,7 @@ export default function DashboardView() {
             <span className="text-sm">🔒</span>
             <span className="text-xs font-semibold" style={{ color: 'var(--text)' }}>RKBAC™ Status</span>
           </div>
-          <div className="flex items-center gap-4 text-[10px]" style={{ color: 'var(--text3)' }}>
+          <div className="flex items-center gap-4 flex-wrap text-[11px]" style={{ color: 'var(--text3)' }}>
             <span>6 active policies</span>
             <span>•</span>
             <span>3 active exceptions</span>

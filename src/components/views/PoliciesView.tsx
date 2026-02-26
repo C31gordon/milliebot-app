@@ -259,7 +259,7 @@ export default function PoliciesView() {
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text3)' }}>
             RKBAC™ Permission Hierarchy
           </span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--green)22', color: 'var(--green)' }}>
+          <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full" style={{ background: 'var(--green)22', color: 'var(--green)' }}>
             All Systems Normal
           </span>
         </div>
@@ -269,12 +269,12 @@ export default function PoliciesView() {
               <div className="px-3 py-2 rounded-lg text-center" style={{
                 background: `${tierColors[tier]}15`,
                 border: `1px solid ${tierColors[tier]}40`,
-                minWidth: '140px',
+                minWidth: '170px',
               }}>
                 <div className="text-xs font-medium" style={{ color: tierColors[tier] }}>
                   {tierLabels[tier]}
                 </div>
-                <div className="text-[10px] mt-0.5" style={{ color: 'var(--text4)' }}>
+                <div className="text-[11px] mt-0.5 leading-relaxed" style={{ color: 'var(--text4)' }}>
                   {tier === 'owner' ? 'Full access • Immutable rules' :
                    tier === 'department_head' ? 'Department scope • Sandboxed' :
                    tier === 'manager' ? 'Team scope • Restricted' :
@@ -285,7 +285,7 @@ export default function PoliciesView() {
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-4 mt-3 text-[10px]" style={{ color: 'var(--text4)' }}>
+        <div className="flex items-center gap-4 mt-3 text-[11px]" style={{ color: 'var(--text4)' }}>
           <span>🔒 Immutable: Only Owner can create/modify</span>
           <span>📦 Sandboxed: Department heads can customize within Owner boundaries</span>
           <span>↕️ Memory flows UP freely, DOWN with permission</span>
@@ -314,7 +314,7 @@ export default function PoliciesView() {
         >
           Exception Waivers ({exceptions.length})
           {pendingExceptions > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
               style={{ background: 'var(--orange)', color: 'white' }}>
               {pendingExceptions}
             </span>
@@ -342,16 +342,16 @@ export default function PoliciesView() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold" style={{ color: 'var(--text)' }}>{policy.name}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                           style={{ background: `${tierColors[policy.tier]}22`, color: tierColors[policy.tier] }}>
                           {tierLabels[policy.tier]}
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                           style={{ background: 'var(--bg3)', color: 'var(--text4)' }}>
                           {policy.layer === 'immutable' ? '🔒 Immutable' : '📦 Sandboxed'}
                         </span>
                         {policy.department !== 'All' && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full"
+                          <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                             style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
                             {policy.department}
                           </span>
@@ -423,18 +423,18 @@ export default function PoliciesView() {
                     <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
                       {exc.requestedBy}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full"
+                    <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                       style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
                       {exc.department}
                     </span>
-                    <span className="text-[10px]" style={{ color: 'var(--text4)' }}>→</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full"
+                    <span className="text-[11px]" style={{ color: 'var(--text4)' }}>→</span>
+                    <span className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full"
                       style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
                       {exc.policyName}
                     </span>
                   </div>
-                  <p className="text-sm mb-2" style={{ color: 'var(--text2)' }}>{exc.reason}</p>
-                  <div className="flex items-center gap-4 text-[10px]" style={{ color: 'var(--text4)' }}>
+                  <p className="text-sm mb-2 leading-relaxed" style={{ color: 'var(--text2)' }}>{exc.reason}</p>
+                  <div className="flex items-center gap-2 flex-wrap text-[11px]" style={{ color: 'var(--text4)' }}>
                     <span>📅 Requested: {exc.requestedAt}</span>
                     <span>⏱ Duration: {exc.duration}</span>
                     <span>📆 Expires: {exc.expiresAt}</span>
@@ -467,7 +467,7 @@ export default function PoliciesView() {
                 </div>
               </div>
               {exc.approvedBy && (
-                <div className="text-[10px] mt-2" style={{ color: 'var(--text4)' }}>
+                <div className="text-[11px] mt-2" style={{ color: 'var(--text4)' }}>
                   Approved by {exc.approvedBy}
                 </div>
               )}

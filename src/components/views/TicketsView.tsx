@@ -71,7 +71,7 @@ export default function TicketsView() {
       <div className="flex items-center gap-2">
         {['all', 'new', 'assigned', 'in_progress', 'waiting_on_requester', 'resolved'].map((f) => (
           <button key={f} onClick={() => setFilter(f)}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all"
             style={{
               background: filter === f ? 'var(--blue)' : 'var(--bg2)',
               color: filter === f ? '#fff' : 'var(--text3)',
@@ -83,12 +83,12 @@ export default function TicketsView() {
       </div>
 
       {/* Ticket List */}
-      <div className="glass-card overflow-hidden">
+      <div className="glass-card overflow-hidden overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)' }}>
               {['Ticket', 'Title', 'Requester', 'Department', 'Priority', 'Status', 'Created'].map((h) => (
-                <th key={h} className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider"
+                <th key={h} className="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap"
                   style={{ color: 'var(--text4)' }}>{h}</th>
               ))}
             </tr>
@@ -97,28 +97,28 @@ export default function TicketsView() {
             {filtered.map((ticket) => (
               <tr key={ticket.id} className="transition-colors hover:bg-white/5 cursor-pointer"
                 style={{ borderBottom: '1px solid var(--border)' }}>
-                <td className="px-4 py-3 text-xs font-mono font-bold" style={{ color: 'var(--blue-light)' }}>{ticket.id}</td>
+                <td className="px-4 py-3 text-xs font-mono font-bold whitespace-nowrap" style={{ color: 'var(--blue-light)' }}>{ticket.id}</td>
                 <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--text)' }}>
                   {ticket.title}
                   {ticket.group && (
-                    <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded"
+                    <span className="ml-2 text-[11px] font-bold whitespace-nowrap px-2 py-0.5 rounded"
                       style={{ background: 'rgba(245,158,11,0.2)', color: 'var(--orange)' }}>GROUPED</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: 'var(--text3)' }}>{ticket.requester}</td>
-                <td className="px-4 py-3 text-xs" style={{ color: 'var(--text3)' }}>{ticket.targetDept}</td>
+                <td className="px-4 py-3 text-xs whitespace-nowrap" style={{ color: 'var(--text3)' }}>{ticket.requester}</td>
+                <td className="px-4 py-3 text-xs whitespace-nowrap" style={{ color: 'var(--text3)' }}>{ticket.targetDept}</td>
                 <td className="px-4 py-3">
                   <span className="text-xs font-bold" style={{ color: priorityConfig[ticket.priority].color }}>
                     {ticket.priority === 'urgent' ? '🔴 ' : ''}{priorityConfig[ticket.priority].label}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-[10px] font-semibold px-2 py-1 rounded-full"
+                  <span className="text-[11px] font-semibold whitespace-nowrap px-2.5 py-1 rounded-full"
                     style={{ background: statusConfig[ticket.status].bg, color: statusConfig[ticket.status].color }}>
                     {statusConfig[ticket.status].label}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: 'var(--text4)' }}>{ticket.created}</td>
+                <td className="px-4 py-3 text-xs whitespace-nowrap" style={{ color: 'var(--text4)' }}>{ticket.created}</td>
               </tr>
             ))}
           </tbody>
