@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, DEMO_MODE } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
@@ -24,6 +24,12 @@ export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
+    if (DEMO_MODE) {
+      // In demo mode, skip auth — show the full app
+      setLoading(false)
+      return
+    }
+
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -58,8 +64,7 @@ export default function Home() {
               <circle cx="16" cy="16" r="4" fill="white"/>
             </svg>
           </div>
-          <div className="shimmer h-4 w-32 mx-auto mb-2"></div>
-          <div className="shimmer h-3 w-48 mx-auto"></div>
+          <p className="text-sm" style={{ color: 'var(--text3)' }}>Loading Milliebot Command Center...</p>
         </div>
       </div>
     )

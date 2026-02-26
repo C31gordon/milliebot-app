@@ -2,266 +2,447 @@
 
 import { useState } from 'react'
 
-const sourceSystems = [
-  { name: 'Microsoft 365', icon: '📧', status: 'connected', desc: 'Email, Calendar, SharePoint, Teams', lastSync: '5 min ago' },
-  { name: 'Entrata', icon: '🏢', status: 'connected', desc: 'Property management, leasing, rent roll', lastSync: '6 hours ago' },
-  { name: 'Egnyte', icon: '📁', status: 'connected', desc: 'File storage, documents, SOPs', lastSync: '1 hour ago' },
-  { name: 'Paycor', icon: '💳', status: 'connected', desc: 'HR, payroll, benefits', lastSync: '12 hours ago' },
-  { name: 'MoonRISE Service Desk', icon: '🎫', status: 'connected', desc: 'IT tickets, service requests', lastSync: '30 min ago' },
-  { name: 'Stripe', icon: '💰', status: 'not_connected', desc: 'Billing & payments', lastSync: null },
-  { name: 'HubSpot', icon: '📊', status: 'not_connected', desc: 'CRM, marketing automation', lastSync: null },
-]
+type SettingsTab = 'general' | 'sso' | 'notifications' | 'branding' | 'billing' | 'danger'
+
+interface ToggleSetting {
+  id: string
+  label: string
+  description: string
+  enabled: boolean
+}
 
 export default function SettingsView() {
-  const [tab, setTab] = useState<'general' | 'systems' | 'billing' | 'notifications' | 'help'>('general')
+  const [activeTab, setActiveTab] = useState<SettingsTab>('general')
+
+  const tabs: { key: SettingsTab; label: string; icon: string }[] = [
+    { key: 'general', label: 'General', icon: '⚙️' },
+    { key: 'sso', label: 'Single Sign-On', icon: '🔑' },
+    { key: 'notifications', label: 'Notifications', icon: '🔔' },
+    { key: 'branding', label: 'Branding', icon: '🎨' },
+    { key: 'billing', label: 'Billing', icon: '💳' },
+    { key: 'danger', label: 'Danger Zone', icon: '⚠️' },
+  ]
 
   return (
-    <div className="max-w-[1000px] mx-auto space-y-6">
-      <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Settings</h1>
-
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--bg2)', border: '1px solid var(--border)' }}>
-        {([
-          { id: 'general' as const, label: '⚙️ General' },
-          { id: 'systems' as const, label: '🔗 Source Systems' },
-          { id: 'billing' as const, label: '💳 Billing & Usage' },
-          { id: 'notifications' as const, label: '🔔 Notifications' },
-          { id: 'help' as const, label: '❓ Help & Feedback' },
-        ]).map((t) => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className="flex-1 px-4 py-2 rounded-lg text-xs font-semibold transition-all"
-            style={{ background: tab === t.id ? 'var(--blue)' : 'transparent', color: tab === t.id ? '#fff' : 'var(--text3)' }}>
-            {t.label}
-          </button>
-        ))}
+    <div className="max-w-[1200px] mx-auto space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Settings</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>
+          Configure your organization, authentication, and platform preferences
+        </p>
       </div>
 
-      {/* General */}
-      {tab === 'general' && (
-        <div className="space-y-6">
-          <div className="glass-card p-6">
-            <h2 className="text-sm font-bold mb-4" style={{ color: 'var(--text)' }}>Tenant Settings</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text3)' }}>Company Name</label>
-                <input type="text" defaultValue="RISE Real Estate" className="w-full px-3 py-2.5 rounded-lg text-sm"
-                  style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text3)' }}>Domain</label>
-                <input type="text" defaultValue="risere.com" className="w-full px-3 py-2.5 rounded-lg text-sm"
-                  style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text3)' }}>Brand Primary Color</label>
-                <div className="flex gap-2">
-                  <input type="color" defaultValue="#2E86AB" className="w-10 h-10 rounded cursor-pointer" style={{ border: '1px solid var(--border)' }} />
-                  <input type="text" defaultValue="#2E86AB" className="flex-1 px-3 py-2.5 rounded-lg text-sm"
-                    style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text3)' }}>Logo</label>
-                <div className="px-3 py-6 rounded-lg text-center cursor-pointer transition-colors hover:border-blue-500"
-                  style={{ border: '2px dashed var(--border)', color: 'var(--text4)' }}>
-                  <span className="text-xs">Drop logo here or click to upload</span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text3)' }}>White-Label Domain (Custom URL)</label>
-              <div className="flex gap-2">
-                <input type="text" placeholder="app.risere.com" className="flex-1 px-3 py-2.5 rounded-lg text-sm"
-                  style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-                <button className="px-4 py-2 rounded-lg text-xs font-bold" style={{ background: 'var(--blue)', color: '#fff' }}>Configure DNS</button>
-              </div>
-              <p className="text-[10px] mt-1" style={{ color: 'var(--text4)' }}>Available after day 15. Point your CNAME to milliebot.vercel.app</p>
-            </div>
-          </div>
+      <div className="flex gap-6">
+        {/* Sidebar Tabs */}
+        <div className="w-48 shrink-0 space-y-1">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-all"
+              style={{
+                background: activeTab === tab.key ? 'var(--bg3)' : 'transparent',
+                color: activeTab === tab.key ? 'var(--text)' : 'var(--text3)',
+              }}
+            >
+              <span>{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          <div className="flex justify-end">
-            <button className="px-6 py-2.5 rounded-lg text-sm font-bold" style={{ background: 'var(--blue)', color: '#fff' }}>
-              Save Changes
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {activeTab === 'general' && <GeneralSettings />}
+          {activeTab === 'sso' && <SSOSettings />}
+          {activeTab === 'notifications' && <NotificationSettings />}
+          {activeTab === 'branding' && <BrandingSettings />}
+          {activeTab === 'billing' && <BillingSettings />}
+          {activeTab === 'danger' && <DangerZone />}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SectionCard({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
+  return (
+    <div className="glass-card p-5 rounded-xl mb-4">
+      <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text)' }}>{title}</h3>
+      {description && <p className="text-xs mb-4" style={{ color: 'var(--text4)' }}>{description}</p>}
+      {children}
+    </div>
+  )
+}
+
+function InputField({ label, value, placeholder, type = 'text', disabled = false }: {
+  label: string; value: string; placeholder?: string; type?: string; disabled?: boolean
+}) {
+  return (
+    <div className="mb-3">
+      <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>{label}</label>
+      <input
+        type={type}
+        defaultValue={value}
+        placeholder={placeholder}
+        disabled={disabled}
+        className="w-full px-3 py-2 rounded-lg text-sm disabled:opacity-50"
+        style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
+      />
+    </div>
+  )
+}
+
+function Toggle({ label, description, defaultChecked = false }: { label: string; description: string; defaultChecked?: boolean }) {
+  const [checked, setChecked] = useState(defaultChecked)
+  return (
+    <div className="flex items-center justify-between py-2">
+      <div>
+        <div className="text-sm" style={{ color: 'var(--text)' }}>{label}</div>
+        <div className="text-xs" style={{ color: 'var(--text4)' }}>{description}</div>
+      </div>
+      <button
+        onClick={() => setChecked(!checked)}
+        className="w-10 h-5 rounded-full transition-all relative"
+        style={{ background: checked ? 'var(--blue)' : 'var(--bg4)' }}
+      >
+        <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all"
+          style={{ left: checked ? '22px' : '2px' }} />
+      </button>
+    </div>
+  )
+}
+
+function GeneralSettings() {
+  return (
+    <>
+      <SectionCard title="Organization" description="Your company information">
+        <div className="grid grid-cols-2 gap-4">
+          <InputField label="Organization Name" value="RISE Real Estate" />
+          <InputField label="Tenant ID" value="a0000000-0000-0000-0000-000000000001" disabled />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <InputField label="Industry" value="Multifamily Real Estate" />
+          <InputField label="Size" value="~30,000 units" />
+        </div>
+        <InputField label="Primary Contact" value="cgordon@risere.com" />
+      </SectionCard>
+
+      <SectionCard title="Platform Preferences">
+        <Toggle label="Planning Mode Required" description="Require blueprint phase before building new agents or workflows" defaultChecked />
+        <Toggle label="Source Citations" description="Show source links on all AI-generated answers" defaultChecked />
+        <Toggle label="Confidence Scores" description="Display confidence percentages on complex answers" defaultChecked />
+        <Toggle label="Mock Data Labels" description="Visually distinguish projected or estimated data with banners" defaultChecked />
+        <Toggle label="Zero Hallucination Mode" description="Block responses when no verified source is available" defaultChecked />
+      </SectionCard>
+
+      <SectionCard title="Data Retention">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Audit Log Retention</label>
+            <select className="w-full px-3 py-2 rounded-lg text-sm"
+              style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+              <option>90 days</option>
+              <option>180 days</option>
+              <option>1 year</option>
+              <option>Indefinite</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Chat History Retention</label>
+            <select className="w-full px-3 py-2 rounded-lg text-sm"
+              style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+              <option>30 days</option>
+              <option>90 days</option>
+              <option>1 year</option>
+              <option>Indefinite</option>
+            </select>
+          </div>
+        </div>
+      </SectionCard>
+
+      <div className="flex justify-end">
+        <button className="px-4 py-2 rounded-lg text-sm font-medium"
+          style={{ background: 'var(--blue)', color: 'white' }}>
+          Save Changes
+        </button>
+      </div>
+    </>
+  )
+}
+
+function SSOSettings() {
+  return (
+    <>
+      <SectionCard title="Microsoft SSO (Entra ID)" description="Allow team members to sign in with their Microsoft work accounts">
+        <Toggle label="Enable Microsoft SSO" description="Users can sign in with their @risere.com accounts" defaultChecked />
+        <div className="grid grid-cols-2 gap-4 mt-3">
+          <InputField label="Tenant ID" value="••••••••-••••-••••-••••-••••••••••••" type="password" />
+          <InputField label="Client ID" value="••••••••-••••-••••-••••-••••••••••••" type="password" />
+        </div>
+        <InputField label="Redirect URI" value="https://nqheduewmpomsvnzjtlc.supabase.co/auth/v1/callback" disabled />
+        <div className="flex items-center gap-2 mt-2">
+          <span className="w-2 h-2 rounded-full" style={{ background: 'var(--green)' }}></span>
+          <span className="text-xs" style={{ color: 'var(--green)' }}>Connected and verified</span>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Google SSO" description="Allow sign-in with Google Workspace accounts">
+        <Toggle label="Enable Google SSO" description="Users can sign in with Google accounts" />
+        <div className="grid grid-cols-2 gap-4 mt-3">
+          <InputField label="Client ID" value="" placeholder="Google OAuth Client ID" />
+          <InputField label="Client Secret" value="" placeholder="Google OAuth Client Secret" type="password" />
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="w-2 h-2 rounded-full" style={{ background: 'var(--text4)' }}></span>
+          <span className="text-xs" style={{ color: 'var(--text4)' }}>Not configured</span>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Email/Password" description="Fallback authentication for users without SSO">
+        <Toggle label="Allow Email/Password Sign-in" description="Users can create accounts with email and password" defaultChecked />
+        <Toggle label="Require Email Verification" description="New users must verify their email before accessing the platform" defaultChecked />
+        <Toggle label="Enforce Strong Passwords" description="Minimum 12 characters, mixed case, numbers, and symbols" defaultChecked />
+      </SectionCard>
+
+      <SectionCard title="Session Security">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Session Timeout</label>
+            <select className="w-full px-3 py-2 rounded-lg text-sm"
+              style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+              <option>8 hours</option>
+              <option>12 hours</option>
+              <option>24 hours</option>
+              <option>7 days</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>MFA Requirement</label>
+            <select className="w-full px-3 py-2 rounded-lg text-sm"
+              style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+              <option>Owner only</option>
+              <option>Owner + Department Heads</option>
+              <option>All users</option>
+              <option>Disabled</option>
+            </select>
+          </div>
+        </div>
+      </SectionCard>
+    </>
+  )
+}
+
+function NotificationSettings() {
+  return (
+    <>
+      <SectionCard title="Alert Channels" description="Where should important notifications be sent?">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+            <div className="flex items-center gap-3">
+              <span className="text-lg">📧</span>
+              <div>
+                <div className="text-sm" style={{ color: 'var(--text)' }}>Email</div>
+                <div className="text-xs" style={{ color: 'var(--text4)' }}>cgordon@risere.com</div>
+              </div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'var(--green)22', color: 'var(--green)' }}>Active</span>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+            <div className="flex items-center gap-3">
+              <span className="text-lg">📱</span>
+              <div>
+                <div className="text-sm" style={{ color: 'var(--text)' }}>Telegram</div>
+                <div className="text-xs" style={{ color: 'var(--text4)' }}>@millie_bot</div>
+              </div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'var(--green)22', color: 'var(--green)' }}>Active</span>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+            <div className="flex items-center gap-3">
+              <span className="text-lg">💬</span>
+              <div>
+                <div className="text-sm" style={{ color: 'var(--text)' }}>Slack</div>
+                <div className="text-xs" style={{ color: 'var(--text4)' }}>Not connected</div>
+              </div>
+            </div>
+            <button className="text-xs px-3 py-1 rounded-full" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+              Connect
             </button>
           </div>
         </div>
-      )}
+      </SectionCard>
 
-      {/* Source Systems */}
-      {tab === 'systems' && (
+      <SectionCard title="Notification Preferences" description="Choose what triggers alerts">
+        <Toggle label="Security Alerts" description="Prompt injection attempts, unusual access patterns, failed logins" defaultChecked />
+        <Toggle label="Ticket Escalations" description="When tickets are escalated or SLA breached" defaultChecked />
+        <Toggle label="Exception Requests" description="When team members request access exceptions" defaultChecked />
+        <Toggle label="Policy Changes" description="When RKBAC policies are created or modified" defaultChecked />
+        <Toggle label="Workflow Failures" description="When automated workflows encounter errors" defaultChecked />
+        <Toggle label="Agent Status Changes" description="When agents go offline or encounter issues" />
+        <Toggle label="Weekly Summary" description="Digest of all activity, trends, and recommendations" defaultChecked />
+      </SectionCard>
+
+      <SectionCard title="Quiet Hours" description="Suppress non-critical notifications during off-hours">
+        <Toggle label="Enable Quiet Hours" description="Only critical/security alerts during quiet hours" defaultChecked />
+        <div className="grid grid-cols-2 gap-4 mt-3">
+          <InputField label="Start" value="11:00 PM" />
+          <InputField label="End" value="7:00 AM" />
+        </div>
+      </SectionCard>
+    </>
+  )
+}
+
+function BrandingSettings() {
+  return (
+    <>
+      <SectionCard title="Custom Domain" description="Point your own domain to this platform (available after day 15)">
+        <InputField label="Custom Domain" value="" placeholder="agents.risere.com" />
+        <div className="p-3 rounded-lg mt-2" style={{ background: 'var(--bg)', border: '1px dashed var(--border)' }}>
+          <p className="text-xs" style={{ color: 'var(--text4)' }}>
+            Add a CNAME record pointing to <code style={{ color: 'var(--blue)' }}>cname.vercel-dns.com</code> then verify below.
+          </p>
+        </div>
+        <button className="mt-3 px-4 py-2 rounded-lg text-sm"
+          style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+          Verify Domain
+        </button>
+      </SectionCard>
+
+      <SectionCard title="Logo & Colors" description="Customize the look of your platform">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Logo</label>
+            <div className="w-full h-24 rounded-lg flex items-center justify-center cursor-pointer"
+              style={{ background: 'var(--bg)', border: '2px dashed var(--border)' }}>
+              <span className="text-sm" style={{ color: 'var(--text4)' }}>Click to upload logo</span>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Favicon</label>
+            <div className="w-full h-24 rounded-lg flex items-center justify-center cursor-pointer"
+              style={{ background: 'var(--bg)', border: '2px dashed var(--border)' }}>
+              <span className="text-sm" style={{ color: 'var(--text4)' }}>Click to upload favicon</span>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          <InputField label="Primary Color" value="#3b82f6" />
+          <InputField label="Accent Color" value="#8b5cf6" />
+          <InputField label="Background" value="#0a0e1a" />
+        </div>
+      </SectionCard>
+
+      <SectionCard title="White Label" description="Remove Ardexa branding for your tenants">
+        <Toggle label="Hide 'Powered by Ardexa'" description="Remove platform attribution from footer and login screen" />
+        <Toggle label="Custom Email Templates" description="Use your branding in system-sent emails" />
+      </SectionCard>
+    </>
+  )
+}
+
+function BillingSettings() {
+  return (
+    <>
+      <SectionCard title="Current Plan">
+        <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: 'var(--bg)', border: '1px solid var(--blue)40' }}>
+          <div>
+            <div className="text-lg font-bold" style={{ color: 'var(--text)' }}>Enterprise</div>
+            <div className="text-xs" style={{ color: 'var(--text3)' }}>Unlimited agents • Custom domain • Priority support • RKBAC™</div>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold" style={{ color: 'var(--blue)' }}>$499<span className="text-sm font-normal" style={{ color: 'var(--text4)' }}>/mo</span></div>
+            <div className="text-xs" style={{ color: 'var(--text4)' }}>Billed annually</div>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Usage This Month" description="Feb 1 – Feb 25, 2026">
         <div className="space-y-3">
-          {sourceSystems.map((sys) => (
-            <div key={sys.name} className="glass-card p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{sys.icon}</span>
-                <div>
-                  <div className="text-sm font-bold" style={{ color: 'var(--text)' }}>{sys.name}</div>
-                  <div className="text-xs" style={{ color: 'var(--text4)' }}>{sys.desc}</div>
-                </div>
+          {[
+            { label: 'AI Queries', used: 2847, limit: 10000, unit: 'queries' },
+            { label: 'Agent Hours', used: 156, limit: 500, unit: 'hours' },
+            { label: 'Storage', used: 2.4, limit: 50, unit: 'GB' },
+            { label: 'Workflow Runs', used: 342, limit: 5000, unit: 'runs' },
+          ].map((item, i) => (
+            <div key={i}>
+              <div className="flex justify-between text-xs mb-1">
+                <span style={{ color: 'var(--text2)' }}>{item.label}</span>
+                <span style={{ color: 'var(--text4)' }}>{item.used.toLocaleString()} / {item.limit.toLocaleString()} {item.unit}</span>
               </div>
-              <div className="flex items-center gap-4">
-                {sys.lastSync && (
-                  <span className="text-[10px]" style={{ color: 'var(--text4)' }}>Last sync: {sys.lastSync}</span>
-                )}
-                <span className={`status-dot ${sys.status === 'connected' ? 'active' : ''}`} />
-                <button className="px-3 py-1.5 rounded-lg text-xs font-semibold"
-                  style={{
-                    background: sys.status === 'connected' ? 'transparent' : 'var(--blue)',
-                    color: sys.status === 'connected' ? 'var(--text3)' : '#fff',
-                    border: sys.status === 'connected' ? '1px solid var(--border)' : 'none',
-                  }}>
-                  {sys.status === 'connected' ? 'Configure' : 'Connect'}
-                </button>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg4)' }}>
+                <div className="h-full rounded-full transition-all" style={{
+                  width: `${Math.min((item.used / item.limit) * 100, 100)}%`,
+                  background: (item.used / item.limit) > 0.8 ? 'var(--orange)' : 'var(--blue)',
+                }} />
               </div>
             </div>
           ))}
         </div>
-      )}
+      </SectionCard>
 
-      {/* Billing */}
-      {tab === 'billing' && (
-        <div className="space-y-6">
-          <div className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
+      <SectionCard title="Payment Method">
+        <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+          <div className="flex items-center gap-3">
+            <span className="text-lg">💳</span>
+            <div>
+              <div className="text-sm" style={{ color: 'var(--text)' }}>•••• •••• •••• 4242</div>
+              <div className="text-xs" style={{ color: 'var(--text4)' }}>Expires 12/2028</div>
+            </div>
+          </div>
+          <button className="text-xs px-3 py-1 rounded-lg" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+            Update
+          </button>
+        </div>
+        <p className="text-xs mt-2" style={{ color: 'var(--text4)' }}>
+          Payments processed securely via Stripe. Invoices available in your billing portal.
+        </p>
+      </SectionCard>
+    </>
+  )
+}
+
+function DangerZone() {
+  return (
+    <>
+      <div className="p-1 rounded-xl" style={{ border: '1px solid var(--red)40' }}>
+        <SectionCard title="⚠️ Danger Zone" description="These actions are irreversible. Proceed with caution.">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
               <div>
-                <h2 className="text-sm font-bold" style={{ color: 'var(--text)' }}>Current Plan</h2>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-2xl font-extrabold" style={{ color: 'var(--gold)' }}>Enterprise</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,166,35,0.2)', color: 'var(--gold)' }}>ACTIVE</span>
-                </div>
+                <div className="text-sm" style={{ color: 'var(--text)' }}>Reset All Agent Memory</div>
+                <div className="text-xs" style={{ color: 'var(--text4)' }}>Wipe all stored knowledge and conversation history for all agents</div>
               </div>
-              <button className="px-4 py-2 rounded-lg text-xs font-semibold" style={{ border: '1px solid var(--border)', color: 'var(--text3)' }}>
-                Manage Plan
+              <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                style={{ background: 'var(--red)15', color: 'var(--red)' }}>
+                Reset Memory
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-4 mt-4">
-              {[
-                { label: 'Departments', value: '7', max: 'Unlimited' },
-                { label: 'Agents', value: '3', max: 'Unlimited' },
-                { label: 'Bots', value: '10', max: 'Unlimited' },
-                { label: 'Users', value: '12', max: '50' },
-              ].map((stat) => (
-                <div key={stat.label} className="p-3 rounded-lg" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
-                  <div className="text-xs" style={{ color: 'var(--text4)' }}>{stat.label}</div>
-                  <div className="text-xl font-bold mt-1" style={{ color: 'var(--text)' }}>{stat.value}</div>
-                  <div className="text-[10px]" style={{ color: 'var(--text4)' }}>of {stat.max}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass-card p-6">
-            <h2 className="text-sm font-bold mb-4" style={{ color: 'var(--text)' }}>Usage This Month</h2>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: 'API Calls', value: '12,847', trend: '+18% from last month' },
-                { label: 'Storage', value: '4.3 GB', trend: '+0.2 GB this week' },
-                { label: 'Bot Runs', value: '1,024', trend: '~34/day average' },
-              ].map((u) => (
-                <div key={u.label} className="p-3 rounded-lg" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
-                  <div className="text-xs" style={{ color: 'var(--text4)' }}>{u.label}</div>
-                  <div className="text-xl font-bold mt-1" style={{ color: 'var(--blue)' }}>{u.value}</div>
-                  <div className="text-[10px] mt-1" style={{ color: 'var(--text4)' }}>{u.trend}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass-card p-6">
-            <h2 className="text-sm font-bold mb-2" style={{ color: 'var(--text)' }}>Payment Method</h2>
-            <p className="text-xs mb-4" style={{ color: 'var(--text3)' }}>Manage your billing through Stripe</p>
-            <button className="px-4 py-2 rounded-lg text-sm font-bold" style={{ background: 'var(--purple)', color: '#fff' }}>
-              Open Stripe Portal
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Notifications */}
-      {tab === 'notifications' && (
-        <div className="glass-card p-6 space-y-4">
-          <h2 className="text-sm font-bold" style={{ color: 'var(--text)' }}>Notification Preferences</h2>
-          {[
-            { label: 'Security alerts (prompt injection, access violations)', default: true, required: true },
-            { label: 'Exception requests requiring your approval', default: true, required: true },
-            { label: 'Ticket escalations', default: true, required: false },
-            { label: 'New suggestions from users', default: true, required: false },
-            { label: 'Bot errors and failures', default: true, required: false },
-            { label: 'Weekly usage summary', default: true, required: false },
-            { label: 'Workflow completion notifications', default: false, required: false },
-          ].map((pref) => (
-            <div key={pref.label} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-              <div className="flex items-center gap-2">
-                <span className="text-xs" style={{ color: 'var(--text2)' }}>{pref.label}</span>
-                {pref.required && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.2)', color: 'var(--orange)' }}>REQUIRED</span>
-                )}
+            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+              <div>
+                <div className="text-sm" style={{ color: 'var(--text)' }}>Delete All Workflows</div>
+                <div className="text-xs" style={{ color: 'var(--text4)' }}>Remove all workflows including active ones. This will stop all automations.</div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" defaultChecked={pref.default} disabled={pref.required} className="sr-only peer" />
-                <div className="w-9 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:rounded-full after:h-4 after:w-4 after:transition-all"
-                  style={{
-                    background: pref.default ? 'var(--blue)' : 'var(--bg4)',
-                    opacity: pref.required ? 0.6 : 1,
-                  }}>
-                  <div className="absolute top-[2px] left-[2px] w-4 h-4 rounded-full transition-transform"
-                    style={{ background: '#fff', transform: pref.default ? 'translateX(16px)' : 'none' }} />
-                </div>
-              </label>
+              <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                style={{ background: 'var(--red)15', color: 'var(--red)' }}>
+                Delete Workflows
+              </button>
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Help & Feedback */}
-      {tab === 'help' && (
-        <div className="space-y-4">
-          <div className="glass-card p-6">
-            <h2 className="text-sm font-bold mb-2" style={{ color: 'var(--text)' }}>💬 Send Feedback</h2>
-            <p className="text-xs mb-4" style={{ color: 'var(--text3)' }}>
-              Tell us what&apos;s working, what&apos;s not, or what you wish existed. Your feedback goes directly to the product team.
-            </p>
-            <textarea rows={4} placeholder="What's on your mind?"
-              className="w-full px-3 py-2.5 rounded-lg text-sm mb-3"
-              style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-            <button className="px-4 py-2 rounded-lg text-sm font-bold" style={{ background: 'var(--blue)', color: '#fff' }}>
-              Send Feedback
-            </button>
-          </div>
-
-          <div className="glass-card p-6">
-            <h2 className="text-sm font-bold mb-2" style={{ color: 'var(--text)' }}>📖 Help & Training</h2>
-            <div className="space-y-2">
-              {[
-                { label: 'Getting Started Guide', desc: 'Learn the basics in 2 minutes' },
-                { label: 'Setting Up Your Dashboard', desc: 'Customize widgets, tabs, and layouts' },
-                { label: 'Creating Agents & Bots', desc: 'Build your department AI team' },
-                { label: 'RKBAC Policies Explained', desc: 'Understand access control in plain language' },
-                { label: 'Workflow Builder', desc: 'Automate trigger → action chains' },
-                { label: 'Tips & Tricks', desc: 'Power user shortcuts and hidden features' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-colors hover:bg-white/5"
-                  style={{ border: '1px solid var(--border)' }}>
-                  <div>
-                    <div className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{item.label}</div>
-                    <div className="text-[10px]" style={{ color: 'var(--text4)' }}>{item.desc}</div>
-                  </div>
-                  <span style={{ color: 'var(--text4)' }}>→</span>
-                </div>
-              ))}
+            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+              <div>
+                <div className="text-sm" style={{ color: 'var(--text)' }}>Delete Organization</div>
+                <div className="text-xs" style={{ color: 'var(--text4)' }}>Permanently delete this organization and all its data. Cannot be undone.</div>
+              </div>
+              <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                style={{ background: 'var(--red)15', color: 'var(--red)' }}>
+                Delete Organization
+              </button>
             </div>
           </div>
-
-          <div className="glass-card p-6">
-            <h2 className="text-sm font-bold mb-2" style={{ color: 'var(--text)' }}>🏷️ Version</h2>
-            <p className="text-xs" style={{ color: 'var(--text3)' }}>
-              Milliebot Command Center v1.0.0 • Powered by RKBAC™ • © 2026 Ardexa
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
+        </SectionCard>
+      </div>
+    </>
   )
 }

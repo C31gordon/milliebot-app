@@ -12,6 +12,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 })
 
+// Service role client for server-side operations
+export const supabaseAdmin = createClient(
+  supabaseUrl,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey,
+  { auth: { persistSession: false } }
+)
+
 // Database types
 export type RoleTier = 'owner' | 'department_head' | 'manager' | 'specialist'
 export type AgentStatus = 'active' | 'paused' | 'configuring' | 'error'
@@ -52,7 +59,7 @@ export interface Role {
   department_id: string | null
 }
 
-export interface User {
+export interface AppUser {
   id: string
   auth_id: string
   tenant_id: string
@@ -109,7 +116,7 @@ export interface Ticket {
   category: string | null
   created_at: string
   updated_at: string
-  requester?: User
+  requester?: AppUser
   target_department?: Department
 }
 
@@ -132,4 +139,17 @@ export interface Notification {
   type: string
   is_read: boolean
   created_at: string
+}
+
+// Demo mode flag
+export const DEMO_MODE = true
+
+// Demo user for unauthenticated browsing
+export const DEMO_USER = {
+  id: 'demo-user',
+  email: 'cgordon@risere.com',
+  full_name: 'Courtney Gordon',
+  role: 'COO',
+  tier: 'owner' as RoleTier,
+  tenant: 'RISE Real Estate',
 }

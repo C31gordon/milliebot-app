@@ -2,204 +2,407 @@
 
 import { useState } from 'react'
 
-const departments = ['Operations', 'Marketing', 'HR', 'Finance', 'IT', 'Training', 'Maintenance']
+type PolicyTier = 'owner' | 'department_head' | 'manager' | 'specialist'
+type PolicyStatus = 'active' | 'draft' | 'disabled'
+type ExceptionStatus = 'active' | 'pending' | 'expired' | 'denied'
+type ExceptionDuration = 'one-time' | '30-days' | '60-days' | '90-days' | 'custom' | 'permanent'
 
-const accessMatrix: Record<string, Record<string, 'allow' | 'deny' | 'owner_only' | 'read_only'>> = {
-  Operations: { Operations: 'allow', Marketing: 'read_only', HR: 'deny', Finance: 'deny', IT: 'allow', Training: 'allow', Maintenance: 'allow' },
-  Marketing: { Operations: 'deny', Marketing: 'allow', HR: 'deny', Finance: 'deny', IT: 'allow', Training: 'read_only', Maintenance: 'deny' },
-  HR: { Operations: 'deny', Marketing: 'deny', HR: 'allow', Finance: 'owner_only', IT: 'allow', Training: 'read_only', Maintenance: 'deny' },
-  Finance: { Operations: 'deny', Marketing: 'deny', HR: 'owner_only', Finance: 'allow', IT: 'allow', Training: 'deny', Maintenance: 'deny' },
-  IT: { Operations: 'allow', Marketing: 'allow', HR: 'allow', Finance: 'allow', IT: 'allow', Training: 'allow', Maintenance: 'allow' },
-  Training: { Operations: 'read_only', Marketing: 'deny', HR: 'deny', Finance: 'deny', IT: 'allow', Training: 'allow', Maintenance: 'read_only' },
-  Maintenance: { Operations: 'read_only', Marketing: 'deny', HR: 'deny', Finance: 'deny', IT: 'allow', Training: 'read_only', Maintenance: 'allow' },
+interface Policy {
+  id: string
+  name: string
+  description: string
+  tier: PolicyTier
+  layer: 'immutable' | 'sandboxed'
+  status: PolicyStatus
+  department: string | 'All'
+  rules: string[]
+  createdBy: string
+  lastModified: string
+  exceptions: number
 }
 
-const cellConfig: Record<string, { label: string; bg: string; color: string }> = {
-  allow: { label: '✅', bg: 'rgba(16,185,129,0.15)', color: 'var(--green-light)' },
-  deny: { label: '❌', bg: 'rgba(239,68,68,0.1)', color: 'var(--red)' },
-  owner_only: { label: '🔒', bg: 'rgba(245,158,11,0.15)', color: 'var(--orange)' },
-  read_only: { label: '👁', bg: 'rgba(59,130,246,0.1)', color: 'var(--blue-light)' },
+interface ExceptionWaiver {
+  id: string
+  policyId: string
+  policyName: string
+  requestedBy: string
+  department: string
+  reason: string
+  duration: ExceptionDuration
+  expiresAt: string
+  status: ExceptionStatus
+  approvedBy: string | null
+  requestedAt: string
+  riskLevel: 'low' | 'medium' | 'high'
 }
 
-const policies = [
-  { name: 'HR PII Isolation', desc: 'Employee PII never leaves HR department', type: 'deny', locked: true, active: true },
-  { name: 'Finance Restricted', desc: 'Financial records require Owner approval for cross-dept access', type: 'owner_only', locked: true, active: true },
-  { name: 'Ops SOPs Readable', desc: 'Operations SOPs readable by all departments', type: 'allow', locked: true, active: true },
-  { name: 'Marketing No Ops Access', desc: 'Marketing assets do not flow to Operations', type: 'deny', locked: true, active: true },
+const policies: Policy[] = [
+  {
+    id: 'POL-001',
+    name: 'Financial Data Access',
+    description: 'Controls who can view and export financial reports, budgets, and revenue data',
+    tier: 'owner',
+    layer: 'immutable',
+    status: 'active',
+    department: 'All',
+    rules: [
+      'Only Owner and Finance department heads can access full financial data',
+      'Property managers see only their property financial summaries',
+      'No bulk export without Owner approval',
+      'AI agents must double-verify all financial figures before presenting',
+    ],
+    createdBy: 'Courtney Gordon',
+    lastModified: '2 days ago',
+    exceptions: 1,
+  },
+  {
+    id: 'POL-002',
+    name: 'Employee Records Privacy',
+    description: 'Protects access to personal employee information, compensation, and performance data',
+    tier: 'owner',
+    layer: 'immutable',
+    status: 'active',
+    department: 'All',
+    rules: [
+      'HR department head + Owner only for compensation data',
+      'Managers see direct reports performance summaries only',
+      'No cross-department employee data access',
+      'SSN and banking info: Owner-only with MFA verification',
+    ],
+    createdBy: 'Courtney Gordon',
+    lastModified: '1 week ago',
+    exceptions: 0,
+  },
+  {
+    id: 'POL-003',
+    name: 'Operations SOP Sharing',
+    description: 'Controls visibility of standard operating procedures across departments',
+    tier: 'department_head',
+    layer: 'sandboxed',
+    status: 'active',
+    department: 'Operations',
+    rules: [
+      'All Ops staff can view SOPs within their department',
+      'Cross-department access requires exception waiver',
+      'External sharing requires Owner approval',
+      'SOPs tagged "confidential" are department-head-only',
+    ],
+    createdBy: 'Courtney Gordon',
+    lastModified: '3 days ago',
+    exceptions: 2,
+  },
+  {
+    id: 'POL-004',
+    name: 'Training Content Distribution',
+    description: 'Rules for who can create, edit, and distribute training materials',
+    tier: 'department_head',
+    layer: 'sandboxed',
+    status: 'active',
+    department: 'Training',
+    rules: [
+      'Training department creates and manages all content',
+      'Department heads can request custom training modules',
+      'Managers can assign training to their teams',
+      'Completion data visible to direct manager + HR',
+    ],
+    createdBy: 'Mona Vogele',
+    lastModified: '5 days ago',
+    exceptions: 0,
+  },
+  {
+    id: 'POL-005',
+    name: 'Maintenance Work Order Visibility',
+    description: 'Controls access to work orders, vendor info, and maintenance budgets',
+    tier: 'manager',
+    layer: 'sandboxed',
+    status: 'active',
+    department: 'Maintenance',
+    rules: [
+      'Maintenance staff see work orders for assigned properties',
+      'Supervisors see all work orders in their region',
+      'Vendor contract details: department head + Finance only',
+      'Emergency work orders visible to all on-call staff',
+    ],
+    createdBy: 'Chris Jackson',
+    lastModified: '1 day ago',
+    exceptions: 1,
+  },
+  {
+    id: 'POL-006',
+    name: 'AI Agent Memory Boundaries',
+    description: 'Defines what information AI agents can store, recall, and share across departments',
+    tier: 'owner',
+    layer: 'immutable',
+    status: 'active',
+    department: 'All',
+    rules: [
+      'Agent memory flows UP freely (subordinate → manager → owner)',
+      'Memory flows DOWN only with explicit permission grant',
+      'No cross-department memory sharing without policy exception',
+      'PII must be redacted from agent long-term memory',
+      'Owner can audit any agent memory at any time',
+    ],
+    createdBy: 'Courtney Gordon',
+    lastModified: '2 days ago',
+    exceptions: 0,
+  },
 ]
 
-const exceptions = [
-  { policy: 'Marketing No Ops Access', grantedTo: 'Training Agent', reason: 'Needs marketing brand guide for onboarding materials', duration: '30 days', expires: 'Mar 27, 2026', status: 'approved' },
-  { policy: 'HR PII Isolation', grantedTo: 'Ops Agent', reason: 'Annual performance review aggregation', duration: 'One-time', expires: 'After use', status: 'pending' },
+const exceptions: ExceptionWaiver[] = [
+  {
+    id: 'EXC-001',
+    policyId: 'POL-001',
+    policyName: 'Financial Data Access',
+    requestedBy: 'Sarah Chen',
+    department: 'Marketing',
+    reason: 'Need revenue data for Q1 marketing ROI report to present at leadership meeting',
+    duration: '30-days',
+    expiresAt: 'Mar 25, 2026',
+    status: 'active',
+    approvedBy: 'Courtney Gordon',
+    requestedAt: 'Feb 23, 2026',
+    riskLevel: 'medium',
+  },
+  {
+    id: 'EXC-002',
+    policyId: 'POL-003',
+    policyName: 'Operations SOP Sharing',
+    requestedBy: 'Mona Vogele',
+    department: 'Training',
+    reason: 'Building new-hire training module that references move-in/move-out SOPs',
+    duration: '60-days',
+    expiresAt: 'Apr 24, 2026',
+    status: 'active',
+    approvedBy: 'Courtney Gordon',
+    requestedAt: 'Feb 22, 2026',
+    riskLevel: 'low',
+  },
+  {
+    id: 'EXC-003',
+    policyId: 'POL-003',
+    policyName: 'Operations SOP Sharing',
+    requestedBy: 'Brett Johnson',
+    department: 'HR',
+    reason: 'Need lease renewal process docs for HR compliance audit',
+    duration: 'one-time',
+    expiresAt: 'One-time access',
+    status: 'pending',
+    approvedBy: null,
+    requestedAt: 'Feb 25, 2026',
+    riskLevel: 'low',
+  },
+  {
+    id: 'EXC-004',
+    policyId: 'POL-005',
+    policyName: 'Maintenance Work Order Visibility',
+    requestedBy: 'David Park',
+    department: 'Finance',
+    reason: 'Vendor invoice reconciliation requires access to completed work orders',
+    duration: '90-days',
+    expiresAt: 'May 24, 2026',
+    status: 'active',
+    approvedBy: 'Courtney Gordon',
+    requestedAt: 'Feb 20, 2026',
+    riskLevel: 'medium',
+  },
 ]
 
-const categories = [
-  { name: 'Employee PII', sensitivity: 'restricted', desc: 'SSN, salary, disciplinary records' },
-  { name: 'Financial Records', sensitivity: 'restricted', desc: 'NOI, budgets, board reports, investor data' },
-  { name: 'Legal Documents', sensitivity: 'restricted', desc: 'Contracts, litigation, compliance' },
-  { name: 'Resident Data', sensitivity: 'confidential', desc: 'Lease details, payment history, screening' },
-  { name: 'Vendor Information', sensitivity: 'confidential', desc: 'Contracts, pricing, performance scores' },
-  { name: 'Operational SOPs', sensitivity: 'internal', desc: 'Standard procedures, checklists, training' },
-  { name: 'Marketing Assets', sensitivity: 'internal', desc: 'Brand guidelines, campaigns, collateral' },
-  { name: 'Property Data', sensitivity: 'internal', desc: 'Unit mix, amenities, physical attributes' },
-]
+const tierColors: Record<PolicyTier, string> = {
+  owner: 'var(--red)',
+  department_head: 'var(--orange)',
+  manager: 'var(--blue)',
+  specialist: 'var(--text4)',
+}
 
-const sensitivityColors: Record<string, { bg: string; color: string }> = {
-  restricted: { bg: 'rgba(239,68,68,0.15)', color: 'var(--red-light)' },
-  confidential: { bg: 'rgba(245,158,11,0.15)', color: 'var(--orange-light)' },
-  internal: { bg: 'rgba(59,130,246,0.15)', color: 'var(--blue-light)' },
-  public: { bg: 'rgba(16,185,129,0.15)', color: 'var(--green-light)' },
+const tierLabels: Record<PolicyTier, string> = {
+  owner: 'Owner',
+  department_head: 'Department Head',
+  manager: 'Manager',
+  specialist: 'Specialist',
+}
+
+const riskColors: Record<string, string> = {
+  low: 'var(--green)',
+  medium: 'var(--orange)',
+  high: 'var(--red)',
 }
 
 export default function PoliciesView() {
-  const [tab, setTab] = useState<'matrix' | 'policies' | 'exceptions' | 'categories'>('matrix')
+  const [tab, setTab] = useState<'policies' | 'exceptions'>('policies')
+  const [expandedPolicy, setExpandedPolicy] = useState<string | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
+
+  const pendingExceptions = exceptions.filter(e => e.status === 'pending').length
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>RKBAC™ Policies</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Access Policies</h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>
-            Roles & Knowledge-Based Access Control — manage boundaries, exceptions, and data categories
+            Manage who can see what — roles, knowledge boundaries, and exception waivers
           </p>
         </div>
-        <button className="px-4 py-2 rounded-lg text-sm font-bold"
-          style={{ background: 'var(--blue)', color: '#fff' }}>
+        <button
+          onClick={() => setShowCreate(!showCreate)}
+          className="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
+          style={{ background: 'var(--blue)', color: 'white' }}
+        >
           + New Policy
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--bg2)', border: '1px solid var(--border)' }}>
-        {([
-          { id: 'matrix' as const, label: 'Access Matrix' },
-          { id: 'policies' as const, label: 'Policies' },
-          { id: 'exceptions' as const, label: 'Exceptions' },
-          { id: 'categories' as const, label: 'Data Categories' },
-        ]).map((t) => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-            style={{
-              background: tab === t.id ? 'var(--blue)' : 'transparent',
-              color: tab === t.id ? '#fff' : 'var(--text3)',
-            }}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Access Matrix */}
-      {tab === 'matrix' && (
-        <div className="glass-card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold" style={{ color: 'var(--text)' }}>Cross-Department Access Matrix</h2>
-            <div className="flex items-center gap-4 text-[10px]" style={{ color: 'var(--text4)' }}>
-              <span>✅ Full Access</span>
-              <span>👁 Read Only</span>
-              <span>🔒 Owner Approval</span>
-              <span>❌ Denied</span>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-left px-3 py-2 text-[10px] font-bold" style={{ color: 'var(--text4)' }}>From ↓ / To →</th>
-                  {departments.map((d) => (
-                    <th key={d} className="px-3 py-2 text-[10px] font-bold text-center" style={{ color: 'var(--text4)' }}>{d}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {departments.map((from) => (
-                  <tr key={from} style={{ borderTop: '1px solid var(--border)' }}>
-                    <td className="px-3 py-2 text-xs font-semibold" style={{ color: 'var(--text2)' }}>{from}</td>
-                    {departments.map((to) => {
-                      const access = accessMatrix[from]?.[to] || 'deny'
-                      const config = cellConfig[access]
-                      return (
-                        <td key={to} className="px-3 py-2 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm cursor-pointer transition-all hover:scale-110"
-                            style={{ background: config.bg }}
-                            title={`${from} → ${to}: ${access}`}>
-                            {config.label}
-                          </span>
-                        </td>
-                      )
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      {/* RKBAC Overview Bar */}
+      <div className="glass-card p-4 rounded-xl">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text3)' }}>
+            RKBAC™ Permission Hierarchy
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--green)22', color: 'var(--green)' }}>
+            All Systems Normal
+          </span>
         </div>
-      )}
-
-      {/* Policies */}
-      {tab === 'policies' && (
-        <div className="space-y-3">
-          {policies.map((p, i) => (
-            <div key={i} className="glass-card p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-lg">{p.locked ? '🔒' : '🔓'}</span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>{p.name}</span>
-                    {p.locked && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.2)', color: 'var(--orange)' }}>
-                        OWNER-LOCKED
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text3)' }}>{p.desc}</p>
+        <div className="flex items-center gap-2">
+          {(['owner', 'department_head', 'manager', 'specialist'] as PolicyTier[]).map((tier, i) => (
+            <div key={tier} className="flex items-center gap-2">
+              <div className="px-3 py-2 rounded-lg text-center" style={{
+                background: `${tierColors[tier]}15`,
+                border: `1px solid ${tierColors[tier]}40`,
+                minWidth: '140px',
+              }}>
+                <div className="text-xs font-medium" style={{ color: tierColors[tier] }}>
+                  {tierLabels[tier]}
+                </div>
+                <div className="text-[10px] mt-0.5" style={{ color: 'var(--text4)' }}>
+                  {tier === 'owner' ? 'Full access • Immutable rules' :
+                   tier === 'department_head' ? 'Department scope • Sandboxed' :
+                   tier === 'manager' ? 'Team scope • Restricted' :
+                   'Task scope • Read-only default'}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-semibold px-2 py-1 rounded-full"
-                  style={{
-                    background: p.type === 'allow' ? 'rgba(16,185,129,0.15)' : p.type === 'deny' ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)',
-                    color: p.type === 'allow' ? 'var(--green-light)' : p.type === 'deny' ? 'var(--red-light)' : 'var(--orange-light)',
-                  }}>
-                  {p.type.toUpperCase()}
-                </span>
-                <span className={`status-dot ${p.active ? 'active' : ''}`} />
-              </div>
+              {i < 3 && <span style={{ color: 'var(--text4)' }}>→</span>}
             </div>
           ))}
         </div>
-      )}
+        <div className="flex items-center gap-4 mt-3 text-[10px]" style={{ color: 'var(--text4)' }}>
+          <span>🔒 Immutable: Only Owner can create/modify</span>
+          <span>📦 Sandboxed: Department heads can customize within Owner boundaries</span>
+          <span>↕️ Memory flows UP freely, DOWN with permission</span>
+        </div>
+      </div>
 
-      {/* Exceptions */}
-      {tab === 'exceptions' && (
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--bg2)' }}>
+        <button
+          onClick={() => setTab('policies')}
+          className="flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all"
+          style={{
+            background: tab === 'policies' ? 'var(--bg3)' : 'transparent',
+            color: tab === 'policies' ? 'var(--text)' : 'var(--text4)',
+          }}
+        >
+          Policies ({policies.length})
+        </button>
+        <button
+          onClick={() => setTab('exceptions')}
+          className="flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all relative"
+          style={{
+            background: tab === 'exceptions' ? 'var(--bg3)' : 'transparent',
+            color: tab === 'exceptions' ? 'var(--text)' : 'var(--text4)',
+          }}
+        >
+          Exception Waivers ({exceptions.length})
+          {pendingExceptions > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+              style={{ background: 'var(--orange)', color: 'white' }}>
+              {pendingExceptions}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Policies Tab */}
+      {tab === 'policies' && (
         <div className="space-y-3">
-          {exceptions.map((ex, i) => (
-            <div key={i} className="glass-card p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>Exception: {ex.policy}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                      style={{
-                        background: ex.status === 'approved' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
-                        color: ex.status === 'approved' ? 'var(--green-light)' : 'var(--orange-light)',
-                      }}>
-                      {ex.status.toUpperCase()}
-                    </span>
+          {policies.map(policy => (
+            <div key={policy.id} className="glass-card rounded-xl overflow-hidden">
+              <div
+                className="p-4 cursor-pointer hover:opacity-90 transition-all"
+                onClick={() => setExpandedPolicy(expandedPolicy === policy.id ? null : policy.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ background: `${tierColors[policy.tier]}15` }}>
+                      <span style={{ color: tierColors[policy.tier] }}>
+                        {policy.layer === 'immutable' ? '🔒' : '📦'}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold" style={{ color: 'var(--text)' }}>{policy.name}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                          style={{ background: `${tierColors[policy.tier]}22`, color: tierColors[policy.tier] }}>
+                          {tierLabels[policy.tier]}
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--bg3)', color: 'var(--text4)' }}>
+                          {policy.layer === 'immutable' ? '🔒 Immutable' : '📦 Sandboxed'}
+                        </span>
+                        {policy.department !== 'All' && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full"
+                            style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+                            {policy.department}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--text3)' }}>{policy.description}</p>
+                    </div>
                   </div>
-                  <p className="text-xs" style={{ color: 'var(--text3)' }}>Granted to: <strong>{ex.grantedTo}</strong></p>
-                  <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Reason: {ex.reason}</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs font-semibold" style={{ color: 'var(--text2)' }}>{ex.duration}</div>
-                  <div className="text-[10px] mt-1" style={{ color: ex.expires === 'After use' ? 'var(--text4)' : 'var(--orange)' }}>
-                    Expires: {ex.expires}
+                  <div className="flex items-center gap-4">
+                    {policy.exceptions > 0 && (
+                      <span className="text-xs px-2 py-1 rounded-full"
+                        style={{ background: 'var(--orange)15', color: 'var(--orange)' }}>
+                        {policy.exceptions} exception{policy.exceptions > 1 ? 's' : ''}
+                      </span>
+                    )}
+                    <span className="text-xs" style={{ color: 'var(--text4)' }}>
+                      Modified {policy.lastModified}
+                    </span>
+                    <span style={{ color: 'var(--text4)', transform: expandedPolicy === policy.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                      ▼
+                    </span>
                   </div>
                 </div>
               </div>
-              {ex.status === 'pending' && (
-                <div className="flex gap-2 mt-3">
-                  <button className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ background: 'var(--green)', color: '#000' }}>Approve</button>
-                  <button className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ background: 'var(--red)', color: '#fff' }}>Deny</button>
+
+              {expandedPolicy === policy.id && (
+                <div className="px-4 pb-4" style={{ borderTop: '1px solid var(--border)' }}>
+                  <div className="pt-3 space-y-2">
+                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text3)' }}>Rules</span>
+                    {policy.rules.map((rule, i) => (
+                      <div key={i} className="flex items-start gap-2 py-1.5 px-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+                        <span className="text-xs mt-0.5" style={{ color: tierColors[policy.tier] }}>•</span>
+                        <span className="text-sm" style={{ color: 'var(--text2)' }}>{rule}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    {policy.layer !== 'immutable' && (
+                      <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'var(--blue)22', color: 'var(--blue)' }}>
+                        ✏️ Edit Rules
+                      </button>
+                    )}
+                    <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+                      📜 View History
+                    </button>
+                    {policy.layer === 'immutable' && (
+                      <span className="px-3 py-1.5 rounded-lg text-xs" style={{ color: 'var(--text4)' }}>
+                        🔒 Only the Owner can modify immutable policies
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -207,32 +410,83 @@ export default function PoliciesView() {
         </div>
       )}
 
-      {/* Data Categories */}
-      {tab === 'categories' && (
-        <div className="glass-card overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Category', 'Sensitivity', 'Description'].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text4)' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((cat) => (
-                <tr key={cat.name} className="transition-colors hover:bg-white/5" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td className="px-4 py-3 text-sm font-semibold" style={{ color: 'var(--text)' }}>{cat.name}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-[10px] font-bold px-2 py-1 rounded-full"
-                      style={{ background: sensitivityColors[cat.sensitivity].bg, color: sensitivityColors[cat.sensitivity].color }}>
-                      {cat.sensitivity.toUpperCase()}
+      {/* Exceptions Tab */}
+      {tab === 'exceptions' && (
+        <div className="space-y-3">
+          {exceptions.map(exc => (
+            <div key={exc.id} className="glass-card p-4 rounded-xl" style={{
+              borderLeft: `3px solid ${exc.status === 'pending' ? 'var(--orange)' : exc.status === 'active' ? 'var(--green)' : 'var(--text4)'}`,
+            }}>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
+                      {exc.requestedBy}
                     </span>
-                  </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--text3)' }}>{cat.desc}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full"
+                      style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+                      {exc.department}
+                    </span>
+                    <span className="text-[10px]" style={{ color: 'var(--text4)' }}>→</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full"
+                      style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+                      {exc.policyName}
+                    </span>
+                  </div>
+                  <p className="text-sm mb-2" style={{ color: 'var(--text2)' }}>{exc.reason}</p>
+                  <div className="flex items-center gap-4 text-[10px]" style={{ color: 'var(--text4)' }}>
+                    <span>📅 Requested: {exc.requestedAt}</span>
+                    <span>⏱ Duration: {exc.duration}</span>
+                    <span>📆 Expires: {exc.expiresAt}</span>
+                    <span style={{ color: riskColors[exc.riskLevel] }}>
+                      ● Risk: {exc.riskLevel.charAt(0).toUpperCase() + exc.riskLevel.slice(1)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {exc.status === 'pending' ? (
+                    <>
+                      <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                        style={{ background: 'var(--green)22', color: 'var(--green)' }}>
+                        ✅ Approve
+                      </button>
+                      <button className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                        style={{ background: 'var(--red)15', color: 'var(--red)' }}>
+                        ❌ Deny
+                      </button>
+                    </>
+                  ) : (
+                    <span className="text-xs px-3 py-1.5 rounded-full"
+                      style={{
+                        background: exc.status === 'active' ? 'var(--green)22' : 'var(--text4)22',
+                        color: exc.status === 'active' ? 'var(--green)' : 'var(--text4)',
+                      }}>
+                      {exc.status === 'active' ? '✅ Approved' : exc.status === 'expired' ? '⏰ Expired' : '❌ Denied'}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {exc.approvedBy && (
+                <div className="text-[10px] mt-2" style={{ color: 'var(--text4)' }}>
+                  Approved by {exc.approvedBy}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Permanent Exception Warning */}
+          <div className="p-4 rounded-xl" style={{ background: 'var(--orange)08', border: '1px dashed var(--orange)40' }}>
+            <div className="flex items-start gap-2">
+              <span>⚠️</span>
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--orange)' }}>About Permanent Exceptions</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>
+                  Permanent (&quot;never expire&quot;) exceptions require Owner approval and trigger a confirmation warning.
+                  All other exceptions have mandatory expiration dates. Expired exceptions automatically revoke access.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

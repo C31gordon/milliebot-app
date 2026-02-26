@@ -1,5 +1,12 @@
+# dependencies
 node_modules/
 .next/
+
+# env
 .env.local
+.env*.local
+
+# misc
 verify-schema.js
-supabase-schema.sql
+*.tsbuildinfo
+next-env.d.ts
