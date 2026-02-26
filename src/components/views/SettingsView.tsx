@@ -344,38 +344,78 @@ function BrandingSettings() {
 }
 
 function BillingSettings() {
+  // In production, these would come from the tenant's actual data
+  const currentPlan: string = 'enterprise'
+  const planNames: Record<string, string> = { free: 'Starter', professional: 'Professional', enterprise: 'Enterprise' }
+  const planPrices: Record<string, string> = { free: 'Free', professional: '$49', enterprise: '$499' }
+  const planDesc: Record<string, string> = {
+    free: '2 agents • 1 bot • 100 queries/day • Community support',
+    professional: '10 agents • 5 bots • 1,000 queries/day • Email support • SSO',
+    enterprise: 'Unlimited agents • Custom domain • Priority support • RKBAC™',
+  }
+
+  const usageItems = [
+    { label: 'AI Agents', used: 4, limit: currentPlan === 'free' ? 2 : currentPlan === 'professional' ? 10 : 999, unit: 'agents' },
+    { label: 'Bots', used: 2, limit: currentPlan === 'free' ? 1 : currentPlan === 'professional' ? 5 : 999, unit: 'bots' },
+    { label: 'AI Queries Today', used: 247, limit: currentPlan === 'free' ? 100 : currentPlan === 'professional' ? 1000 : 99999, unit: 'queries' },
+    { label: 'Storage', used: 2.4, limit: 50, unit: 'GB' },
+  ]
+
+  const handleManageBilling = async () => {
+    try {
+      const res = await fetch('/api/stripe/create-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId: 'current' }),
+      })
+      const data = await res.json() as { url?: string; error?: string }
+      if (data.url) window.location.href = data.url
+    } catch { /* Stripe not configured */ }
+  }
+
   return (
     <>
       <SectionCard title="Current Plan">
         <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: 'var(--bg)', border: '1px solid var(--blue)40' }}>
           <div>
-            <div className="text-lg font-bold" style={{ color: 'var(--text)' }}>Enterprise</div>
-            <div className="text-xs" style={{ color: 'var(--text3)' }}>Unlimited agents • Custom domain • Priority support • RKBAC™</div>
+            <div className="text-lg font-bold" style={{ color: 'var(--text)' }}>{planNames[currentPlan]}</div>
+            <div className="text-xs" style={{ color: 'var(--text3)' }}>{planDesc[currentPlan]}</div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold" style={{ color: 'var(--blue)' }}>$499<span className="text-sm font-normal" style={{ color: 'var(--text4)' }}>/mo</span></div>
-            <div className="text-xs" style={{ color: 'var(--text4)' }}>Billed annually</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--blue)' }}>
+              {planPrices[currentPlan]}{currentPlan !== 'free' && <span className="text-sm font-normal" style={{ color: 'var(--text4)' }}>/mo</span>}
+            </div>
+            {currentPlan !== 'free' && <div className="text-xs" style={{ color: 'var(--text4)' }}>Billed annually</div>}
           </div>
+        </div>
+        <div className="flex gap-3 mt-4">
+          <a href="/pricing"
+            className="flex-1 py-2 rounded-lg font-medium text-sm text-center transition-all hover:scale-[1.02]"
+            style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))', color: '#fff' }}>
+            {currentPlan === 'enterprise' ? 'View Plans' : 'Upgrade Plan'}
+          </a>
+          <button onClick={handleManageBilling}
+            className="flex-1 py-2 rounded-lg font-medium text-sm transition-all"
+            style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
+            Manage Billing
+          </button>
         </div>
       </SectionCard>
 
-      <SectionCard title="Usage This Month" description="Feb 1 – Feb 25, 2026">
+      <SectionCard title="Usage This Period">
         <div className="space-y-3">
-          {[
-            { label: 'AI Queries', used: 2847, limit: 10000, unit: 'queries' },
-            { label: 'Agent Hours', used: 156, limit: 500, unit: 'hours' },
-            { label: 'Storage', used: 2.4, limit: 50, unit: 'GB' },
-            { label: 'Workflow Runs', used: 342, limit: 5000, unit: 'runs' },
-          ].map((item, i) => (
+          {usageItems.map((item, i) => (
             <div key={i}>
               <div className="flex justify-between text-xs mb-1">
                 <span className="whitespace-nowrap" style={{ color: 'var(--text2)' }}>{item.label}</span>
-                <span className="whitespace-nowrap" style={{ color: 'var(--text4)' }}>{item.used.toLocaleString()} / {item.limit.toLocaleString()} {item.unit}</span>
+                <span className="whitespace-nowrap" style={{ color: 'var(--text4)' }}>
+                  {item.used.toLocaleString()} / {item.limit >= 999 ? '∞' : item.limit.toLocaleString()} {item.unit}
+                </span>
               </div>
               <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg4)' }}>
                 <div className="h-full rounded-full transition-all" style={{
-                  width: `${Math.min((item.used / item.limit) * 100, 100)}%`,
-                  background: (item.used / item.limit) > 0.8 ? 'var(--orange)' : 'var(--blue)',
+                  width: `${item.limit >= 999 ? 5 : Math.min((item.used / item.limit) * 100, 100)}%`,
+                  background: item.limit < 999 && (item.used / item.limit) > 0.8 ? 'var(--orange)' : 'var(--blue)',
                 }} />
               </div>
             </div>
@@ -383,21 +423,29 @@ function BillingSettings() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Payment Method">
-        <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
-          <div className="flex items-center gap-3">
-            <span className="text-lg">💳</span>
-            <div>
-              <div className="text-sm" style={{ color: 'var(--text)' }}>•••• •••• •••• 4242</div>
-              <div className="text-xs" style={{ color: 'var(--text4)' }}>Expires 12/2028</div>
+      <SectionCard title="Invoice History">
+        <div className="space-y-2">
+          {[
+            { date: 'Feb 1, 2026', amount: '$499.00', status: 'Paid' },
+            { date: 'Jan 1, 2026', amount: '$499.00', status: 'Paid' },
+            { date: 'Dec 1, 2025', amount: '$499.00', status: 'Paid' },
+          ].map((inv, i) => (
+            <div key={i} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+              <div className="flex items-center gap-3">
+                <span className="text-sm">📄</span>
+                <div>
+                  <div className="text-sm" style={{ color: 'var(--text)' }}>{inv.date}</div>
+                  <div className="text-xs" style={{ color: 'var(--text4)' }}>{inv.amount}</div>
+                </div>
+              </div>
+              <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--green)' }}>
+                {inv.status}
+              </span>
             </div>
-          </div>
-          <button className="text-xs px-3 py-1 rounded-lg" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
-            Update
-          </button>
+          ))}
         </div>
-        <p className="text-xs mt-2" style={{ color: 'var(--text4)' }}>
-          Payments processed securely via Stripe. Invoices available in your billing portal.
+        <p className="text-xs mt-3" style={{ color: 'var(--text4)' }}>
+          Payments processed securely via Stripe. Full invoice history available in the billing portal.
         </p>
       </SectionCard>
     </>

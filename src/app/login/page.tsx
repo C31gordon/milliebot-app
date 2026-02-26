@@ -158,6 +158,13 @@ export default function LoginPage() {
                   {loading ? 'Signing in...' : 'Sign In'}
                 </button>
               </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-xs" style={{ color: 'var(--text4)' }}>
+                  Don&apos;t have an account?{' '}
+                  <a href="/signup" className="font-semibold hover:underline" style={{ color: 'var(--blue)' }}>Sign up</a>
+                </p>
+              </div>
             </>
           ) : (
             <>
@@ -201,7 +208,7 @@ export default function LoginPage() {
           <p className="text-xs" style={{ color: 'var(--text4)' }}>
             Powered by <strong>RKBAC™</strong> — Roles & Knowledge-Based Access Control
           </p>
-          <p className="text-xs mt-1" style={{ color: 'var(--text4)' }}>© 2026 Ardexa. All rights reserved.</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text4)' }}>© 2026 Milliebot Inc. All rights reserved.</p>
         </div>
       </div>
     </div>
