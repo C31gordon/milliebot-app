@@ -14,8 +14,10 @@ import WorkflowsView from '@/components/views/WorkflowsView'
 import PoliciesView from '@/components/views/PoliciesView'
 import AuditView from '@/components/views/AuditView'
 import SettingsView from '@/components/views/SettingsView'
+import OnboardingView from '@/components/views/OnboardingView'
+import TrainingView from '@/components/views/TrainingView'
 
-type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings'
+type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training'
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -98,6 +100,8 @@ export default function Home() {
       case 'policies': return <PoliciesView />
       case 'audit': return <AuditView />
       case 'settings': return <SettingsView />
+      case 'onboarding': return <OnboardingView />
+      case 'training': return <TrainingView />
       default: return <DashboardView />
     }
   }

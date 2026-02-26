@@ -1,6 +1,6 @@
 'use client'
 
-type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings'
+type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training'
 
 interface SidebarProps {
   activeView: ViewType
@@ -16,6 +16,8 @@ const navItems: { id: ViewType; label: string; icon: string; section?: string }[
   { id: 'workflows', label: 'Workflows', icon: '⚡', section: 'Automation' },
   { id: 'tickets', label: 'Tickets', icon: '🎫', section: 'Operations' },
   { id: 'suggestions', label: 'Suggestions', icon: '💡', section: 'Operations' },
+  { id: 'onboarding', label: 'Onboarding', icon: '🎓', section: 'Operations' },
+  { id: 'training', label: 'Training', icon: '📚', section: 'Operations' },
   { id: 'policies', label: 'RKBAC Policies', icon: '🔒', section: 'Security' },
   { id: 'audit', label: 'Audit Log', icon: '📋', section: 'Security' },
   { id: 'settings', label: 'Settings', icon: '⚙️', section: 'System' },
