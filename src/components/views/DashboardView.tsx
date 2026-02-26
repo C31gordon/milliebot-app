@@ -54,7 +54,7 @@ export default function DashboardView() {
   }, [])
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6">
+    <div className="w-full mx-auto space-y-6">
       {/* Welcome Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap fade-in">
         <div className="min-w-0">

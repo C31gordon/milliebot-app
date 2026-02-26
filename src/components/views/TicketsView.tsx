@@ -35,7 +35,7 @@ export default function TicketsView() {
   const grouped = tickets.filter((t) => t.group === 'vpn-issues')
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6">
+    <div className="w-full mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Tickets</h1>

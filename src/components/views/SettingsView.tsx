@@ -24,7 +24,7 @@ export default function SettingsView() {
   ]
 
   return (
-    <div className="max-w-[1200px] mx-auto space-y-6">
+    <div className="w-full mx-auto space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Settings</h1>
