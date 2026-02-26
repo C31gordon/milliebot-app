@@ -72,10 +72,10 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
       {/* Search — taller input, multi-line friendly */}
       <form onSubmit={handleSearch} className="flex-1 min-w-0" style={{ maxWidth: '600px' }}>
         <div className="relative">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--text4)' }}>🔍</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--text4)' }}>🔍</span>
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Ask Millie anything... or search across your workspace"
-            className="w-full pl-10 pr-14 py-3 rounded-xl text-sm transition-all focus:ring-2 focus:ring-blue-500/30"
+            className="w-full pl-11 pr-14 py-3 rounded-xl text-sm transition-all focus:ring-2 focus:ring-blue-500/30"
             style={{
               background: 'var(--bg2)',
               border: '1px solid var(--border)',

@@ -250,7 +250,7 @@ export default function AgentsView() {
           <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🚀 Upcoming Deployments</h3>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>Departments pending agent deployment per 90-day rollout plan</p>
         </div>
-        <div className="grid grid-cols-4 divide-x" style={{ borderColor: 'var(--border)' }}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x" style={{ borderColor: 'var(--border)' }}>
           {pendingDepartments.map((dept, i) => (
             <div key={i} className="p-4 text-center">
               <span className="text-2xl">{dept.icon}</span>

@@ -56,8 +56,8 @@ export default function DashboardView() {
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
       {/* Welcome Header */}
-      <div className="flex items-center justify-between fade-in">
-        <div>
+      <div className="flex items-center justify-between gap-4 flex-wrap fade-in">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
             {getGreeting()}, Courtney
           </h1>
@@ -65,7 +65,7 @@ export default function DashboardView() {
             RISE Real Estate — Owner Dashboard • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {(['today', 'week', 'month'] as const).map(period => (
             <button key={period} onClick={() => setSelectedPeriod(period)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
@@ -80,7 +80,7 @@ export default function DashboardView() {
       </div>
 
       {/* Status Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statusCards.map((card, i) => (
           <div key={i} className="glass-card p-5 rounded-xl fade-in" style={{ animationDelay: `${i * 80}ms` }}>
             <div className="flex items-center justify-between mb-3">
@@ -98,9 +98,9 @@ export default function DashboardView() {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity */}
-        <div className="col-span-2 glass-card-static rounded-xl overflow-hidden">
+        <div className="lg:col-span-2 glass-card-static rounded-xl overflow-hidden">
           <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
             <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>Recent Activity</h3>
             <button className="text-xs" style={{ color: 'var(--blue)' }}>View All</button>
@@ -133,8 +133,8 @@ export default function DashboardView() {
                 borderLeft: `3px solid ${alert.level === 'critical' ? 'var(--red)' : alert.level === 'warning' ? 'var(--orange)' : 'var(--green)'}`,
               }}>
                 <div className="flex items-start gap-2">
-                  <span className="text-xs">{alert.icon}</span>
-                  <div className="flex-1">
+                  <span className="text-xs flex-shrink-0">{alert.icon}</span>
+                  <div className="flex-1 min-w-0">
                     <p className="text-xs leading-relaxed" style={{ color: 'var(--text2)' }}>{alert.text}</p>
                     <button className="text-[11px] font-medium mt-1" style={{ color: 'var(--blue)' }}>{alert.action} →</button>
                   </div>

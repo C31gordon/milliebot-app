@@ -195,7 +195,7 @@ export default function AuditView() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Events', value: stats.total, icon: '📊', color: 'var(--blue)' },
           { label: 'Critical', value: stats.critical, icon: '🔴', color: 'var(--red)' },

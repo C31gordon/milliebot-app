@@ -263,7 +263,7 @@ export default function PoliciesView() {
             All Systems Normal
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {(['owner', 'department_head', 'manager', 'specialist'] as PolicyTier[]).map((tier, i) => (
             <div key={tier} className="flex items-center gap-2">
               <div className="px-3 py-2 rounded-lg text-center" style={{
