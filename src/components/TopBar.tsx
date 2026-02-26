@@ -53,7 +53,7 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
   const unreadCount = notifications.filter(n => n.unread).length
 
   return (
-    <div className="sticky top-0 z-[60] flex items-center justify-between px-5 py-2.5 no-print gap-4"
+    <div className="sticky top-0 z-[60] flex items-center justify-between px-5 md:px-8 py-2.5 no-print gap-4"
       style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)', minHeight: '56px' }}>
 
       {/* Mobile hamburger */}

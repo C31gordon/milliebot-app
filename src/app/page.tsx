@@ -145,7 +145,7 @@ export default function Home() {
           isMobile={isMobile}
           onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
         />
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 p-4 md:px-8 md:py-6 overflow-y-auto overflow-x-hidden">
           {renderView()}
         </main>
       </div>
