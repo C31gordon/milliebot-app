@@ -45,7 +45,7 @@ ${body}
 <tr><td style="background-color:#f9fafb;padding:24px 40px;border-top:1px solid ${BRAND.borderColor};">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr><td style="text-align:center;color:${BRAND.footerText};font-size:12px;line-height:1.6;">
-&copy; 2026 Zynthr LLC | Jacksonville, FL | Powered by Zynthr. Run by Millie.<br/>
+&copy; 2026 Zynthr Inc. | Jacksonville, FL | Powered by Zynthr. Run by Millie.<br/>
 <a href="{{unsubscribe_url}}" style="color:${BRAND.footerText};text-decoration:underline;">Unsubscribe</a>
 </td></tr></table>
 </td></tr>
@@ -100,7 +100,7 @@ export function baaConfirmationEmail(params: {
 
   const body = `
 ${p(`Hey ${firstName},`)}
-${p(`This confirms that the Business Associate Agreement (BAA) between <strong>${orgName}</strong> and Zynthr LLC has been successfully signed.`)}
+${p(`This confirms that the Business Associate Agreement (BAA) between <strong>${orgName}</strong> and Zynthr Inc. has been successfully signed.`)}
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background:#f9fafb;border:1px solid ${BRAND.borderColor};border-radius:8px;width:100%;">
 <tr><td style="padding:16px 20px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
