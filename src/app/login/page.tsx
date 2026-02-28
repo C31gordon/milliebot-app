@@ -19,7 +19,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const [name, setName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [signupEmail, setSignupEmail] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -68,7 +69,8 @@ export default function LoginPage() {
     e.preventDefault()
     setErrors({})
     const errs: FormErrors = {}
-    if (!name.trim()) errs.name = 'Full name is required'
+    if (!firstName.trim()) errs.name = 'First name is required'
+    if (!lastName.trim()) errs.name = 'Last name is required'
     if (!signupEmail.trim()) errs.email = 'Email is required'
     else if (!validateEmail(signupEmail)) errs.email = 'Invalid email format'
     if (!signupPassword) errs.password = 'Password is required'
@@ -84,7 +86,7 @@ export default function LoginPage() {
       setLoading(false)
       return
     }
-    const userData = { name: name.trim(), email: signupEmail.trim(), orgName: orgName.trim(), createdAt: new Date().toISOString() }
+    const userData = { firstName: firstName.trim(), lastName: lastName.trim(), name: firstName.trim() + ' ' + lastName.trim(), email: signupEmail.trim(), orgName: orgName.trim(), createdAt: new Date().toISOString() }
     storedUsers.push({ ...userData, password: signupPassword })
     localStorage.setItem('milliebot_users', JSON.stringify(storedUsers))
     localStorage.setItem('milliebot_user', JSON.stringify(userData))
@@ -165,9 +167,18 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSignUp} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Full Name</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Smith"
-                  className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>First Name</label>
+                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Jane"
+                      className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Last Name</label>
+                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Smith"
+                      className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
+                  </div>
+                </div>
                 {errors.name && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.name}</p>}
               </div>
               <div>
