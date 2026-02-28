@@ -20,7 +20,9 @@ const navItems: { id: ViewType; label: string; icon: string; section?: string }[
   { id: 'training', label: 'Training', icon: '📚', section: 'Operations' },
   { id: 'policies', label: 'RKBAC Policies', icon: '🔒', section: 'Security' },
   { id: 'audit', label: 'Audit Log', icon: '📋', section: 'Security' },
-  { id: 'healthcare' | 'setup' | 'birthcenter', label: 'Healthcare', icon: '🏥', section: 'Industry' },
+  { id: 'setup', label: 'Setup Wizard', icon: '🚀', section: 'Industry' },
+  { id: 'healthcare', label: 'Healthcare', icon: '🏥', section: 'Industry' },
+  { id: 'birthcenter', label: 'Birth Center', icon: '🌿', section: 'Industry' },
   { id: 'settings', label: 'Settings', icon: '⚙️', section: 'System' },
 ]
 

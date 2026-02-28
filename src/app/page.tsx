@@ -105,7 +105,9 @@ export default function Home() {
       case 'settings': return <SettingsView />
       case 'onboarding': return <OnboardingView />
       case 'training': return <TrainingView />
-      case 'healthcare' | 'setup' | 'birthcenter': return <HealthcareView />
+      case 'healthcare': return <HealthcareView />
+      case 'setup': return <SetupWizardView />
+      case 'birthcenter': return <BirthCenterView />
       default: return <DashboardView />
     }
   }
