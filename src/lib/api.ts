@@ -1,10 +1,12 @@
 // API layer — fetches from Supabase with fallback to demo data
 import { supabase } from './supabase'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any
 
 const TENANT_ID = 'a0000000-0000-0000-0000-000000000001'
 
 export async function fetchDepartments() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('departments')
     .select('*')
     .eq('tenant_id', TENANT_ID)
@@ -14,7 +16,7 @@ export async function fetchDepartments() {
 }
 
 export async function fetchRoles() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('roles')
     .select('*')
     .eq('tenant_id', TENANT_ID)
@@ -23,7 +25,7 @@ export async function fetchRoles() {
 }
 
 export async function fetchAgents() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('agents')
     .select('*, departments(name, icon)')
     .eq('tenant_id', TENANT_ID)
@@ -32,7 +34,7 @@ export async function fetchAgents() {
 }
 
 export async function fetchTickets() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('tickets')
     .select('*, departments!tickets_target_department_id_fkey(name)')
     .eq('tenant_id', TENANT_ID)
@@ -42,7 +44,7 @@ export async function fetchTickets() {
 }
 
 export async function fetchSuggestions() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('suggestions')
     .select('*')
     .eq('tenant_id', TENANT_ID)
@@ -52,7 +54,7 @@ export async function fetchSuggestions() {
 }
 
 export async function fetchAuditLog(limit = 50) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('audit_log')
     .select('*')
     .eq('tenant_id', TENANT_ID)
@@ -63,7 +65,7 @@ export async function fetchAuditLog(limit = 50) {
 }
 
 export async function fetchPolicies() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('rkbac_policies')
     .select('*')
     .eq('tenant_id', TENANT_ID)
@@ -72,7 +74,7 @@ export async function fetchPolicies() {
 }
 
 export async function fetchDataCategories() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('data_categories')
     .select('*')
     .eq('tenant_id', TENANT_ID)
@@ -88,7 +90,7 @@ export async function createTicket(ticket: {
   priority?: string
   category?: string
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('tickets')
     .insert({
       ...ticket,
@@ -108,7 +110,7 @@ export async function createSuggestion(suggestion: {
   title: string
   description: string
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('suggestions')
     .insert({
       ...suggestion,
@@ -124,7 +126,7 @@ export async function createSuggestion(suggestion: {
 }
 
 export async function logAudit(action: string, details: Record<string, unknown> = {}) {
-  return supabase.from('audit_log').insert({
+  return db.from('audit_log').insert({
     tenant_id: TENANT_ID,
     action,
     details,

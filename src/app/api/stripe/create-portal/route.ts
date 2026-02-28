@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any
+
 export async function POST(request: NextRequest) {
   try {
     const stripe = getStripe()
@@ -11,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     const { tenantId } = await request.json() as { tenantId: string }
 
-    const { data: tenant } = await supabaseAdmin
+    const { data: tenant } = await db
       .from('tenants')
       .select('stripe_customer_id')
       .eq('id', tenantId)

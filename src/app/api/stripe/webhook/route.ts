@@ -3,6 +3,9 @@ import { getStripe, determinePlanFromPrice } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 import Stripe from 'stripe'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any
+
 export async function POST(request: NextRequest) {
   const stripe = getStripe()
   if (!stripe) {
@@ -34,18 +37,15 @@ export async function POST(request: NextRequest) {
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
         const priceId = subscription.items.data[0]?.price.id
         const plan = determinePlanFromPrice(priceId)
-        await supabaseAdmin
+        await db
           .from('organizations')
-          .update({
-            stripe_subscription_id: session.subscription as string,
-            plan,
-          } as Record<string, unknown>)
+          .update({ stripe_subscription_id: session.subscription as string, plan })
           .eq('id', orgId)
       }
     } else if (eventType === 'customer.subscription.updated') {
       const subscription = event.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
-      const { data: org } = await supabaseAdmin
+      const { data: org } = await db
         .from('organizations')
         .select('id')
         .eq('stripe_customer_id', customerId)
@@ -53,22 +53,21 @@ export async function POST(request: NextRequest) {
       if (org) {
         const priceId = subscription.items.data[0]?.price.id
         const plan = determinePlanFromPrice(priceId)
-        await supabaseAdmin
+        await db
           .from('organizations')
-          .update({ plan, stripe_subscription_id: subscription.id } as Record<string, unknown>)
+          .update({ plan, stripe_subscription_id: subscription.id })
           .eq('id', org.id)
       }
     } else if (eventType === 'customer.subscription.deleted') {
       const subscription = event.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
-      await supabaseAdmin
+      await db
         .from('organizations')
-        .update({ plan: 'starter', stripe_subscription_id: null } as Record<string, unknown>)
+        .update({ plan: 'starter', stripe_subscription_id: null })
         .eq('stripe_customer_id', customerId)
     } else if (eventType === 'invoice.payment_failed') {
       const invoice = event.data.object as Stripe.Invoice
       console.log(`[Stripe] Payment failed for customer: ${invoice.customer}`)
-      // TODO: Send notification to org admin
     }
 
     return NextResponse.json({ received: true })

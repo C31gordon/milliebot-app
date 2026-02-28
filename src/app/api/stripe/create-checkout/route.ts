@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any
+
 export async function POST(request: NextRequest) {
   try {
     const stripe = getStripe()
@@ -20,8 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Check if tenant already has a Stripe customer
-    const { data: tenant } = await supabaseAdmin
+    const { data: tenant } = await db
       .from('tenants')
       .select('stripe_customer_id')
       .eq('id', tenantId)
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
         metadata: { tenantId, userId },
       })
       customerId = customer.id
-      await supabaseAdmin
+      await db
         .from('tenants')
         .update({ stripe_customer_id: customerId })
         .eq('id', tenantId)

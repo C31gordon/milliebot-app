@@ -355,5 +355,5 @@ export async function logAudit(entry: {
     console.log('[DEMO] Audit log:', entry.action, entry)
     return
   }
-  await supabaseAdmin.from('audit_log').insert(entry)
+  await (supabaseAdmin as any).from("audit_log").insert(entry)
 }

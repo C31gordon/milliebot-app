@@ -22,6 +22,9 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, '')
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as CreateTenantBody
@@ -33,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Generate unique slug
     let slug = slugify(companyName)
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await db
       .from('tenants')
       .select('id')
       .eq('slug', slug)
@@ -43,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Create tenant
-    const { data: tenant, error: tenantError } = await supabaseAdmin
+    const { data: tenant, error: tenantError } = await db
       .from('tenants')
       .insert({
         name: companyName,
@@ -62,13 +65,13 @@ export async function POST(request: NextRequest) {
     const tenantId = tenant.id
 
     // 2. Create departments
-    const deptInserts = departments.map((name, i) => ({
+    const deptInserts = departments.map((name: string, i: number) => ({
       tenant_id: tenantId,
       name,
       slug: slugify(name),
       sort_order: i,
     }))
-    const { data: createdDepts, error: deptError } = await supabaseAdmin
+    const { data: createdDepts, error: deptError } = await db
       .from('departments')
       .insert(deptInserts)
       .select()
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
       name: r.name,
       tier: r.tier,
     }))
-    const { data: createdRoles, error: roleError } = await supabaseAdmin
+    const { data: createdRoles, error: roleError } = await db
       .from('roles')
       .insert(roleInserts)
       .select()
@@ -99,9 +102,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Create default RKBAC policies
-    const ownerRole = createdRoles?.find(r => r.name === 'Owner')
+    const ownerRole = createdRoles?.find((r: { name: string }) => r.name === 'Owner')
     if (ownerRole) {
-      await supabaseAdmin.from('rkbac_policies').insert([
+      await db.from('rkbac_policies').insert([
         {
           tenant_id: tenantId,
           role_id: ownerRole.id,
@@ -114,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Assign user as Owner
-    const { error: userError } = await supabaseAdmin
+    const { error: userError } = await db
       .from('users')
       .update({
         tenant_id: tenantId,
@@ -129,8 +132,8 @@ export async function POST(request: NextRequest) {
 
     // 6. Create first agent if provided
     if (agent?.name && createdDepts?.length) {
-      const targetDept = createdDepts.find(d => d.name === agent.departmentName) || createdDepts[0]
-      await supabaseAdmin.from('agents').insert({
+      const targetDept = createdDepts.find((d: { name: string }) => d.name === agent.departmentName) || createdDepts[0]
+      await db.from('agents').insert({
         tenant_id: tenantId,
         department_id: targetDept.id,
         name: agent.name,
@@ -140,9 +143,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 7. Store invite emails (optional — for later processing)
+    // 7. Store invite emails (optional)
     if (inviteEmails?.length) {
-      // Could send invite emails here or store for later
       console.log(`Invite emails for tenant ${tenantId}:`, inviteEmails)
     }
 
