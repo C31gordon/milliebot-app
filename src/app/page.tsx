@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { supabase, DEMO_MODE } from '@/lib/supabase'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { DEMO_MODE } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import DashboardView from '@/components/views/DashboardView'
@@ -21,8 +20,17 @@ import SetupWizardView from '@/components/views/SetupWizardView'
 import BirthCenterView from '@/components/views/BirthCenterView'
 import PatientDashboardView from '@/components/views/PatientDashboardView'
 import OrgSetupWizardView from '@/components/views/OrgSetupWizardView'
+import WelcomeBanner from "@/components/WelcomeBanner"
+import GuidedTour from "@/components/GuidedTour"
 
 type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup' | 'birthcenter' | 'patientdash' | 'orgsetup'
+
+interface LocalUser {
+  name: string
+  email: string
+  orgName: string
+  createdAt: string
+}
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -36,12 +44,21 @@ function useIsMobile() {
 }
 
 export default function Home() {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [localUser, setLocalUser] = useState<LocalUser | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [activeView, setActiveView] = useState<ViewType>('dashboard')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [tourActive, setTourActive] = useState(false)
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    if (!loading) {
+      const completed = localStorage.getItem("milliebot_tour_completed") === "true"
+      if (!completed) setTourActive(true)
+    }
+  }, [loading])
 
   const handleNavigate = useCallback((view: ViewType) => {
     setActiveView(view)
@@ -50,31 +67,32 @@ export default function Home() {
 
   useEffect(() => {
     if (DEMO_MODE) {
+      // In demo mode, still check if user is authenticated for personalization
+      const auth = localStorage.getItem('milliebot_authenticated')
+      if (auth === 'true') {
+        try {
+          const userData = JSON.parse(localStorage.getItem('milliebot_user') || '{}')
+          if (userData.name) setLocalUser(userData)
+          setIsAuthenticated(true)
+        } catch { /* ignore */ }
+      }
       setLoading(false)
       return
     }
 
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = '/login'
-        return
-      }
-      setUser(user)
-      setLoading(false)
+    // Non-demo mode: require authentication
+    const auth = localStorage.getItem('milliebot_authenticated')
+    if (auth !== 'true') {
+      window.location.href = '/login'
+      return
     }
 
-    getUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        window.location.href = '/login'
-      } else {
-        setUser(session.user)
-      }
-    })
-
-    return () => subscription.unsubscribe()
+    try {
+      const userData = JSON.parse(localStorage.getItem('milliebot_user') || '{}')
+      if (userData.name) setLocalUser(userData)
+      setIsAuthenticated(true)
+    } catch { /* ignore */ }
+    setLoading(false)
   }, [])
 
   if (loading) {
@@ -96,7 +114,7 @@ export default function Home() {
 
   const renderView = () => {
     switch (activeView) {
-      case 'dashboard': return <DashboardView />
+      case 'dashboard': return <><WelcomeBanner onNavigate={(v) => handleNavigate(v as ViewType)} /><DashboardView userName={localUser?.name} /></>
       case 'agents': return <AgentsView />
       case 'chat': return <ChatView />
       case 'tickets': return <TicketsView />
@@ -112,7 +130,7 @@ export default function Home() {
       case 'birthcenter': return <BirthCenterView />
       case 'patientdash': return <PatientDashboardView />
       case 'orgsetup': return <OrgSetupWizardView />
-      default: return <DashboardView />
+      default: return <DashboardView userName={localUser?.name} />
     }
   }
 
@@ -120,50 +138,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--bg)' }}>
-      {/* Mobile overlay backdrop */}
       {isMobile && mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-[55] bg-black/60 transition-opacity"
-          onClick={() => setMobileMenuOpen(false)}
-        />
+        <div className="fixed inset-0 z-[55] bg-black/60 transition-opacity" onClick={() => setMobileMenuOpen(false)} />
       )}
-
-      {/* Sidebar — fixed on desktop, slide-over on mobile */}
-      <div
-        className="transition-transform duration-300"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          height: '100vh',
-          zIndex: 60,
-          transform: isMobile && !mobileMenuOpen ? 'translateX(-100%)' : 'translateX(0)',
-        }}
-      >
-        <Sidebar
-          activeView={activeView}
-          onNavigate={handleNavigate}
-          collapsed={isMobile ? false : sidebarCollapsed}
-          onToggle={() => isMobile ? setMobileMenuOpen(false) : setSidebarCollapsed(!sidebarCollapsed)}
-        />
+      <div className="transition-transform duration-300"
+        style={{ position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 60, transform: isMobile && !mobileMenuOpen ? 'translateX(-100%)' : 'translateX(0)' }}>
+        <Sidebar activeView={activeView} onNavigate={handleNavigate} collapsed={isMobile ? false : sidebarCollapsed}
+          onToggle={() => isMobile ? setMobileMenuOpen(false) : setSidebarCollapsed(!sidebarCollapsed)} />
       </div>
-
-      {/* Main content */}
-      <div
-        className="flex-1 flex flex-col min-h-screen transition-all duration-300"
-        style={{ marginLeft: isMobile ? 0 : sidebarWidth }}
-      >
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300" style={{ marginLeft: isMobile ? 0 : sidebarWidth }}>
         <TopBar
-          user={user}
-          onNavigate={handleNavigate}
-          isMobile={isMobile}
-          onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
-        />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden" style={{ padding: '24px' }}>
-          <div className="max-w-full">
-            {renderView()}
-          </div>
+          onTourStart={() => setTourActive(true)} user={null} localUser={localUser} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} isMobile={isMobile} onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+        <main data-tour="dashboard" className="flex-1 overflow-y-auto overflow-x-hidden" style={{ padding: '24px' }}>
+          <div className="max-w-full">{renderView()}</div>
         </main>
+        <GuidedTour active={tourActive} onComplete={() => setTourActive(false)} onNavigate={(v) => handleNavigate(v as ViewType)} />
       </div>
     </div>
   )

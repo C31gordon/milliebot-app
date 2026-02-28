@@ -1,19 +1,29 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { supabase, DEMO_MODE, DEMO_USER } from '@/lib/supabase'
+import { DEMO_MODE, DEMO_USER } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
 
 type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings'
 
+interface LocalUser {
+  name: string
+  email: string
+  orgName: string
+  createdAt: string
+}
+
 interface TopBarProps {
   user: User | null
+  localUser?: LocalUser | null
+  isAuthenticated?: boolean
   onNavigate: (view: ViewType) => void
   isMobile?: boolean
   onMenuToggle?: () => void
+  onTourStart?: () => void
 }
 
-export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: TopBarProps) {
+export default function TopBar({ user, localUser, isAuthenticated, onNavigate, isMobile, onMenuToggle, onTourStart }: TopBarProps) {
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -48,7 +58,6 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current
     if (el) {
@@ -57,9 +66,9 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
     }
   }, [searchQuery])
 
-  const handleLogout = async () => {
-    if (DEMO_MODE) { window.location.href = '/login'; return }
-    await supabase.auth.signOut()
+  const handleLogout = () => {
+    localStorage.removeItem('milliebot_authenticated')
+    localStorage.removeItem('milliebot_user')
     window.location.href = '/login'
   }
 
@@ -75,7 +84,12 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
     }
   }
 
-  const displayEmail = DEMO_MODE ? DEMO_USER.email : user?.email
+  // Determine display name and email
+  const displayName = localUser?.name || (DEMO_MODE ? DEMO_USER.full_name : user?.email?.split('@')[0] || 'User')
+  const displayEmail = localUser?.email || (DEMO_MODE ? DEMO_USER.email : user?.email)
+  const displayOrg = localUser?.orgName || (DEMO_MODE ? DEMO_USER.tenant : '')
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  const displayRole = DEMO_MODE && !isAuthenticated ? DEMO_USER.role : (localUser ? 'Member' : '')
 
   const notifications = [
     { icon: '🛡️', text: 'Prompt injection attempt blocked from jsmith@risere.com', time: '2 min ago', unread: true },
@@ -89,76 +103,54 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
 
   return (
     <div className="sticky top-0 z-[60] flex items-center justify-between no-print gap-4"
-      style={{
-        background: 'var(--bg)',
-        borderBottom: '1px solid var(--border)',
-        padding: '10px 24px',
-        minHeight: '56px',
-      }}>
+      style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)', padding: '10px 24px', minHeight: '56px' }}>
 
-      {/* Mobile hamburger */}
       {isMobile && (
-        <button
-          onClick={onMenuToggle}
+        <button onClick={onMenuToggle}
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors hover:bg-white/5"
-          style={{ color: 'var(--text)' }}
-        >
+          style={{ color: 'var(--text)' }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
       )}
 
-      {/* Search — expandable textarea */}
       <form onSubmit={handleSearch} className="flex-1 min-w-0" style={{ maxWidth: '640px' }}>
         <div className="relative">
           <span className="absolute left-4 top-3 text-sm pointer-events-none" style={{ color: 'var(--text4)' }}>🔍</span>
-          <textarea
-            ref={textareaRef}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask Millie anything... or search across your workspace"
-            rows={1}
+          <textarea ref={textareaRef} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={handleKeyDown}
+            placeholder="Ask Millie anything... or search across your workspace" rows={1}
             className="w-full rounded-xl text-sm transition-all focus:ring-2 focus:ring-blue-500/30 resize-none"
-            style={{
-              background: 'var(--bg2)',
-              border: '1px solid var(--border)',
-              color: 'var(--text)',
-              fontSize: '13px',
-              lineHeight: '1.5',
-              padding: '10px 52px 10px 44px',
-              minHeight: '40px',
-              maxHeight: '80px',
-              overflow: 'hidden',
-            }}
-          />
+            style={{ background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: '13px', lineHeight: '1.5', padding: '10px 52px 10px 44px', minHeight: '40px', maxHeight: '80px', overflow: 'hidden' }} />
           <span className="absolute right-4 top-3 text-[10px] px-1.5 py-0.5 rounded pointer-events-none"
             style={{ background: 'var(--bg3)', color: 'var(--text4)' }}>⌘K</span>
         </div>
       </form>
 
-      {/* Right actions */}
       <div className="flex items-center gap-3 flex-shrink-0">
-        {/* Theme toggle */}
+
+        {/* Take a Tour */}
         <button
-          onClick={toggleTheme}
+          onClick={onTourStart}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:bg-white/5"
-          style={{ color: 'var(--text3)', fontSize: '18px' }}
-          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          style={{ color: "var(--text3)", fontSize: "16px" }}
+          title="Take a Tour"
         >
+          ❓
+        </button>
+        <button onClick={toggleTheme}
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:bg-white/5"
+          style={{ color: 'var(--text3)', fontSize: '18px' }} title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
           {isDark ? '☀️' : '🌙'}
         </button>
 
-        {/* Demo badge */}
-        {DEMO_MODE && (
+        {DEMO_MODE && !isAuthenticated && (
           <span className="text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap"
             style={{ background: 'rgba(245,158,11,0.13)', color: 'var(--orange)', border: '1px solid rgba(245,158,11,0.25)' }}>
             DEMO MODE
           </span>
         )}
 
-        {/* Notifications */}
         <div className="relative" ref={notifRef}>
           <button onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false) }}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors hover:bg-white/5 relative"
@@ -193,36 +185,32 @@ export default function TopBar({ user, onNavigate, isMobile, onMenuToggle }: Top
                   </div>
                 ))}
               </div>
-              <div className="px-4 py-2.5 text-center border-t cursor-pointer transition-colors hover:bg-white/5"
-                style={{ borderColor: 'var(--border)' }}>
+              <div className="px-4 py-2.5 text-center border-t cursor-pointer transition-colors hover:bg-white/5" style={{ borderColor: 'var(--border)' }}>
                 <span className="text-xs font-medium" style={{ color: 'var(--blue)' }}>View all notifications</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Profile */}
         <div className="relative" ref={profileRef}>
           <button onClick={() => { setShowProfile(!showProfile); setShowNotifications(false) }}
             className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all hover:ring-2 hover:ring-blue-500/30 flex-shrink-0"
             style={{ background: 'linear-gradient(135deg, var(--green), var(--teal))', color: '#000' }}>
-            CG
+            {initials}
           </button>
           {showProfile && (
             <div className="absolute right-0 top-14 rounded-xl overflow-hidden"
-              style={{
-                background: 'var(--bg2)',
-                border: '1px solid var(--border)',
-                boxShadow: 'var(--shadow-lg)',
-                width: '260px',
-              }}>
+              style={{ background: 'var(--bg2)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)', width: '260px' }}>
               <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-                <div className="text-sm font-bold" style={{ color: 'var(--text)' }}>Courtney Gordon</div>
+                <div className="text-sm font-bold" style={{ color: 'var(--text)' }}>{displayName}</div>
                 <div className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>{displayEmail}</div>
-                <div className="mt-2">
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
-                    style={{ background: 'rgba(245,166,35,0.2)', color: 'var(--gold)' }}>OWNER</span>
-                </div>
+                {displayOrg && <div className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>{displayOrg}</div>}
+                {displayRole && (
+                  <div className="mt-2">
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
+                      style={{ background: 'rgba(245,166,35,0.2)', color: 'var(--gold)' }}>{displayRole.toUpperCase()}</span>
+                  </div>
+                )}
               </div>
               <div className="py-2">
                 <button onClick={() => { onNavigate('settings'); setShowProfile(false) }}
