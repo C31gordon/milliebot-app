@@ -1,6 +1,6 @@
 'use client'
 
-type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup' | 'birthcenter'
+type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup' | 'birthcenter' | 'patientdash'
 
 interface SidebarProps {
   activeView: ViewType
@@ -23,6 +23,7 @@ const navItems: { id: ViewType; label: string; icon: string; section?: string }[
   { id: 'setup', label: 'Setup Wizard', icon: '🚀', section: 'Industry' },
   { id: 'healthcare', label: 'Healthcare', icon: '🏥', section: 'Industry' },
   { id: 'birthcenter', label: 'Birth Center', icon: '🌿', section: 'Industry' },
+  { id: 'patientdash', label: 'Patient View', icon: '👩‍⚕️', section: 'Industry' },
   { id: 'settings', label: 'Settings', icon: '⚙️', section: 'System' },
 ]
 
