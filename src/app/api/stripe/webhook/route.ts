@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getStripe } from '@/lib/stripe'
+import { getStripe, determinePlanFromPrice } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 import Stripe from 'stripe'
 
@@ -25,75 +25,56 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session
-        const tenantId = session.metadata?.tenantId
-        if (tenantId && session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-          const priceId = subscription.items.data[0]?.price.id
-          // Determine plan from price ID
-          const plan = determinePlanFromPrice(priceId)
-          await supabaseAdmin
-            .from('tenants')
-            .update({
-              stripe_subscription_id: session.subscription as string,
-              plan,
-            })
-            .eq('id', tenantId)
-        }
-        break
-      }
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
-        const customerId = subscription.customer as string
-        const { data: tenant } = await supabaseAdmin
-          .from('tenants')
-          .select('id')
-          .eq('stripe_customer_id', customerId)
-          .single()
-        if (tenant) {
-          const priceId = subscription.items.data[0]?.price.id
-          const plan = determinePlanFromPrice(priceId)
-          await supabaseAdmin
-            .from('tenants')
-            .update({ plan, stripe_subscription_id: subscription.id })
-            .eq('id', tenant.id)
-        }
-        break
-      }
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription
-        const customerId = subscription.customer as string
+    const eventType = event.type
+
+    if (eventType === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session
+      const orgId = session.metadata?.orgId || session.metadata?.tenantId
+      if (orgId && session.subscription) {
+        const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+        const priceId = subscription.items.data[0]?.price.id
+        const plan = determinePlanFromPrice(priceId)
         await supabaseAdmin
-          .from('tenants')
-          .update({ plan: 'free', stripe_subscription_id: null })
-          .eq('stripe_customer_id', customerId)
-        break
+          .from('organizations')
+          .update({
+            stripe_subscription_id: session.subscription as string,
+            plan,
+          } as Record<string, unknown>)
+          .eq('id', orgId)
       }
-      case 'invoice.payment_failed': {
-        // Could add notification logic here
-        break
+    } else if (eventType === 'customer.subscription.updated') {
+      const subscription = event.data.object as Stripe.Subscription
+      const customerId = subscription.customer as string
+      const { data: org } = await supabaseAdmin
+        .from('organizations')
+        .select('id')
+        .eq('stripe_customer_id', customerId)
+        .single()
+      if (org) {
+        const priceId = subscription.items.data[0]?.price.id
+        const plan = determinePlanFromPrice(priceId)
+        await supabaseAdmin
+          .from('organizations')
+          .update({ plan, stripe_subscription_id: subscription.id } as Record<string, unknown>)
+          .eq('id', org.id)
       }
+    } else if (eventType === 'customer.subscription.deleted') {
+      const subscription = event.data.object as Stripe.Subscription
+      const customerId = subscription.customer as string
+      await supabaseAdmin
+        .from('organizations')
+        .update({ plan: 'starter', stripe_subscription_id: null } as Record<string, unknown>)
+        .eq('stripe_customer_id', customerId)
+    } else if (eventType === 'invoice.payment_failed') {
+      const invoice = event.data.object as Stripe.Invoice
+      console.log(`[Stripe] Payment failed for customer: ${invoice.customer}`)
+      // TODO: Send notification to org admin
     }
 
     return NextResponse.json({ received: true })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Webhook handler error'
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Webhook handler error'
+    console.error('[Stripe Webhook Error]', message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
-}
-
-function determinePlanFromPrice(priceId: string): string {
-  const proPrices = [
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY,
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_ANNUAL,
-  ]
-  const entPrices = [
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_ENT_MONTHLY,
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_ENT_ANNUAL,
-  ]
-  if (proPrices.includes(priceId)) return 'professional'
-  if (entPrices.includes(priceId)) return 'enterprise'
-  return 'free'
 }

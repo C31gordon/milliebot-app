@@ -79,6 +79,9 @@ export default function LoginPage() {
     }
     localStorage.setItem('zynthr_user', JSON.stringify(userData))
     localStorage.setItem('zynthr_authenticated', 'true')
+    // Send welcome email on sign-up
+    fetch('/api/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ template: 'welcome', to: signupEmail.trim(), data: { firstName: firstName.trim(), subdomain: subdomain.trim() } }) }).catch(console.error)
+    // TODO: scheduleOnboardingSequence(user) when cron/queue is wired
     setTimeout(() => { window.location.href = '/' }, 400)
   }
 
@@ -110,6 +113,9 @@ export default function LoginPage() {
     localStorage.setItem('zynthr_users', JSON.stringify(storedUsers))
     localStorage.setItem('zynthr_user', JSON.stringify(userData))
     localStorage.setItem('zynthr_authenticated', 'true')
+    // Send welcome email on sign-up
+    fetch('/api/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ template: 'welcome', to: signupEmail.trim(), data: { firstName: firstName.trim(), subdomain: subdomain.trim() } }) }).catch(console.error)
+    // TODO: scheduleOnboardingSequence(user) when cron/queue is wired
     setTimeout(() => { window.location.href = '/' }, 400)
   }
 

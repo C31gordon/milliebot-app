@@ -275,6 +275,9 @@ export default function OrgSetupWizardView() {
       stored.baaSignerTitle = baaSignerTitle.trim()
       localStorage.setItem('zynthr_user', JSON.stringify(stored))
       setBaaSigned(true)
+      // Send BAA confirmation email
+      const user = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+      if (user.email) { fetch('/api/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ template: 'baa_confirmation', to: user.email, data: { firstName: user.firstName || '', signerName: baaSignerName.trim(), signedDate: new Date().toLocaleDateString(), method: 'Digital Signature', orgName: user.orgName || '', subdomain: user.subdomain || 'app' } }) }).catch(console.error) }
     }
 
     const handleDocuSign = () => {
