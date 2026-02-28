@@ -17,8 +17,9 @@ import SettingsView from '@/components/views/SettingsView'
 import OnboardingView from '@/components/views/OnboardingView'
 import TrainingView from '@/components/views/TrainingView'
 import HealthcareView from '@/components/views/HealthcareView'
+import SetupWizardView from '@/components/views/SetupWizardView'
 
-type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare'
+type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup'
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -103,7 +104,7 @@ export default function Home() {
       case 'settings': return <SettingsView />
       case 'onboarding': return <OnboardingView />
       case 'training': return <TrainingView />
-      case 'healthcare': return <HealthcareView />
+      case 'healthcare' | 'setup': return <HealthcareView />
       default: return <DashboardView />
     }
   }
