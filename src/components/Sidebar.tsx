@@ -1,6 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { getTenantFromStorage } from '@/lib/tenant'
+
+function SubdomainBadge() {
+  const [subdomain, setSubdomain] = useState<string | null>(null)
+  useEffect(() => {
+    const tenant = getTenantFromStorage()
+    if (tenant) setSubdomain(tenant.subdomain)
+  }, [])
+  if (!subdomain) return null
+  return (
+    <div className="text-[10px] truncate" style={{ color: 'var(--text4)', opacity: 0.7 }}>
+      {subdomain}.milliebot.ai
+    </div>
+  )
+}
 
 type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup' | 'birthcenter' | 'patientdash' | 'orgsetup'
 
@@ -112,6 +127,7 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, o
           <div className="flex-1 min-w-0">
             <div className="text-sm font-bold truncate" style={{ color: 'var(--text)', letterSpacing: '0.08em' }}>{(orgName || 'Milliebot')}</div>
             <div className="text-[11px] font-medium" style={{ color: 'var(--text4)' }}>Command Center</div>
+            <SubdomainBadge />
           </div>
         )}
         <button

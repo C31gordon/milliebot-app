@@ -24,6 +24,21 @@ import OrgSetupWizardView from '@/components/views/OrgSetupWizardView'
 import WelcomeBanner from "@/components/WelcomeBanner"
 import GuidedTour from "@/components/GuidedTour"
 import SessionTimeout from "@/components/SessionTimeout"
+import { getTenantFromStorage } from '@/lib/tenant'
+
+function WorkspaceBar() {
+  const [sub, setSub] = useState<string | null>(null)
+  useEffect(() => {
+    const t = getTenantFromStorage()
+    if (t) setSub(t.subdomain)
+  }, [])
+  if (!sub) return null
+  return (
+    <div style={{ background: 'rgba(85,156,181,0.08)', borderBottom: '1px solid var(--border)', padding: '6px 24px', fontSize: 12, color: 'var(--text4)' }}>
+      Your workspace: <strong style={{ color: 'var(--text3)' }}>{sub}.milliebot.ai</strong>
+    </div>
+  )
+}
 
 type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup' | 'birthcenter' | 'patientdash' | 'orgsetup'
 
@@ -151,6 +166,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col min-h-screen transition-all duration-300" style={{ marginLeft: isMobile ? 0 : sidebarWidth }}>
         <TopBar
           onTourStart={() => setTourActive(true)} user={null} localUser={localUser} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} isMobile={isMobile} onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+        <WorkspaceBar />
         <main data-tour="dashboard" className="flex-1 overflow-y-auto overflow-x-hidden" style={{ padding: '24px' }}>
           <div className="max-w-full">{renderView()}</div>
         </main>

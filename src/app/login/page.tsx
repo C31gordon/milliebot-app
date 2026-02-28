@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import SubdomainPicker from '@/components/SubdomainPicker'
 
 interface FormErrors {
   name?: string
@@ -26,6 +27,9 @@ export default function LoginPage() {
   const [signupPassword, setSignupPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [orgName, setOrgName] = useState('')
+  const [subdomain, setSubdomain] = useState('')
+  const [subdomainValid, setSubdomainValid] = useState(false)
+  const handleSubdomainValid = useCallback((v: boolean) => setSubdomainValid(v), [])
 
   useEffect(() => {
     if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("expired") === "1") {
@@ -84,6 +88,7 @@ export default function LoginPage() {
     else if (signupPassword.length < 6) errs.password = 'Password must be at least 6 characters'
     if (signupPassword !== confirmPassword) errs.confirmPassword = 'Passwords do not match'
     if (!orgName.trim()) errs.orgName = 'Organization name is required'
+    if (!subdomainValid) errs.general = 'Please choose a valid workspace URL'
     if (Object.keys(errs).length) { setErrors(errs); return }
 
     setLoading(true)
@@ -93,7 +98,7 @@ export default function LoginPage() {
       setLoading(false)
       return
     }
-    const userData = { firstName: firstName.trim(), lastName: lastName.trim(), name: firstName.trim() + ' ' + lastName.trim(), email: signupEmail.trim(), orgName: orgName.trim(), createdAt: new Date().toISOString() }
+    const userData = { firstName: firstName.trim(), lastName: lastName.trim(), name: firstName.trim() + ' ' + lastName.trim(), email: signupEmail.trim(), orgName: orgName.trim(), subdomain: subdomain.trim(), createdAt: new Date().toISOString() }
     storedUsers.push({ ...userData, password: signupPassword })
     localStorage.setItem('milliebot_users', JSON.stringify(storedUsers))
     localStorage.setItem('milliebot_user', JSON.stringify(userData))
@@ -218,6 +223,7 @@ export default function LoginPage() {
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
                 {errors.orgName && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.orgName}</p>}
               </div>
+              <SubdomainPicker value={subdomain} onChange={setSubdomain} onValidChange={handleSubdomainValid} />
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))', boxShadow: loading ? 'none' : 'var(--shadow-glow-blue)' }}>
