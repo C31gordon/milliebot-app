@@ -17,6 +17,7 @@ import OnboardingView from '@/components/views/OnboardingView'
 import TrainingView from '@/components/views/TrainingView'
 import HealthcareView from '@/components/views/HealthcareView'
 import SetupWizardView from '@/components/views/SetupWizardView'
+import FloatingChat from '@/components/FloatingChat'
 import BirthCenterView from '@/components/views/BirthCenterView'
 import PatientDashboardView from '@/components/views/PatientDashboardView'
 import OrgSetupWizardView from '@/components/views/OrgSetupWizardView'
@@ -154,6 +155,6 @@ export default function Home() {
         </main>
         <GuidedTour active={tourActive} onComplete={() => setTourActive(false)} onNavigate={(v) => handleNavigate(v as ViewType)} />
       </div>
-    </div>
+    <FloatingChat /></div>
   )
 }
