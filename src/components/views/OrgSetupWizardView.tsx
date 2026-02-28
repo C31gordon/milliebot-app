@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { BAA_CONTENT } from '@/lib/baa-content'
 
 /* ──────────────────────── Types ──────────────────────── */
 
@@ -99,7 +100,8 @@ const INTEGRATIONS_DATA: Integration[] = [
   { id: 'slack', name: 'Slack', icon: '💬', description: 'Team messaging and notifications', connected: false, connecting: false, recommended: ['property', 'healthcare', 'legal', 'finance', 'construction', 'education', 'hospitality', 'other'] },
 ]
 
-const STEP_LABELS = ['Organization', 'Departments', 'Permissions', 'Integrations', 'Team', 'Review & Launch']
+const STEP_LABELS_BASE = ['Organization', 'Departments', 'Permissions', 'Integrations', 'Team', 'Review & Launch']
+const STEP_LABELS_HEALTHCARE = ['Organization', 'BAA', 'Departments', 'Permissions', 'Integrations', 'Team', 'Review & Launch']
 
 let _idCounter = 100
 const uid = () => `id_${_idCounter++}`
@@ -111,6 +113,14 @@ export default function OrgSetupWizardView() {
   const [animDir, setAnimDir] = useState<'next' | 'prev'>('next')
   const [launched, setLaunched] = useState(false)
   const [launching, setLaunching] = useState(false)
+
+  // BAA state
+  const [baaSignMode, setBaaSignMode] = useState<'none' | 'digital' | 'docusign'>('none')
+  const [baaSignerName, setBaaSignerName] = useState('')
+  const [baaSignerTitle, setBaaSignerTitle] = useState('')
+  const [baaOrgName, setBaaOrgName] = useState('')
+  const [baaSigned, setBaaSigned] = useState(false)
+  const [baaDocuSignSent, setBaaDocuSignSent] = useState(false)
 
   const [org, setOrg] = useState<OrgInfo>({ name: '', industry: '', size: '', contactName: '', contactEmail: '' })
   const [departments, setDepartments] = useState<Department[]>([])
@@ -163,10 +173,12 @@ export default function OrgSetupWizardView() {
     borderRadius: 8, color: 'var(--text)', fontSize: 14, outline: 'none',
   }
 
+  const stepLabels = org.industry === 'healthcare' ? STEP_LABELS_HEALTHCARE : STEP_LABELS_BASE
+
   const renderProgressBar = () => (
     <div style={{ padding: '24px 32px 0', maxWidth: 800, margin: '0 auto', width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-        {STEP_LABELS.map((label, i) => (
+        {stepLabels.map((label, i) => (
           <div key={label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <div style={{
               width: '100%', height: 4, borderRadius: 2,
@@ -189,7 +201,7 @@ export default function OrgSetupWizardView() {
           ← Back
         </button>
       ) : <div />}
-      {step < 5 && (
+      {step < steps.length - 1 && (
         <button
           onClick={() => go('next')}
           disabled={nextDisabled}
@@ -250,6 +262,92 @@ export default function OrgSetupWizardView() {
       {navButtons(!org.name || !org.industry || !org.size)}
     </div>
   )
+
+
+  const renderBaaStep = () => {
+    const handleDigitalSign = () => {
+      if (!baaSignerName.trim() || !baaSignerTitle.trim()) return
+      const now = new Date().toISOString()
+      const stored = JSON.parse(localStorage.getItem('milliebot_user') || '{}')
+      stored.baaSignedDigitally = true
+      stored.baaSignedAt = now
+      stored.baaSignerName = baaSignerName.trim()
+      stored.baaSignerTitle = baaSignerTitle.trim()
+      localStorage.setItem('milliebot_user', JSON.stringify(stored))
+      setBaaSigned(true)
+    }
+
+    const handleDocuSign = () => {
+      const now = new Date().toISOString()
+      const stored = JSON.parse(localStorage.getItem('milliebot_user') || '{}')
+      stored.baaDocuSignRequested = true
+      stored.baaDocuSignRequestedAt = now
+      localStorage.setItem('milliebot_user', JSON.stringify(stored))
+      setBaaDocuSignSent(true)
+    }
+
+    return (
+      <div>
+        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: 'var(--text)' }}>📋 Business Associate Agreement (BAA)</h2>
+        <p style={{ color: 'var(--text3)', marginBottom: 20, fontSize: 14 }}>Required for HIPAA compliance when handling Protected Health Information (PHI)</p>
+
+        <div style={{ maxHeight: 300, overflow: 'auto', padding: 16, background: 'var(--bg1)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24, fontSize: 12, lineHeight: 1.7, color: 'var(--text3)', whiteSpace: 'pre-wrap' }}>
+          {BAA_CONTENT}
+        </div>
+
+        {baaSigned ? (
+          <div style={{ padding: 20, background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, textAlign: 'center' }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+            <div style={{ color: '#22c55e', fontWeight: 700, fontSize: 16 }}>BAA Signed Digitally</div>
+            <div style={{ color: 'var(--text3)', fontSize: 13, marginTop: 4 }}>Signed by {baaSignerName} on {new Date().toLocaleDateString()}</div>
+          </div>
+        ) : baaDocuSignSent ? (
+          <div style={{ padding: 20, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 12, textAlign: 'center' }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>📧</div>
+            <div style={{ color: '#f59e0b', fontWeight: 700, fontSize: 16 }}>DocuSign Envelope Requested</div>
+            <div style={{ color: 'var(--text3)', fontSize: 13, marginTop: 4 }}>A DocuSign envelope will be sent to your email. You can continue setup while the BAA is being signed.</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 260 }} className="glass-card" >
+              <div style={{ padding: 20, border: '1px solid var(--border)', borderRadius: 12 }}>
+                <h3 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Option A: Sign Digitally Now</h3>
+                <p style={{ color: 'var(--text4)', fontSize: 12, marginBottom: 16 }}>Complete the BAA signing process immediately</p>
+                {baaSignMode === 'digital' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <input style={inputStyle} placeholder="Full Legal Name" value={baaSignerName} onChange={e => setBaaSignerName(e.target.value)} />
+                    <input style={inputStyle} placeholder="Title (e.g. CEO, Practice Manager)" value={baaSignerTitle} onChange={e => setBaaSignerTitle(e.target.value)} />
+                    <input style={inputStyle} placeholder="Organization Name" value={baaOrgName || org.name} onChange={e => setBaaOrgName(e.target.value)} />
+                    <input style={inputStyle} value={new Date().toLocaleDateString()} disabled />
+                    <button onClick={handleDigitalSign} disabled={!baaSignerName.trim() || !baaSignerTitle.trim()}
+                      style={{ padding: '10px 20px', background: baaSignerName.trim() && baaSignerTitle.trim() ? 'var(--accent)' : 'var(--bg3)', color: baaSignerName.trim() && baaSignerTitle.trim() ? '#fff' : 'var(--text4)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: baaSignerName.trim() && baaSignerTitle.trim() ? 'pointer' : 'not-allowed' }}>
+                      I Accept &amp; Sign
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => setBaaSignMode('digital')} style={{ padding: '10px 20px', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+                    Sign Digitally Now
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div style={{ flex: 1, minWidth: 260 }} className="glass-card">
+              <div style={{ padding: 20, border: '1px solid var(--border)', borderRadius: 12 }}>
+                <h3 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Option B: Sign via DocuSign</h3>
+                <p style={{ color: 'var(--text4)', fontSize: 12, marginBottom: 16 }}>Receive a DocuSign envelope to sign at your convenience</p>
+                <button onClick={handleDocuSign} style={{ padding: '10px 20px', background: 'var(--bg3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+                  Send DocuSign Envelope
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {navButtons(!baaSigned && !baaDocuSignSent)}
+      </div>
+    )
+  }
 
   const renderStep2 = () => {
     const toggleDept = (id: string) => setDepartments(prev => prev.map(d => d.id === id ? { ...d, enabled: !d.enabled } : d))
@@ -475,7 +573,9 @@ export default function OrgSetupWizardView() {
     )
   }
 
-  const steps = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6]
+  const steps = org.industry === 'healthcare'
+    ? [renderStep1, renderBaaStep, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6]
+    : [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6]
 
   return (
     <div style={{ height: '100%', overflow: 'auto' }}>

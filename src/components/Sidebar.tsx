@@ -101,6 +101,19 @@ function HipaaModal({ onClose }: { onClose: () => void }) {
 
 export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, orgName, userName }: SidebarProps) {
   const [hipaaOpen, setHipaaOpen] = useState(false)
+  const [baaPending, setBaaPending] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = JSON.parse(localStorage.getItem('milliebot_user') || '{}')
+        if (stored.baaDocuSignRequested && !stored.baaSignedDigitally) {
+          setBaaPending(true)
+        }
+      } catch { /* noop */ }
+    }
+  }, [])
+
   let lastSection = ''
 
   return (
@@ -175,6 +188,20 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, o
 
       {hipaaOpen && <HipaaModal onClose={() => setHipaaOpen(false)} />}
       {/* HIPAA Badge */}
+      {!collapsed && baaPending && (
+        <div className="px-3 pb-1">
+          <div className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold"
+            style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}>
+            <span>⚠️</span><span>BAA Pending</span>
+          </div>
+        </div>
+      )}
+      {collapsed && baaPending && (
+        <div className="px-2 pb-1">
+          <div className="w-full flex items-center justify-center py-2 rounded-lg text-xs"
+            style={{ color: '#f59e0b' }} title="BAA Pending">⚠️</div>
+        </div>
+      )}
       {!collapsed && (
         <div className="px-3 pb-1">
           <button onClick={() => setHipaaOpen(true)}

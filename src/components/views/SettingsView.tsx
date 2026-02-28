@@ -670,7 +670,92 @@ function SecuritySettings() {
         <StaticToggle label="Force Logout on Password Change" description="Invalidate all sessions when a user changes their password" defaultChecked />
         <StaticToggle label="Single Session Only" description="Allow only one active session per user" />
       </SectionCard>
+      <SectionCard title="📄 Agreements" description="Legal agreements and compliance documents">
+        <AgreementsSection />
+      </SectionCard>
     </>
+  )
+}
+
+function AgreementsSection() {
+  const [agreements, setAgreements] = useState<{
+    tosAccepted?: boolean; tosAcceptedAt?: string
+    privacyAccepted?: boolean; privacyAcceptedAt?: string
+    baaSignedDigitally?: boolean; baaSignedAt?: string; baaSignerName?: string
+    baaDocuSignRequested?: boolean; baaDocuSignRequestedAt?: string
+  }>({})
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = JSON.parse(localStorage.getItem('milliebot_user') || '{}')
+        setAgreements(stored)
+      } catch { /* noop */ }
+    }
+  }, [])
+
+  const formatDate = (iso?: string) => {
+    if (!iso) return 'N/A'
+    return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  }
+
+  const items = [
+    {
+      name: 'Terms of Service',
+      status: agreements.tosAccepted ? 'Accepted' : 'Not Accepted',
+      date: agreements.tosAcceptedAt,
+      color: agreements.tosAccepted ? '#22c55e' : 'var(--text4)',
+      icon: agreements.tosAccepted ? '✅' : '⏳',
+    },
+    {
+      name: 'Privacy Policy',
+      status: agreements.privacyAccepted ? 'Accepted' : 'Not Accepted',
+      date: agreements.privacyAcceptedAt,
+      color: agreements.privacyAccepted ? '#22c55e' : 'var(--text4)',
+      icon: agreements.privacyAccepted ? '✅' : '⏳',
+    },
+    {
+      name: 'Business Associate Agreement (BAA)',
+      status: agreements.baaSignedDigitally
+        ? 'Signed Digitally'
+        : agreements.baaDocuSignRequested
+        ? 'Awaiting DocuSign Signature'
+        : 'Not Required',
+      date: agreements.baaSignedAt ?? agreements.baaDocuSignRequestedAt,
+      color: agreements.baaSignedDigitally
+        ? '#22c55e'
+        : agreements.baaDocuSignRequested
+        ? '#f59e0b'
+        : 'var(--text4)',
+      icon: agreements.baaSignedDigitally
+        ? '✅'
+        : agreements.baaDocuSignRequested
+        ? '⚠️'
+        : '—',
+    },
+  ]
+
+  return (
+    <div className="space-y-2">
+      {items.map((item) => (
+        <div key={item.name} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg)' }}>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <span className="text-lg shrink-0">{item.icon}</span>
+            <div className="min-w-0">
+              <div className="text-sm font-medium" style={{ color: 'var(--text)' }}>{item.name}</div>
+              <div className="text-xs" style={{ color: item.color }}>
+                {item.status}{item.date ? ` — ${formatDate(item.date)}` : ''}
+              </div>
+            </div>
+          </div>
+          <button className="text-xs px-3 py-1.5 rounded-lg shrink-0 ml-3"
+            style={{ background: 'var(--bg3)', color: 'var(--text4)', cursor: 'not-allowed', opacity: 0.6 }}
+            title="Coming soon">
+            Download PDF
+          </button>
+        </div>
+      ))}
+    </div>
   )
 }
 

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import SubdomainPicker from '@/components/SubdomainPicker'
+import LegalModal from '@/components/LegalModal'
+import { TERMS_OF_SERVICE, PRIVACY_POLICY } from '@/lib/legal-docs'
 
 interface FormErrors {
   name?: string
@@ -10,6 +12,7 @@ interface FormErrors {
   confirmPassword?: string
   orgName?: string
   general?: string
+  tos?: string
 }
 
 export default function LoginPage() {
@@ -27,6 +30,9 @@ export default function LoginPage() {
   const [signupPassword, setSignupPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [orgName, setOrgName] = useState('')
+  const [tosAccepted, setTosAccepted] = useState(false)
+  const [showTosModal, setShowTosModal] = useState(false)
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
   const [subdomain, setSubdomain] = useState('')
   const [subdomainValid, setSubdomainValid] = useState(false)
   const handleSubdomainValid = useCallback((v: boolean) => setSubdomainValid(v), [])
@@ -88,6 +94,7 @@ export default function LoginPage() {
     else if (signupPassword.length < 6) errs.password = 'Password must be at least 6 characters'
     if (signupPassword !== confirmPassword) errs.confirmPassword = 'Passwords do not match'
     if (!orgName.trim()) errs.orgName = 'Organization name is required'
+    if (!tosAccepted) errs.tos = 'You must agree to the Terms of Service and Privacy Policy'
     if (!subdomainValid) errs.general = 'Please choose a valid workspace URL'
     if (Object.keys(errs).length) { setErrors(errs); return }
 
@@ -224,6 +231,17 @@ export default function LoginPage() {
                 {errors.orgName && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.orgName}</p>}
               </div>
               <SubdomainPicker value={subdomain} onChange={setSubdomain} onValidChange={handleSubdomainValid} />
+              <div className="flex items-start gap-2">
+                <input type="checkbox" checked={tosAccepted} onChange={(e) => setTosAccepted(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded" style={{ accentColor: 'var(--blue)' }} />
+                <label className="text-xs leading-relaxed" style={{ color: 'var(--text3)' }}>
+                  I agree to the{' '}
+                  <button type="button" onClick={() => setShowTosModal(true)} style={{ color: 'var(--blue)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}>Terms of Service</button>
+                  {' '}and{' '}
+                  <button type="button" onClick={() => setShowPrivacyModal(true)} style={{ color: 'var(--blue)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}>Privacy Policy</button>
+                </label>
+              </div>
+              {errors.tos && <p className="text-xs" style={{ color: 'var(--red-light)' }}>{errors.tos}</p>}
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))', boxShadow: loading ? 'none' : 'var(--shadow-glow-blue)' }}>
@@ -254,6 +272,8 @@ export default function LoginPage() {
           <p className="text-xs mt-1" style={{ color: 'var(--text4)' }}>© 2026 Milliebot Inc. All rights reserved.</p>
         </div>
       </div>
+      <LegalModal title="Terms of Service" content={TERMS_OF_SERVICE} isOpen={showTosModal} onClose={() => setShowTosModal(false)} />
+      <LegalModal title="Privacy Policy" content={PRIVACY_POLICY} isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
     </div>
   )
 }
