@@ -185,12 +185,21 @@ p, span, div, td, th, li, a, label, h1, h2, h3, h4, h5, h6 {
 
 /* Pulse glow */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(85,156,181,0.3); }
-  50% { box-shadow: 0 0 20px rgba(85,156,181,0.6); }
+  0%, 100% { box-shadow: 0 0 12px rgba(108,99,255,0.3), 0 0 24px rgba(78,205,196,0.15); transform: scale(1); }
+  50% { box-shadow: 0 0 30px rgba(108,99,255,0.6), 0 0 60px rgba(78,205,196,0.3); transform: scale(1.08); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.spin-slow {
+  animation: spin-slow 3s linear infinite;
 }
 
 /* Fade in */

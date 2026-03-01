@@ -90,14 +90,21 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 pulse-glow"
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 pulse-glow"
             style={{ background: 'linear-gradient(135deg, var(--blue), var(--purple))' }}>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <rect x="8" y="8" width="16" height="16" rx="2" transform="rotate(45 16 16)" fill="white" opacity="0.9"/>
-              <circle cx="16" cy="16" r="4" fill="white"/>
-            </svg>
+            <div className="spin-slow">
+              <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+                <rect x="8" y="8" width="16" height="16" rx="2" transform="rotate(45 16 16)" fill="white" opacity="0.9"/>
+                <circle cx="16" cy="16" r="4" fill="white"/>
+              </svg>
+            </div>
           </div>
-          <p className="text-sm" style={{ color: 'var(--text3)' }}>Loading Zynthr Command Center...</p>
+          <p className="text-sm font-medium" style={{ color: 'var(--text3)' }}>Loading Zynthr Command Center...</p>
+          <div className="mt-3 flex items-center gap-1.5 justify-center">
+            <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'var(--blue)', animationDelay: '0ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'var(--purple)', animationDelay: '150ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'var(--teal)', animationDelay: '300ms' }} />
+          </div>
         </div>
       </div>
     )
