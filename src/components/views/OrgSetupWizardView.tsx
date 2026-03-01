@@ -2,7 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import IntegrationWalkthrough from '@/components/IntegrationWalkthrough'
 import { BAA_CONTENT } from '@/lib/baa-content'
+import { INTEGRATION_WALKTHROUGHS } from '@/lib/integration-walkthroughs'
+
 
 /* ──────────────────────── Types ──────────────────────── */
 
@@ -165,7 +168,7 @@ const uid = () => `id_${_idCounter++}`
 /* ──────────────────────── Component ──────────────────────── */
 
 export default function OrgSetupWizardView() {
-  const { user, organization } = useAuth()
+  const { user, organization, membership } = useAuth()
   const [step, setStep] = useState(0)
   const [animDir, setAnimDir] = useState<'next' | 'prev'>('next')
   const [launched, setLaunched] = useState(false)
@@ -185,6 +188,7 @@ export default function OrgSetupWizardView() {
   const [deptInited, setDeptInited] = useState('')
   const [integrations, setIntegrations] = useState<Integration[]>(INTEGRATIONS_DATA)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [walkthroughId, setWalkthroughId] = useState<string | null>(null)
   const [newMember, setNewMember] = useState({ name: '', title: '', email: '', department: '', tier: 3 })
 
   useEffect(() => {
@@ -203,10 +207,14 @@ export default function OrgSetupWizardView() {
   const connectedCount = integrations.filter(i => i.connected).length
 
   const handleConnect = (id: string) => {
-    setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connecting: true } : i))
-    setTimeout(() => {
-      setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connecting: false, connected: true } : i))
-    }, 1800)
+    if (INTEGRATION_WALKTHROUGHS[id]) {
+      setWalkthroughId(id)
+    }
+  }
+
+  const handleWalkthroughComplete = (integrationId: string, _credentials: Record<string, string>) => {
+    setIntegrations(prev => prev.map(i => i.id === integrationId ? { ...i, connecting: false, connected: true } : i))
+    setWalkthroughId(null)
   }
 
   const addMember = () => {
@@ -542,16 +550,30 @@ export default function OrgSetupWizardView() {
     </div>
   )
 
-  const renderStep4 = () => (
+  const userTier = membership?.permission_tier ?? 1
+
+  const renderStep4 = () => {
+    const tierGated = userTier > 2
+    return (
     <div>
       <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: 'var(--text)' }}>🔌 Connect Your Systems</h2>
       <p style={{ color: 'var(--text3)', marginBottom: 24, fontSize: 14 }}>Connect the tools your team already uses. You can always add more later.</p>
+      {tierGated && (
+        <div style={{ padding: 16, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 20 }}>🔒</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#f59e0b' }}>Admin Access Required</div>
+            <div style={{ fontSize: 13, color: 'var(--text3)' }}>Contact your admin (Tier 1 or 2) to configure integrations.</div>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
         {integrations.map(integ => {
           const recommended = integ.recommended.includes(org.industry)
           return (
             <div key={integ.id} className="glass-card" style={{
               padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg3)', position: 'relative',
+              opacity: tierGated ? 0.5 : 1,
             }}>
               {recommended && (
                 <span style={{ position: 'absolute', top: 8, right: 8, fontSize: 10, background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Recommended</span>
@@ -561,8 +583,8 @@ export default function OrgSetupWizardView() {
               <div style={{ fontSize: 12, color: 'var(--text4)', marginBottom: 12 }}>{integ.description}</div>
               {integ.connected ? (
                 <div style={{ fontSize: 13, color: '#2ecc71', fontWeight: 600 }}>✅ Connected</div>
-              ) : integ.connecting ? (
-                <div style={{ fontSize: 13, color: '#559CB5', fontWeight: 600 }}>⟳ Connecting…</div>
+              ) : tierGated ? (
+                <span style={{ fontSize: 12, color: 'var(--text4)' }}>Requires admin access</span>
               ) : (
                 <button onClick={() => handleConnect(integ.id)} style={{
                   padding: '8px 16px', background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -572,6 +594,13 @@ export default function OrgSetupWizardView() {
           )
         })}
       </div>
+      {walkthroughId && INTEGRATION_WALKTHROUGHS[walkthroughId] && (
+        <IntegrationWalkthrough
+          walkthrough={INTEGRATION_WALKTHROUGHS[walkthroughId]}
+          onClose={() => setWalkthroughId(null)}
+          onComplete={handleWalkthroughComplete}
+        />
+      )}
       <div style={{ marginTop: 16 }}>
         <button onClick={() => go('next')} style={{
           padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text3)', cursor: 'pointer', fontSize: 13,
@@ -579,7 +608,8 @@ export default function OrgSetupWizardView() {
       </div>
       {navButtons()}
     </div>
-  )
+    )
+  }
 
   const renderStep5 = () => (
     <div>
@@ -696,6 +726,7 @@ export default function OrgSetupWizardView() {
   const steps = org.industry === 'healthcare'
     ? [renderStep1, renderBaaStep, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6]
     : [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6]
+
 
   return (
     <div style={{ height: '100%', overflow: 'auto' }}>
