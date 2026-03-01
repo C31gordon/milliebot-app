@@ -351,7 +351,7 @@ export default function LoginPage() {
 
           {errors.general && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs mb-4"
-              style={{ background: 'rgba(174,19,42,0.1)', border: '1px solid rgba(174,19,42,0.3)', color: 'var(--red-light)' }}>
+              style={{ background: 'rgba(174,19,42,0.1)', border: '1px solid rgba(174,19,42,0.3)', color: 'var(--red-text, #ff6b7a)' }}>
               ⚠️ {errors.general}
             </div>
           )}
@@ -362,13 +362,13 @@ export default function LoginPage() {
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Email</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com"
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
-                {errors.email && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.email}</p>}
+                {errors.email && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Password</label>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
-                {errors.password && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.password}</p>}
+                {errors.password && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.password}</p>}
               </div>
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
@@ -391,25 +391,25 @@ export default function LoginPage() {
                       className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
                   </div>
                 </div>
-                {errors.name && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.name}</p>}
+                {errors.name && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.name}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Email</label>
                 <input type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="you@company.com"
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
-                {errors.email && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.email}</p>}
+                {errors.email && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Password</label>
                 <input type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Min. 6 characters"
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
-                {errors.password && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.password}</p>}
+                {errors.password && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.password}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Confirm Password</label>
                 <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••"
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
-                {errors.confirmPassword && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.confirmPassword}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Organization Name</label>
@@ -421,10 +421,10 @@ export default function LoginPage() {
                   }
                 }} placeholder="Acme Inc."
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
-                {errors.orgName && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.orgName}</p>}
+                {errors.orgName && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.orgName}</p>}
               </div>
               <SubdomainPicker value={subdomain} onChange={setSubdomain} onValidChange={handleSubdomainValid} />
-              {errors.subdomain && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.subdomain}</p>}
+              {errors.subdomain && <p className="text-xs mt-1" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.subdomain}</p>}
               <div className="flex items-start gap-2">
                 <input type="checkbox" checked={tosAccepted} onChange={(e) => setTosAccepted(e.target.checked)}
                   className="mt-1 w-4 h-4 rounded" style={{ accentColor: 'var(--blue)' }} />
@@ -435,7 +435,7 @@ export default function LoginPage() {
                   <button type="button" onClick={() => setShowPrivacyModal(true)} style={{ color: 'var(--blue)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}>Privacy Policy</button>
                 </label>
               </div>
-              {errors.tos && <p className="text-xs" style={{ color: 'var(--red-light)' }}>{errors.tos}</p>}
+              {errors.tos && <p className="text-xs" style={{ color: 'var(--red-text, #ff6b7a)' }}>{errors.tos}</p>}
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))', boxShadow: loading ? 'none' : 'var(--shadow-glow-blue)' }}>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { getAgents, getBots, getTickets, getSuggestions, getDepartments, getAuditLog } from '@/lib/data'
+import { useAuth } from '@/lib/auth-context'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -30,6 +31,8 @@ const deptIcons: Record<string, string> = {
 }
 
 export default function DashboardView({ userName, orgName }: { userName?: string; orgName?: string }) {
+  const { organization } = useAuth()
+  const orgId = organization?.id
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today')
   const [currentTime, setCurrentTime] = useState(new Date())
   const [loading, setLoading] = useState(true)
@@ -44,12 +47,12 @@ export default function DashboardView({ userName, orgName }: { userName?: string
   }, [])
 
   useEffect(() => {
-    Promise.all([getAgents(), getBots(), getTickets(), getSuggestions(), getDepartments(), getAuditLog(10)])
+    Promise.all([getAgents(orgId), getBots(orgId), getTickets(orgId), getSuggestions(orgId), getDepartments(orgId), getAuditLog(10, orgId)])
       .then(([agents, bots, tickets, suggestions, departments, audit]) => {
         setData({ agents, bots, tickets, suggestions, departments, audit })
         setLoading(false)
-      })
-  }, [])
+      }).catch(() => setLoading(false))
+  }, [orgId])
 
   // Period filtering
   const periodStart = (() => {

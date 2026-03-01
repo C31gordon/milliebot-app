@@ -21,6 +21,7 @@
   --orange-light: #fdc764;
   --red: #AE132A;
   --red-light: rgba(174,19,42,0.15);
+  --red-text: #ff6b7a;
   --purple: #8b5cf6;
   --teal: #559CB5;
   --gold: #FCB53B;
@@ -63,6 +64,7 @@ html[data-theme="light"] {
   --orange-light: #d97706;
   --red: #AE132A;
   --red-light: rgba(174,19,42,0.1);
+  --red-text: #be123c;
   --purple: #7c3aed;
   --teal: #559CB5;
   --gold: #FCB53B;

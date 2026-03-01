@@ -40,7 +40,7 @@ const smartResponses: Record<string, { content: string; confidence?: number; sou
   occupancy: {
     content: "**Portfolio Occupancy — Feb 28, 2026**\n\n📊 **Physical Occupancy:** 94.2% (↑ 0.3%)\n• Bartram Park: 96.3% (285/297 units)\n• Prosper On Fayette: 62.1% preleased (195/314 beds)\n\n📈 **Leased:** 95.8% — 12 new leases this week\n\n⚠️ Prosper needs 8 leases/week to hit fall target",
     confidence: 94,
-    sources: [{ label: 'Entrata Box Score', url: '#' }],
+    sources: [{ label: 'System Report', url: '#' }],
     freshness: 'verified',
   },
   workorder: {

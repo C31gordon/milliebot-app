@@ -16,10 +16,7 @@ interface CreateTenantBody {
 }
 
 function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,129 +31,93 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Generate unique slug
-    let slug = slugify(companyName)
-    const { data: existing } = await db
-      .from('tenants')
-      .select('id')
-      .eq('slug', slug)
+    // Check if user already has an org
+    const { data: existingMember } = await db
+      .from('org_members')
+      .select('org_id')
+      .eq('user_id', userId)
       .single()
-    if (existing) {
-      slug = `${slug}-${Date.now().toString(36)}`
+
+    if (existingMember?.org_id) {
+      // User already has an org — update it with onboarding data
+      await db.from('organizations')
+        .update({ name: companyName, industry, settings: { companySize } })
+        .eq('id', existingMember.org_id)
+
+      return NextResponse.json({
+        success: true,
+        tenant: { id: existingMember.org_id, slug: slugify(companyName), name: companyName },
+        departments: departments.length,
+        roles: 0,
+        metadata: { industry, companySize },
+      })
     }
 
-    // 1. Create tenant
-    const { data: tenant, error: tenantError } = await db
-      .from('tenants')
+    // Create new organization
+    const slug = slugify(companyName)
+    const { data: org, error: orgError } = await db
+      .from('organizations')
       .insert({
         name: companyName,
         slug,
+        industry,
         plan: 'free',
-        brand_primary: '#559CB5',
-        brand_secondary: '#8b5cf6',
+        owner_id: userId,
+        hipaa_required: industry === 'healthcare',
+        settings: { companySize },
       })
       .select()
       .single()
 
-    if (tenantError || !tenant) {
-      return NextResponse.json({ error: tenantError?.message || 'Failed to create tenant' }, { status: 500 })
+    if (orgError || !org) {
+      return NextResponse.json({ error: orgError?.message || 'Failed to create organization' }, { status: 500 })
     }
 
-    const tenantId = tenant.id
+    const orgId = org.id
 
-    // 2. Create departments
-    const deptInserts = departments.map((name: string, i: number) => ({
-      tenant_id: tenantId,
-      name,
-      slug: slugify(name),
-      sort_order: i,
-    }))
-    const { data: createdDepts, error: deptError } = await db
-      .from('departments')
-      .insert(deptInserts)
-      .select()
+    // Create membership
+    await db.from('org_members').insert({
+      org_id: orgId,
+      user_id: userId,
+      role: 'owner',
+      permission_tier: 100,
+      status: 'active',
+    })
 
-    if (deptError) {
-      return NextResponse.json({ error: `Departments: ${deptError.message}` }, { status: 500 })
+    // Create departments
+    for (const name of departments) {
+      await db.from('departments').insert({
+        org_id: orgId,
+        name,
+        slug: slugify(name),
+        status: 'active',
+      }).select()
     }
 
-    // 3. Create default roles
-    const roles = [
-      { name: 'Owner', tier: 'owner' },
-      { name: 'Manager', tier: 'manager' },
-      { name: 'Specialist', tier: 'specialist' },
-      { name: 'Viewer', tier: 'specialist' },
-    ]
-    const roleInserts = roles.map(r => ({
-      tenant_id: tenantId,
-      name: r.name,
-      tier: r.tier,
-    }))
-    const { data: createdRoles, error: roleError } = await db
-      .from('roles')
-      .insert(roleInserts)
-      .select()
-
-    if (roleError) {
-      return NextResponse.json({ error: `Roles: ${roleError.message}` }, { status: 500 })
-    }
-
-    // 4. Create default RKBAC policies
-    const ownerRole = createdRoles?.find((r: { name: string }) => r.name === 'Owner')
-    if (ownerRole) {
-      await db.from('rkbac_policies').insert([
-        {
-          tenant_id: tenantId,
-          role_id: ownerRole.id,
-          resource_type: '*',
-          action: '*',
-          effect: 'allow',
-          sensitivity_level: 'restricted',
-        },
-      ])
-    }
-
-    // 5. Assign user as Owner
-    const { error: userError } = await db
-      .from('users')
-      .update({
-        tenant_id: tenantId,
-        role_id: ownerRole?.id,
-        onboarding_completed: true,
-      })
-      .eq('auth_id', userId)
-
-    if (userError) {
-      return NextResponse.json({ error: `User assignment: ${userError.message}` }, { status: 500 })
-    }
-
-    // 6. Create first agent if provided
-    if (agent?.name && createdDepts?.length) {
-      const targetDept = createdDepts.find((d: { name: string }) => d.name === agent.departmentName) || createdDepts[0]
+    // Create first agent if provided
+    if (agent?.name) {
       await db.from('agents').insert({
-        tenant_id: tenantId,
-        department_id: targetDept.id,
+        org_id: orgId,
         name: agent.name,
         description: agent.description || null,
         status: 'configuring',
-        capabilities: [],
-      })
+      }).select()
     }
 
-    // 7. Store invite emails (optional)
     if (inviteEmails?.length) {
-      console.log(`Invite emails for tenant ${tenantId}:`, inviteEmails)
+      console.log(`Invite emails for org ${orgId}:`, inviteEmails)
     }
 
     return NextResponse.json({
       success: true,
-      tenant: { id: tenantId, slug, name: companyName },
-      departments: createdDepts?.length || 0,
-      roles: createdRoles?.length || 0,
+      tenant: { id: orgId, slug, name: companyName },
+      departments: departments.length,
+      roles: 0,
       metadata: { industry, companySize },
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Provisioning error:', message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -73,12 +73,11 @@ const CAPABILITIES = [
 ]
 
 const SYSTEMS = [
-  { key: 'entrata', label: 'Entrata', connected: true },
-  { key: 'microsoft365', label: 'Microsoft 365', connected: true },
+  { key: 'microsoft365', label: 'Microsoft 365', connected: false },
   { key: 'google_workspace', label: 'Google Workspace', connected: false },
-  { key: 'paycor', label: 'Paycor', connected: false },
-  { key: 'egnyte', label: 'Egnyte', connected: true },
   { key: 'slack', label: 'Slack', connected: false },
+  { key: 'stripe', label: 'Stripe', connected: false },
+  { key: 'docusign', label: 'DocuSign', connected: false },
   { key: 'custom_api', label: 'Custom API', connected: false },
 ]
 

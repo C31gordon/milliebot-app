@@ -197,7 +197,7 @@ export default function OnboardingPage() {
               <button onClick={() => setStep(2)}
                 disabled={!companyName || !industry || !companySize}
                 className="w-full py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))' }}>
+                style={{ background: 'linear-gradient(135deg, #559CB5, #3d7a94)' }}>
                 Continue →
               </button>
             </div>
@@ -233,7 +233,7 @@ export default function OnboardingPage() {
                 <button onClick={() => setStep(3)}
                   disabled={selectedDepts.length === 0}
                   className="flex-1 py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))' }}>
+                  style={{ background: 'linear-gradient(135deg, #559CB5, #3d7a94)' }}>
                   Continue →
                 </button>
               </div>
@@ -279,7 +279,7 @@ export default function OnboardingPage() {
                 </button>
                 <button onClick={() => setStep(4)}
                   className="flex-1 py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02]"
-                  style={{ background: 'linear-gradient(135deg, var(--blue), var(--blue-dark))' }}>
+                  style={{ background: 'linear-gradient(135deg, #559CB5, #3d7a94)' }}>
                   Continue →
                 </button>
               </div>
@@ -306,7 +306,7 @@ export default function OnboardingPage() {
 
               {error && (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
-                  style={{ background: 'rgba(174,19,42,0.1)', border: '1px solid rgba(174,19,42,0.3)', color: 'var(--red-light)' }}>
+                  style={{ background: 'rgba(174,19,42,0.1)', border: '1px solid rgba(174,19,42,0.3)', color: 'var(--red-text, #ff6b7a)' }}>
                   ⚠️ {error}
                 </div>
               )}
@@ -319,7 +319,7 @@ export default function OnboardingPage() {
                 </button>
                 <button onClick={handleFinish} disabled={loading}
                   className="flex-1 py-3 rounded-lg font-bold text-sm text-white transition-all hover:scale-[1.02] disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, var(--green), var(--teal))', boxShadow: loading ? 'none' : 'var(--shadow-glow-green)' }}>
+                  style={{ background: 'linear-gradient(135deg, #22c55e, #4ECDC4)', boxShadow: loading ? 'none' : 'var(--shadow-glow-green)' }}>
                   {loading ? 'Setting up...' : '🚀 Launch Workspace'}
                 </button>
               </div>
