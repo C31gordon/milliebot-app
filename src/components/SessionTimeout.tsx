@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 const TIMEOUT_MS = 15 * 60 * 1000
 const WARNING_MS = 13 * 60 * 1000
@@ -17,11 +18,10 @@ export default function SessionTimeout() {
     setCountdown(120)
   }, [])
 
+  const { signOut } = useAuth()
   const doLogout = useCallback(() => {
-    localStorage.removeItem('zynthr_authenticated')
-    localStorage.removeItem('zynthr_user')
-    window.location.href = '/login?expired=1'
-  }, [])
+    signOut()
+  }, [signOut])
 
   useEffect(() => {
     const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'] as const

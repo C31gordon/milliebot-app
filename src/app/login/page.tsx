@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import SubdomainPicker from '@/components/SubdomainPicker'
 import LegalModal from '@/components/LegalModal'
 import { TERMS_OF_SERVICE, PRIVACY_POLICY } from '@/lib/legal-docs'
+import { supabase, DEMO_MODE } from '@/lib/supabase'
 
 interface FormErrors {
   name?: string
@@ -45,9 +46,18 @@ export default function LoginPage() {
   }, [])
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('zynthr_authenticated') === 'true') {
-      window.location.href = '/'
+    if (DEMO_MODE) {
+      if (typeof window !== 'undefined' && localStorage.getItem('zynthr_authenticated') === 'true') {
+        window.location.href = '/'
+      }
+      return
     }
+    // Real auth: check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        window.location.href = '/'
+      }
+    })
   }, [])
 
   const validateEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
@@ -57,7 +67,7 @@ export default function LoginPage() {
     setTimeout(() => setOauthToast(false), 3000)
   }
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
     const errs: FormErrors = {}
@@ -67,28 +77,47 @@ export default function LoginPage() {
     if (Object.keys(errs).length) { setErrors(errs); return }
 
     setLoading(true)
-    const storedUsers = JSON.parse(localStorage.getItem('zynthr_users') || '[]')
-    const found = storedUsers.find((u: { email: string; password: string }) =>
-      u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    )
-    if (!found && storedUsers.length > 0) {
-      setErrors({ general: 'Invalid email or password' })
+
+    if (DEMO_MODE) {
+      // Legacy localStorage flow
+      const storedUsers = JSON.parse(localStorage.getItem('zynthr_users') || '[]')
+      const found = storedUsers.find((u: { email: string; password: string }) =>
+        u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      )
+      if (!found && storedUsers.length > 0) {
+        setErrors({ general: 'Invalid email or password' })
+        setLoading(false)
+        return
+      }
+      const userData = found
+        ? { name: found.name, email: found.email, orgName: found.orgName, createdAt: found.createdAt }
+        : { name: email.split('@')[0], email, orgName: '', createdAt: new Date().toISOString() }
+      if (!found) {
+        storedUsers.push({ ...userData, password })
+        localStorage.setItem('zynthr_users', JSON.stringify(storedUsers))
+      }
+      localStorage.setItem('zynthr_user', JSON.stringify(userData))
+      localStorage.setItem('zynthr_authenticated', 'true')
+      setTimeout(() => { window.location.href = '/' }, 400)
+      return
+    }
+
+    // Real Supabase auth
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
+
+    if (error) {
+      setErrors({ general: error.message })
       setLoading(false)
       return
     }
-    const userData = found
-      ? { name: found.name, email: found.email, orgName: found.orgName, createdAt: found.createdAt }
-      : { name: email.split('@')[0], email, orgName: '', createdAt: new Date().toISOString() }
-    if (!found) {
-      storedUsers.push({ ...userData, password })
-      localStorage.setItem('zynthr_users', JSON.stringify(storedUsers))
-    }
-    localStorage.setItem('zynthr_user', JSON.stringify(userData))
-    localStorage.setItem('zynthr_authenticated', 'true')
-    setTimeout(() => { window.location.href = '/' }, 400)
+
+    window.location.href = '/'
   }
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
     const errs: FormErrors = {}
@@ -105,21 +134,106 @@ export default function LoginPage() {
     if (Object.keys(errs).length) { setErrors(errs); return }
 
     setLoading(true)
-    const storedUsers = JSON.parse(localStorage.getItem('zynthr_users') || '[]')
-    if (storedUsers.find((u: { email: string }) => u.email.toLowerCase() === signupEmail.toLowerCase())) {
-      setErrors({ general: 'An account with this email already exists' })
+
+    if (DEMO_MODE) {
+      // Legacy localStorage flow
+      const storedUsers = JSON.parse(localStorage.getItem('zynthr_users') || '[]')
+      if (storedUsers.find((u: { email: string }) => u.email.toLowerCase() === signupEmail.toLowerCase())) {
+        setErrors({ general: 'An account with this email already exists' })
+        setLoading(false)
+        return
+      }
+      const userData = { firstName: firstName.trim(), lastName: lastName.trim(), name: firstName.trim() + ' ' + lastName.trim(), email: signupEmail.trim(), orgName: orgName.trim(), subdomain: subdomain.trim(), createdAt: new Date().toISOString() }
+      storedUsers.push({ ...userData, password: signupPassword })
+      localStorage.setItem('zynthr_users', JSON.stringify(storedUsers))
+      localStorage.setItem('zynthr_user', JSON.stringify(userData))
+      localStorage.setItem('zynthr_authenticated', 'true')
+      setTimeout(() => { window.location.href = '/' }, 400)
+      return
+    }
+
+    // Real Supabase auth: sign up
+    const fullName = firstName.trim() + ' ' + lastName.trim()
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: signupEmail.trim(),
+      password: signupPassword,
+      options: {
+        data: {
+          full_name: fullName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          org_name: orgName.trim(),
+        },
+      },
+    })
+
+    if (signUpError) {
+      setErrors({ general: signUpError.message })
       setLoading(false)
       return
     }
-    const userData = { firstName: firstName.trim(), lastName: lastName.trim(), name: firstName.trim() + ' ' + lastName.trim(), email: signupEmail.trim(), orgName: orgName.trim(), subdomain: subdomain.trim(), createdAt: new Date().toISOString() }
-    storedUsers.push({ ...userData, password: signupPassword })
-    localStorage.setItem('zynthr_users', JSON.stringify(storedUsers))
-    localStorage.setItem('zynthr_user', JSON.stringify(userData))
-    localStorage.setItem('zynthr_authenticated', 'true')
-    setTimeout(() => { window.location.href = '/' }, 400)
+
+    const userId = signUpData.user?.id
+    if (!userId) {
+      setErrors({ general: 'Sign-up succeeded but no user ID returned. Check your email for confirmation.' })
+      setLoading(false)
+      return
+    }
+
+    // Create organization
+    const slug = subdomain.trim().toLowerCase()
+    const { data: orgData, error: orgError } = await (supabase as any)
+      .from('organizations')
+      .insert({
+        name: orgName.trim(),
+        slug,
+        owner_id: userId,
+        plan: 'free',
+      })
+      .select()
+      .single()
+
+    if (orgError) {
+      console.error('Org creation error:', orgError)
+      // Don't block — user was created. They can set up org later.
+      setErrors({ general: 'Account created but org setup failed: ' + orgError.message })
+      setLoading(false)
+      return
+    }
+
+    // Create org_member record
+    if (orgData) {
+      const { error: memberError } = await (supabase as any)
+        .from('org_members')
+        .insert({
+          org_id: orgData.id,
+          user_id: userId,
+          role: 'owner',
+          permission_tier: 100,
+          status: 'active',
+          joined_at: new Date().toISOString(),
+        })
+
+      if (memberError) {
+        console.error('Member creation error:', memberError)
+      }
+    }
+
+    window.location.href = '/'
   }
 
-  const handleDemoMode = () => { window.location.href = '/' }
+  const handleDemoMode = () => {
+    if (DEMO_MODE) {
+      localStorage.setItem('zynthr_authenticated', 'true')
+      localStorage.setItem('zynthr_user', JSON.stringify({
+        name: 'Demo User',
+        email: 'demo@zynthr.ai',
+        orgName: 'Demo Organization',
+        createdAt: new Date().toISOString(),
+      }))
+    }
+    window.location.href = '/'
+  }
 
   const inputStyle = { background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }
 

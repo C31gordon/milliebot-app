@@ -263,8 +263,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 const hasSupabase = !!(supabaseUrl && supabaseAnonKey)
 
-// Demo mode flag — true when Supabase env vars are not configured
-export const DEMO_MODE = !hasSupabase
+// Demo mode: explicit env var OR missing Supabase config
+export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || !hasSupabase
 
 export const supabase: SupabaseClient<Database> = hasSupabase
   ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -355,5 +355,5 @@ export async function logAudit(entry: {
     console.log('[DEMO] Audit log:', entry.action, entry)
     return
   }
-  await (supabaseAdmin as any).from("audit_log").insert(entry)
+  await (supabaseAdmin as SupabaseClient).from("audit_log").insert(entry)
 }

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { DEMO_MODE, DEMO_USER } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 import type { User } from '@supabase/supabase-js'
 
 type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings'
@@ -66,10 +67,9 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
     }
   }, [searchQuery])
 
+  const { signOut } = useAuth()
   const handleLogout = () => {
-    localStorage.removeItem('zynthr_authenticated')
-    localStorage.removeItem('zynthr_user')
-    window.location.href = '/login'
+    signOut()
   }
 
   const handleSearch = (e: React.FormEvent) => {
