@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getAgents, getBots } from '@/lib/data'
+import { useAuth } from '@/lib/auth-context'
+import { getAgents, getBots, getDepartments } from '@/lib/data'
 
 interface BotRow {
   id: string
@@ -58,7 +59,7 @@ const pendingDepartments = [
   { name: 'IT', icon: '💻', owner: 'Ben McClendon', planned: 'Phase 4 (Day 60-90)' },
 ]
 
-const DEPARTMENTS = ['Operations', 'Leasing', 'Maintenance', 'Training', 'HR', 'Marketing', 'Finance', 'Compliance', 'IT']
+// DEPARTMENTS loaded dynamically from org data
 const PERMISSION_TIERS = ['Tier 1 Owner/Executive', 'Tier 2 Dept Head', 'Tier 3 Manager', 'Tier 4 Specialist']
 const EMOJI_OPTIONS = ['🤖', '🧠', '📊', '🔍', '📋', '💬', '⚡', '🛡️', '📈', '🎯', '🔧', '📝', '🚀', '💡', '🏢', '📢', '👥', '💰', '💻', '📚']
 
@@ -103,7 +104,7 @@ interface NewAgentForm {
 
 const defaultForm: NewAgentForm = {
   name: '',
-  department: DEPARTMENTS[0],
+  department: '',
   description: '',
   permissionTier: PERMISSION_TIERS[2],
   emoji: '🤖',
@@ -125,6 +126,8 @@ export default function AgentsView() {
   const [bots, setBots] = useState<BotRow[]>([])
   const [localAgents, setLocalAgents] = useState<AgentRow[]>([])
   const [localBots, setLocalBots] = useState<LocalBot[]>([])
+  const { user } = useAuth()
+  const [orgDepartments, setOrgDepartments] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   const [showWizard, setShowWizard] = useState(false)
@@ -137,7 +140,8 @@ export default function AgentsView() {
   const [botForm, setBotForm] = useState<BotForm>({ name: '', description: '', capabilities: [], agentId: '' })
 
   useEffect(() => {
-    Promise.all([getAgents(), getBots()]).then(([a, b]) => {
+    Promise.all([getAgents(), getBots(), getDepartments()]).then(([a, b, d]) => {
+      setOrgDepartments((d || []).map((dept: any) => dept.name))
       setAgents(a as AgentRow[])
       setBots(b as BotRow[])
       if (a.length > 0) setExpandedAgent(a[0].id)
@@ -270,7 +274,7 @@ export default function AgentsView() {
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 6 }}>Department</label>
             <select value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
               style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
-              {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+              {orgDepartments.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
           <div>
