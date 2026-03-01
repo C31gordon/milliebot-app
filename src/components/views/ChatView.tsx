@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 interface Message {
   id: string
@@ -152,11 +153,12 @@ const freshnessLabels: Record<string, { label: string; color: string; icon: stri
 }
 
 export default function ChatView() {
+  const { user } = useAuth()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hello! I'm your AI Practice Assistant, connected to your DrChrono EMR, claims pipeline, and patient management systems.\n\nI can help you with:\n• 🤰 **Patients** — \"Show me my patient panel\" or \"Who's due this month?\"\n• 💰 **Claims & Revenue** — \"What's my claims status?\" or \"Show me revenue\"\n• 📅 **Schedule** — \"What's on my schedule today?\"\n• 🧪 **Labs** — \"Any overdue labs?\" or \"GBS status\"\n• 👶 **Postpartum** — \"Show postpartum follow-ups\"\n• 💡 **Suggestions** — Start with \"I wish...\" to log an idea\n• 🎫 **Support** — Start with \"I need...\" to create a ticket\n• 🏗️ **Build** — Start with \"Build me...\" to start a project\n\nAll answers include confidence scores and data source links. How can I help?",
+      content: "Hey! 👋 I'm your Zynthr AI assistant. I know your organization, your departments, and your agents.\n\nI can help you with:\n• 🤰 **Patients** — \"Show me my patient panel\" or \"Who's due this month?\"\n• 💰 **Claims & Revenue** — \"What's my claims status?\" or \"Show me revenue\"\n• 📅 **Schedule** — \"What's on my schedule today?\"\n• 🧪 **Labs** — \"Any overdue labs?\" or \"GBS status\"\n• 👶 **Postpartum** — \"Show postpartum follow-ups\"\n• 💡 **Suggestions** — Start with \"I wish...\" to log an idea\n• 🎫 **Support** — Start with \"I need...\" to create a ticket\n• 🏗️ **Build** — Start with \"Build me...\" to start a project\n\nAll answers include confidence scores and data source links. How can I help?",
       timestamp: new Date(),
     },
   ])
@@ -178,23 +180,45 @@ export default function ChatView() {
       timestamp: new Date(),
     }
     setMessages(prev => [...prev, userMsg])
+    const currentInput = input.trim()
     setInput('')
     setIsTyping(true)
 
-    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1200))
-
-    const response = getSmartResponse(userMsg.content)
-    setMessages(prev => [...prev, response])
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          message: currentInput,
+          history: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+        }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: data.reply || "Hmm, let me try that again...",
+        timestamp: new Date(),
+      }])
+    } catch {
+      setMessages(prev => [...prev, {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: "Something went wrong — mind trying that again? 🤔",
+        timestamp: new Date(),
+      }])
+    }
     setIsTyping(false)
   }
 
   const quickActions = [
-    "Show me my patient panel",
-    "What's my claims status?",
-    "Any overdue labs?",
-    "What's on my schedule today?",
-    "Show postpartum follow-ups",
-    "Build me a weekly report",
+    "What can you help me with?",
+    "Help me set up an agent",
+    "What integrations do I need?",
+    "Explain RKBAC permissions",
+    "Build me a workflow",
+    "What's my org status?",
   ]
 
   return (
@@ -203,14 +227,14 @@ export default function ChatView() {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, var(--blue), var(--purple))' }}>
-            <span className="text-lg">🌿</span>
+            <span className="text-lg">⚡</span>
           </div>
           <div>
-            <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>Practice Assistant</h2>
+            <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>Zynthr AI</h2>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full" style={{ background: 'var(--green)', boxShadow: '0 0 6px rgba(107,164,138,0.6)' }} />
               <span className="text-xs" style={{ color: 'var(--green)' }}>Online</span>
-              <span className="text-xs" style={{ color: 'var(--text4)' }}>• Connected to DrChrono, Claims Pipeline, Patient Portal</span>
+              <span className="text-xs" style={{ color: 'var(--text4)' }}>• Knows your org • Always learning</span>
             </div>
           </div>
         </div>
