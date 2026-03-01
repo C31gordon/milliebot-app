@@ -440,3 +440,13 @@ html[data-theme="light"] table tbody tr:hover {
   background: rgba(85,156,181,0.3);
   color: white;
 }
+
+/* Fix select dropdown option colors in dark mode */
+[data-theme="dark"] select option {
+  background: #0a0f1a;
+  color: #e4e4e7;
+}
+[data-theme="light"] select option {
+  background: #ffffff;
+  color: #1a1a2e;
+}

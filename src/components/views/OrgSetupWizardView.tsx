@@ -53,6 +53,31 @@ const INDUSTRIES = [
   { id: 'other', label: 'Other', icon: '⚙️' },
 ]
 
+
+const SUBCATEGORIES: Record<string, { id: string; label: string }[]> = {
+  healthcare: [
+    { id: 'birth_center', label: 'Birth Center / Midwifery' },
+    { id: 'primary_care', label: 'Primary Care' },
+    { id: 'urgent_care', label: 'Urgent Care' },
+    { id: 'dental', label: 'Dental' },
+    { id: 'mental_health', label: 'Mental Health / Behavioral' },
+    { id: 'physical_therapy', label: 'Physical Therapy / Rehab' },
+    { id: 'home_health', label: 'Home Health' },
+    { id: 'specialty', label: 'Specialty Practice' },
+    { id: 'hospital', label: 'Hospital / Health System' },
+    { id: 'other_hc', label: 'Other Healthcare' },
+  ],
+  property: [
+    { id: 'multifamily', label: 'Multifamily / Apartments' },
+    { id: 'commercial', label: 'Commercial' },
+    { id: 'student_housing', label: 'Student Housing' },
+    { id: 'senior_living', label: 'Senior Living / 55+' },
+    { id: 'single_family', label: 'Single Family Rentals' },
+    { id: 'hoa', label: 'HOA / Community Association' },
+    { id: 'other_pm', label: 'Other Property' },
+  ],
+}
+
 const SIZES = ['1-10', '11-50', '51-200', '201-500', '500+']
 
 const DEPT_TEMPLATES: Record<string, Department[]> = {
@@ -124,6 +149,7 @@ export default function OrgSetupWizardView() {
   const [baaSigned, setBaaSigned] = useState(false)
   const [baaDocuSignSent, setBaaDocuSignSent] = useState(false)
 
+  const [subcategory, setSubcategory] = useState('')
   const [org, setOrg] = useState<OrgInfo>({ name: '', industry: '', size: '', contactName: '', contactEmail: '' })
   const [departments, setDepartments] = useState<Department[]>([])
   const [deptInited, setDeptInited] = useState('')
@@ -284,6 +310,15 @@ export default function OrgSetupWizardView() {
             <option value="">Select industry…</option>
             {INDUSTRIES.map(ind => <option key={ind.id} value={ind.id}>{ind.icon} {ind.label}</option>)}
           </select>
+          {SUBCATEGORIES[org.industry] && (
+            <>
+              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginTop: 12, display: 'block' }}>Specialty / Subcategory</label>
+              <select style={{ ...inputStyle, cursor: 'pointer', marginTop: 4 }} value={subcategory} onChange={e => setSubcategory(e.target.value)}>
+                <option value="">Select a subcategory...</option>
+                {SUBCATEGORIES[org.industry].map(sub => <option key={sub.id} value={sub.id}>{sub.label}</option>)}
+              </select>
+            </>
+          )}
         </div>
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 8, display: 'block' }}>Organization Size</label>
