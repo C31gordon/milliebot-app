@@ -14,6 +14,7 @@ interface FormErrors {
   orgName?: string
   general?: string
   tos?: string
+  subdomain?: string
 }
 
 export default function LoginPage() {
@@ -130,7 +131,7 @@ export default function LoginPage() {
     if (signupPassword !== confirmPassword) errs.confirmPassword = 'Passwords do not match'
     if (!orgName.trim()) errs.orgName = 'Organization name is required'
     if (!tosAccepted) errs.tos = 'You must agree to the Terms of Service and Privacy Policy'
-    if (!subdomainValid) errs.general = 'Please choose a valid workspace URL'
+    if (!subdomainValid) errs.subdomain = 'Please choose a valid workspace URL'
     if (Object.keys(errs).length) { setErrors(errs); return }
 
     setLoading(true)
@@ -390,11 +391,18 @@ export default function LoginPage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>Organization Name</label>
-                <input type="text" value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="Acme Inc."
+                <input type="text" value={orgName} onChange={(e) => {
+                  setOrgName(e.target.value)
+                  if (!subdomain || subdomain === orgName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) {
+                    const auto = e.target.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+                    setSubdomain(auto)
+                  }
+                }} placeholder="Acme Inc."
                   className="w-full px-4 py-3 rounded-lg text-sm transition-all focus:ring-2 focus:ring-blue-500/50" style={inputStyle} />
                 {errors.orgName && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.orgName}</p>}
               </div>
               <SubdomainPicker value={subdomain} onChange={setSubdomain} onValidChange={handleSubdomainValid} />
+              {errors.subdomain && <p className="text-xs mt-1" style={{ color: 'var(--red-light)' }}>{errors.subdomain}</p>}
               <div className="flex items-start gap-2">
                 <input type="checkbox" checked={tosAccepted} onChange={(e) => setTosAccepted(e.target.checked)}
                   className="mt-1 w-4 h-4 rounded" style={{ accentColor: 'var(--blue)' }} />
