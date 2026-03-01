@@ -78,10 +78,18 @@ const SYSTEMS = [
 ]
 
 const AI_MODELS = [
-  { key: 'claude-3.5-sonnet', label: 'Claude 3.5 Sonnet', tag: 'Recommended', speed: '⚡⚡⚡⚡', cost: '$$', desc: 'Best balance of speed, quality, and cost' },
-  { key: 'gpt-4o', label: 'GPT-4o', tag: '', speed: '⚡⚡⚡⚡', cost: '$$', desc: 'Fast multimodal model, great for general tasks' },
-  { key: 'gpt-4-turbo', label: 'GPT-4 Turbo', tag: '', speed: '⚡⚡⚡', cost: '$$$', desc: 'Strong reasoning with larger context window' },
-  { key: 'claude-3-opus', label: 'Claude 3 Opus', tag: 'Advanced', speed: '⚡⚡', cost: '$$$$', desc: 'Highest quality for complex analysis and writing' },
+  { key: 'claude-4-sonnet', label: 'Claude 4 Sonnet', tag: 'Recommended', speed: '⚡⚡⚡⚡', cost: '$$', desc: 'Best balance of speed, quality, and cost' },
+  { key: 'claude-4-opus', label: 'Claude 4 Opus', tag: 'Advanced', speed: '⚡⚡⚡', cost: '$$$$', desc: 'Highest quality for complex analysis and writing' },
+  { key: 'claude-4-haiku', label: 'Claude 4 Haiku', tag: 'Fast', speed: '⚡⚡⚡⚡⚡', cost: '$', desc: 'Ultra-fast and cost-effective for simple tasks' },
+  { key: 'gpt-5', label: 'GPT-5', tag: '', speed: '⚡⚡⚡⚡', cost: '$$$', desc: 'OpenAI flagship — strong reasoning and tool use' },
+  { key: 'gpt-4.1', label: 'GPT-4.1', tag: '', speed: '⚡⚡⚡⚡', cost: '$$', desc: 'Fast and capable for everyday tasks' },
+  { key: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', tag: 'Budget', speed: '⚡⚡⚡⚡⚡', cost: '$', desc: 'Lightweight and affordable at scale' },
+  { key: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', tag: '', speed: '⚡⚡⚡⚡', cost: '$$', desc: 'Google\'s flagship with deep reasoning and 1M context' },
+  { key: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', tag: 'Fast', speed: '⚡⚡⚡⚡⚡', cost: '$', desc: 'Ultra-fast Google model for high-volume tasks' },
+  { key: 'grok-3', label: 'Grok 3', tag: '', speed: '⚡⚡⚡⚡', cost: '$$', desc: 'xAI\'s latest — strong reasoning with real-time data' },
+  { key: 'grok-3-mini', label: 'Grok 3 Mini', tag: 'Fast', speed: '⚡⚡⚡⚡⚡', cost: '$', desc: 'Lightweight Grok for quick tasks' },
+  { key: 'llama-4-maverick', label: 'Llama 4 Maverick', tag: 'Open Source', speed: '⚡⚡⚡⚡', cost: '$', desc: 'Meta\'s open-source model — self-hostable, no vendor lock-in' },
+  { key: 'deepseek-r1', label: 'DeepSeek R1', tag: 'Open Source', speed: '⚡⚡⚡', cost: '$', desc: 'Strong reasoning model — excellent value for complex tasks' },
 ]
 
 const STEP_LABELS = ['Basics', 'Capabilities', 'Systems', 'AI Model', 'Review']
@@ -105,7 +113,7 @@ const defaultForm: NewAgentForm = {
   emoji: '🤖',
   capabilities: [],
   systems: [],
-  aiModel: 'claude-3.5-sonnet',
+  aiModel: 'claude-4-sonnet',
 }
 
 interface BotForm {
