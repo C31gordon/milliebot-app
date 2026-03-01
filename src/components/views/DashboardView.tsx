@@ -81,7 +81,8 @@ export default function DashboardView({ userName, orgName }: { userName?: string
   // Build department health from real data
   const departmentHealth = data.departments.map((dept: { id: string; name: string }) => {
     const deptAgents = data.agents.filter((a: { department_id: string }) => a.department_id === dept.id)
-    const deptBots = data.bots.filter((b: { department_id: string }) => b.department_id === dept.id)
+    const deptAgentIds = deptAgents.map((a: { id: string }) => a.id)
+    const deptBots = data.bots.filter((b: { agent_id: string }) => deptAgentIds.includes(b.agent_id))
     const deptTickets = data.tickets.filter((t: { target_department_id: string }) => t.target_department_id === dept.id)
     const isActive = deptAgents.length > 0
     return {

@@ -145,7 +145,13 @@ export default function AgentsView() {
   useEffect(() => {
     Promise.all([getAgents(), getBots(), getDepartments()]).then(([a, b, d]) => {
       setOrgDepartments((d || []).map((dept: any) => dept.name))
-      setAgents(a as AgentRow[])
+      setAgents((a || []).map((agent: any) => ({
+        ...agent,
+        emoji: agent.icon || agent.emoji || '🤖',
+        aiModel: agent.model || agent.aiModel || '',
+        connectedSystems: agent.connected_systems || agent.connectedSystems || [],
+        permissionTier: agent.permission_tier ? `Tier ${agent.permission_tier}` : agent.permissionTier || '',
+      })))
       setBots(b as BotRow[])
       if (a.length > 0) setExpandedAgent(a[0].id)
       setLoading(false)
