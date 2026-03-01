@@ -144,13 +144,13 @@ const INITIAL_DEPARTMENTS: Department[] = [
 
 const INITIAL_USERS: AppUser[] = [
   {id:'1',name:'Admin User',email:'admin@example.com',department:'Operations',tier:1,status:'Active',lastActive:'2 min ago'},
-  {id:'2',name:'Marcus Rivera',email:'mrivera@risere.com',department:'Operations',tier:2,status:'Active',lastActive:'15 min ago'},
-  {id:'3',name:'Sarah Chen',email:'schen@risere.com',department:'Leasing',tier:2,status:'Active',lastActive:'1 hour ago'},
-  {id:'4',name:'Rachel Kim',email:'rkim@risere.com',department:'HR',tier:1,status:'Active',lastActive:'3 hours ago'},
-  {id:'5',name:'James Mitchell',email:'jmitchell@risere.com',department:'Finance',tier:1,status:'Active',lastActive:'30 min ago'},
-  {id:'6',name:'Kevin Nguyen',email:'knguyen@risere.com',department:'IT',tier:1,status:'Active',lastActive:'5 min ago'},
-  {id:'7',name:'Lauren Hayes',email:'lhayes@risere.com',department:'Marketing',tier:3,status:'Invited',lastActive:'—'},
-  {id:'8',name:'Carlos Mendez',email:'cmendez@risere.com',department:'Maintenance',tier:2,status:'Deactivated',lastActive:'Jan 15, 2026'},
+  {id:'2',name:'Marcus Rivera',email:'mrivera@example.com',department:'Operations',tier:2,status:'Active',lastActive:'15 min ago'},
+  {id:'3',name:'Sarah Chen',email:'schen@example.com',department:'Operations',tier:2,status:'Active',lastActive:'1 hour ago'},
+  {id:'4',name:'Rachel Kim',email:'rkim@example.com',department:'HR',tier:1,status:'Active',lastActive:'3 hours ago'},
+  {id:'5',name:'James Mitchell',email:'jmitchell@example.com',department:'Finance',tier:1,status:'Active',lastActive:'30 min ago'},
+  {id:'6',name:'Kevin Nguyen',email:'knguyen@example.com',department:'IT',tier:1,status:'Active',lastActive:'5 min ago'},
+  {id:'7',name:'Lauren Hayes',email:'lhayes@example.com',department:'Operations',tier:3,status:'Invited',lastActive:'—'},
+  {id:'8',name:'Carlos Mendez',email:'cmendez@example.com',department:'Operations',tier:2,status:'Deactivated',lastActive:'Jan 15, 2026'},
 ]
 
 export default function SettingsView() {
@@ -210,7 +210,7 @@ function GeneralSettings({ showToast }: { showToast: (m: string) => void }) {
   const [orgName, setOrgName] = useState(() => { if (typeof window !== 'undefined') { const u = localStorage.getItem('zynthr_user'); if (u) { try { return JSON.parse(u).orgName || 'Zynthr' } catch { return 'Zynthr' } } } return 'Zynthr' })
   const [industry, setIndustry] = useState('Multifamily Real Estate')
   const [size, setSize] = useState('~30,000 units')
-  const [contact, setContact] = useState('cgordon@risere.com')
+  const [contact, setContact] = useState('cgordon@example.com')
 
   const integrations = [
     { name: 'Microsoft 365', icon: '🟦', status: 'Connected' as const },
@@ -523,7 +523,7 @@ function UsersSettings({ users, setUsers, departments, showToast }: {
           <div className="glass-card" style={{ padding: 24, borderRadius: 16, maxWidth: 440, width: '90%' }} onClick={e => e.stopPropagation()}>
             <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--text)' }}>Invite User</h3>
             <InputField label="Full Name *" value={invName} onChange={setInvName} placeholder="Jane Doe" />
-            <InputField label="Email *" value={invEmail} onChange={setInvEmail} placeholder="jane@risere.com" />
+            <InputField label="Email *" value={invEmail} onChange={setInvEmail} placeholder="jane@example.com" />
             <div className="mb-3">
               <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Department</label>
               <select value={invDept} onChange={e => setInvDept(e.target.value)}
@@ -790,7 +790,7 @@ function SSOSettings() {
   return (
     <>
       <SectionCard title="Microsoft SSO (Entra ID)" description="Allow team members to sign in with their Microsoft work accounts">
-        <StaticToggle label="Enable Microsoft SSO" description="Users can sign in with their @risere.com accounts" defaultChecked />
+        <StaticToggle label="Enable Microsoft SSO" description="Users can sign in with their @example.com accounts" defaultChecked />
         <div className="grid grid-cols-2 gap-4 mt-3">
           <InputField label="Tenant ID" value="••••••••-••••-••••-••••-••••••••••••" />
           <InputField label="Client ID" value="••••••••-••••-••••-••••-••••••••••••" />
@@ -843,7 +843,7 @@ function NotificationSettings() {
       <SectionCard title="Alert Channels" description="Where should important notifications be sent?">
         <div className="space-y-3">
           {[
-            { icon: '📧', name: 'Email', detail: 'cgordon@risere.com', active: true },
+            { icon: '📧', name: 'Email', detail: 'cgordon@example.com', active: true },
             { icon: '📱', name: 'Telegram', detail: '@millie_bot', active: true },
             { icon: '💬', name: 'Slack', detail: 'Not connected', active: false },
           ].map((ch, i) => (
@@ -888,7 +888,7 @@ function BrandingSettings() {
   return (
     <>
       <SectionCard title="Custom Domain" description="Point your own domain to this platform (available after day 15)">
-        <InputField label="Custom Domain" value="" placeholder="agents.risere.com" />
+        <InputField label="Custom Domain" value="" placeholder="agents.yourdomain.com" />
         <div className="p-3 rounded-lg mt-2" style={{ background: 'var(--bg)', border: '1px dashed var(--border)' }}>
           <p className="text-xs" style={{ color: 'var(--text4)' }}>Add a CNAME record pointing to <code style={{ color: 'var(--blue)' }}>cname.vercel-dns.com</code> then verify below.</p>
         </div>

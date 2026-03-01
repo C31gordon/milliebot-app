@@ -38,7 +38,7 @@ const smartResponses: Record<string, { content: string; confidence?: number; sou
     freshness: 'verified',
   },
   occupancy: {
-    content: "**Portfolio Occupancy — Feb 28, 2026**\n\n📊 **Physical Occupancy:** 94.2% (↑ 0.3%)\n• Bartram Park: 96.3% (285/297 units)\n• Prosper On Fayette: 62.1% preleased (195/314 beds)\n\n📈 **Leased:** 95.8% — 12 new leases this week\n\n⚠️ Prosper needs 8 leases/week to hit fall target",
+    content: "**Welcome to Zynthr — Feb 28, 2026**\n\n📊 **Physical Occupancy:** 94.2% (↑ 0.3%)\n• Deploy agents to automate your workflows\n• Connect your tools and integrations\n\n📈 **Getting Started:** Set up departments, agents, and bots\n\n⚠️ Ask me anything to get started!",
     confidence: 94,
     sources: [{ label: 'System Report', url: '#' }],
     freshness: 'verified',

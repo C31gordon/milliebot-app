@@ -92,7 +92,7 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
   const displayRole = DEMO_MODE && !isAuthenticated ? DEMO_USER.role : (localUser ? 'Member' : '')
 
   const notifications = [
-    { icon: '🛡️', text: 'Prompt injection attempt blocked from jsmith@risere.com', time: '2 min ago', unread: true },
+    { icon: '🛡️', text: 'Prompt injection attempt blocked from external@example.com', time: '2 min ago', unread: true },
     { icon: '🎫', text: 'New ticket #TKT-0012 assigned to IT', time: '12 min ago', unread: true },
     { icon: '🔒', text: 'Access exception expiring in 7 days', time: '1 hour ago', unread: false },
     { icon: '💡', text: 'Suggestion #SUG-0008 shipped!', time: '3 hours ago', unread: false },

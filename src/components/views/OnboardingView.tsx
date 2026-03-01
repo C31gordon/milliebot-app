@@ -41,7 +41,7 @@ const pathways: Pathway[] = [
     steps: [
       { name: 'Company Orientation', timeline: 'Day 1', status: 'complete' },
       { name: 'Fair Housing Certification', timeline: 'Day 1-3', status: 'complete' },
-      { name: 'Entrata System Training', timeline: 'Day 2-5', status: 'complete' },
+      { name: 'System Training', timeline: 'Day 2-5', status: 'complete' },
       { name: 'Shadow 3 Live Tours', timeline: 'Day 3-7', status: 'complete', requires: 'Step 2' },
       { name: 'Conduct 3 Observed Tours', timeline: 'Day 7-14', status: 'in-progress', requires: 'Step 4', detail: '1/3 completed' },
       { name: 'Guardian Gate: Lease Execution Clearance', timeline: '', status: 'locked', requires: 'Steps 2, 4, 5 + Manager Sign-off', isGate: true, gateBlocks: ['Independent lease execution', 'Access to lease templates', 'Resident move-in processing'], gatePrereqs: [{ label: 'Fair Housing Certification', met: true }, { label: 'Shadow 3 Live Tours', met: true }, { label: 'Conduct 3 Observed Tours', met: false }, { label: 'Manager Sign-off', met: false }] },
@@ -75,7 +75,7 @@ const pathways: Pathway[] = [
     progress: 28,
     steps: [
       { name: 'Management Orientation & Systems Access', timeline: 'Day 1-2', status: 'complete' },
-      { name: 'Financial Systems Training (Yardi/Entrata)', timeline: 'Day 2-5', status: 'complete' },
+      { name: 'Financial Systems Training', timeline: 'Day 2-5', status: 'complete' },
       { name: 'Vendor Management & Procurement', timeline: 'Day 5-8', status: 'in-progress' },
       { name: 'Lease Audit Training', timeline: 'Day 8-12', status: 'pending', requires: 'Step 2' },
       { name: 'Resident Escalation Protocols', timeline: 'Day 10-14', status: 'pending', requires: 'Step 3' },
@@ -123,7 +123,7 @@ const allEmployees = [
 const sarahChecklist = [
   { step: 'Company Orientation', done: true },
   { step: 'Fair Housing Certification', done: true },
-  { step: 'Entrata System Training', done: true },
+  { step: 'System Training', done: true },
   { step: 'Shadow 3 Live Tours', done: true },
   { step: 'Conduct 3 Observed Tours', done: false },
   { step: 'Guardian Gate: Lease Execution', done: false },

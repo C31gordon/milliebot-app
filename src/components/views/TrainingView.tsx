@@ -11,7 +11,7 @@ const stats = [
 
 const trainingModules = [
   { title: 'Fair Housing Fundamentals', type: 'Required' as const, duration: '45 min', completion: 94 },
-  { title: 'Entrata Lease Execution', type: 'Required' as const, duration: '60 min', completion: 78 },
+  { title: 'Platform Training', type: 'Required' as const, duration: '60 min', completion: 78 },
   { title: "Miya's Law Documentation", type: 'Required' as const, duration: '30 min', completion: 100 },
   { title: 'Work Order Triage & Priority', type: 'Required' as const, duration: '40 min', completion: 85 },
   { title: 'Resident Communication Best Practices', type: 'Recommended' as const, duration: '25 min', completion: 67 },
@@ -84,7 +84,7 @@ const certificates = [
   { employee: 'Rachel Kim', module: 'Yardi Financial Reporting', score: 85, issued: 'Jan 20, 2026', expiry: 'Jan 20, 2027', status: 'Active' },
   { employee: 'Aisha Patel', module: 'Fair Housing Fundamentals', score: 91, issued: 'Mar 05, 2025', expiry: 'Mar 05, 2026', status: 'Expiring' },
   { employee: 'David Chen', module: 'Emergency Maintenance Protocols', score: 78, issued: 'Mar 12, 2025', expiry: 'Mar 12, 2026', status: 'Expiring' },
-  { employee: 'Tyler Brooks', module: 'Entrata Lease Execution', score: 94, issued: 'Aug 15, 2025', expiry: 'Aug 15, 2026', status: 'Active' },
+  { employee: 'Tyler Brooks', module: 'Platform Training', score: 94, issued: 'Aug 15, 2025', expiry: 'Aug 15, 2026', status: 'Active' },
   { employee: 'Lisa Nguyen', module: 'Fair Housing Fundamentals', score: 82, issued: 'Jan 20, 2025', expiry: 'Jan 20, 2026', status: 'Expired' },
   { employee: 'Chris Johnson', module: 'Work Order Triage & Priority', score: 89, issued: 'Feb 10, 2025', expiry: 'Feb 10, 2026', status: 'Expired' },
   { employee: 'Amanda Foster', module: 'ADA Compliance & Accessibility', score: 95, issued: 'Feb 20, 2026', expiry: 'Feb 20, 2027', status: 'Active' },

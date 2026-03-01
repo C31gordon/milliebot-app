@@ -40,7 +40,7 @@ const workflows: Workflow[] = [
     triggerDetail: 'Every 2 hours (7 AM – 7 PM)',
     steps: [
       { id: 's1', type: 'trigger', label: 'Schedule Timer', config: 'Every 2 hours' },
-      { id: 's2', type: 'action', label: 'Scan Inbox', config: 'courtney.assistant@risere.com' },
+      { id: 's2', type: 'action', label: 'Scan Inbox', config: 'assistant@yourdomain.com' },
       { id: 's3', type: 'condition', label: 'Classify Email', config: 'Junk / DLR / Uber / Marketing' },
       { id: 's4', type: 'action', label: 'Move & Tag', config: 'Auto-file to folders' },
       { id: 's5', type: 'notification', label: 'Report', config: 'Telegram summary' },
@@ -55,15 +55,15 @@ const workflows: Workflow[] = [
   {
     id: 'WF-002',
     name: 'DLR Auto-Generation',
-    description: 'Pull Entrata reports, build Daily Leasing Reports, deploy to GitHub Pages',
+    description: 'Pull system reports, build daily summaries, deploy to dashboard',
     department: 'Operations',
     status: 'active',
     trigger: 'schedule',
     triggerDetail: 'Daily at 8:00 AM',
     steps: [
       { id: 's1', type: 'trigger', label: 'Daily Timer', config: '8:00 AM ET' },
-      { id: 's2', type: 'action', label: 'Pull Entrata Data', config: '5 reports per property' },
-      { id: 's3', type: 'action', label: 'Build Reports', config: 'Bartram + Prosper' },
+      { id: 's2', type: 'action', label: 'Pull System Data', config: 'Automated data pull' },
+      { id: 's3', type: 'action', label: 'Build Reports', config: 'Property A + Property B' },
       { id: 's4', type: 'action', label: 'Deploy', config: 'GitHub Pages' },
       { id: 's5', type: 'notification', label: 'Email Links', config: 'Property managers + regionals' },
     ],
@@ -104,8 +104,8 @@ const workflows: Workflow[] = [
     trigger: 'event',
     triggerDetail: 'When new employee record is created',
     steps: [
-      { id: 's1', type: 'trigger', label: 'New Employee Event', config: 'Paycor webhook' },
-      { id: 's2', type: 'action', label: 'Create Accounts', config: 'M365, Entrata, MoonRISE' },
+      { id: 's1', type: 'trigger', label: 'New Employee Event', config: 'HR system webhook' },
+      { id: 's2', type: 'action', label: 'Create Accounts', config: 'M365, CRM, Service Desk' },
       { id: 's3', type: 'action', label: 'Assign Training', config: 'Role-based curriculum' },
       { id: 's4', type: 'notification', label: 'Notify Manager', config: 'Welcome packet + checklist' },
     ],
@@ -146,7 +146,7 @@ const workflows: Workflow[] = [
     trigger: 'webhook',
     triggerDetail: 'When invoice email received',
     steps: [
-      { id: 's1', type: 'trigger', label: 'Email Received', config: 'invoices@risere.com' },
+      { id: 's1', type: 'trigger', label: 'Email Received', config: 'invoices@yourdomain.com' },
       { id: 's2', type: 'action', label: 'Extract Data', config: 'AI document parsing' },
       { id: 's3', type: 'condition', label: 'Match PO', config: 'Auto-match or flag for review' },
       { id: 's4', type: 'action', label: 'Route Approval', config: 'Based on amount threshold' },

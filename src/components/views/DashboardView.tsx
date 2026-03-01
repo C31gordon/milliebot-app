@@ -94,7 +94,7 @@ export default function DashboardView({ userName, orgName }: { userName?: string
   })
 
   const securityAlerts = [
-    { level: 'critical' as const, text: '3 prompt injection attempts from jsmith@risere.com in 24 hours', action: 'Investigate', icon: '🔴' },
+    { level: 'critical' as const, text: '3 prompt injection attempts from external@example.com in 24 hours', action: 'Investigate', icon: '🔴' },
     { level: 'warning' as const, text: 'Access exception for Marketing → Ops expires in 7 days', action: 'Review', icon: '🟡' },
     { level: 'info' as const, text: 'Weekly security audit completed — no issues found', action: 'View', icon: '🟢' },
   ]
