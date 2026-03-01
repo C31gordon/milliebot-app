@@ -41,14 +41,12 @@ export async function POST(request: NextRequest) {
         description: description || null,
         status: 'active',
         capabilities: capabilities || [],
-        settings: {
-          systems: systems || [],
-          aiModel: aiModel || 'claude-4-sonnet',
-          emoji: emoji || '🤖',
-          permissionTier: permissionTier || 'Tier 3 Manager',
-        },
+        connected_systems: systems || [],
+        model: aiModel || 'claude-4-sonnet',
+        icon: emoji || '🤖',
+        permission_tier: permissionTier || 'Tier 3 Manager',
       })
-      .select()
+      .select('*, department:departments(id, name)')
       .single()
 
     if (error) {
