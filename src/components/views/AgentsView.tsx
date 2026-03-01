@@ -334,7 +334,15 @@ export default function AgentsView() {
     if (wizardStep === 1) {
       return (
         <div className="space-y-3" style={{ paddingTop: 8 }}>
-          <p style={{ fontSize: 13, color: 'var(--text3)', marginBottom: 8 }}>Select what this agent can do:</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <p style={{ fontSize: 13, color: 'var(--text3)', margin: 0 }}>Select what this agent can do:</p>
+            <button type="button" onClick={() => setForm(f => ({
+              ...f,
+              capabilities: f.capabilities.length === CAPABILITIES.length ? [] : CAPABILITIES.map(c => c.key),
+            }))} style={{ fontSize: 12, fontWeight: 600, color: 'var(--blue)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}>
+              {form.capabilities.length === CAPABILITIES.length ? 'Deselect All' : 'Select All'}
+            </button>
+          </div>
           {CAPABILITIES.map(cap => (
             <label key={cap.key} style={{
               display: 'flex', gap: 12, padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
