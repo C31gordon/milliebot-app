@@ -143,7 +143,7 @@ const INITIAL_DEPARTMENTS: Department[] = [
 ]
 
 const INITIAL_USERS: AppUser[] = [
-  {id:'1',name:'Courtney Gordon',email:'cgordon@risere.com',department:'Operations',tier:1,status:'Active',lastActive:'2 min ago'},
+  {id:'1',name:'Admin User',email:'admin@example.com',department:'Operations',tier:1,status:'Active',lastActive:'2 min ago'},
   {id:'2',name:'Marcus Rivera',email:'mrivera@risere.com',department:'Operations',tier:2,status:'Active',lastActive:'15 min ago'},
   {id:'3',name:'Sarah Chen',email:'schen@risere.com',department:'Leasing',tier:2,status:'Active',lastActive:'1 hour ago'},
   {id:'4',name:'Rachel Kim',email:'rkim@risere.com',department:'HR',tier:1,status:'Active',lastActive:'3 hours ago'},

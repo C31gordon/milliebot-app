@@ -39,14 +39,14 @@ const exceptions: ExceptionWaiver[] = [
     requestedBy: 'Sarah Chen', department: 'Marketing',
     reason: 'Need revenue data for Q1 marketing ROI report to present at leadership meeting',
     duration: '30-days', expiresAt: 'Mar 25, 2026', status: 'active',
-    approvedBy: 'Courtney Gordon', requestedAt: 'Feb 23, 2026', riskLevel: 'medium',
+    approvedBy: 'Admin', requestedAt: 'Feb 23, 2026', riskLevel: 'medium',
   },
   {
     id: 'EXC-002', policyId: 'POL-003', policyName: 'Operations SOP Sharing',
     requestedBy: 'Mona Vogel', department: 'Training',
     reason: 'Building new-hire training module that references move-in/move-out SOPs',
     duration: '60-days', expiresAt: 'Apr 24, 2026', status: 'active',
-    approvedBy: 'Courtney Gordon', requestedAt: 'Feb 22, 2026', riskLevel: 'low',
+    approvedBy: 'Admin', requestedAt: 'Feb 22, 2026', riskLevel: 'low',
   },
   {
     id: 'EXC-003', policyId: 'POL-003', policyName: 'Operations SOP Sharing',

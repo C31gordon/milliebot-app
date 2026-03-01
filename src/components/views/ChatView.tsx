@@ -17,19 +17,19 @@ interface Message {
 
 const smartResponses: Record<string, { content: string; confidence?: number; sources?: { label: string; url: string }[]; freshness?: string }> = {
   occupancy: {
-    content: "**Current Portfolio Occupancy — Feb 28, 2026**\n\n📊 **Physical Occupancy:** 94.2% (↑ 0.3% from last week)\n• Bartram Park: 96.3% (285/297 units)\n• Prosper On Fayette: 62.1% preleased (195/314 beds)\n\n📈 **Leased Occupancy:** 95.8%\n• 12 new leases signed this week\n• 3 move-outs scheduled next week\n\n⚠️ **Watch Items:**\n• Prosper pre-lease velocity needs to hit 8 leases/week to meet fall target\n• Bartram renewal rate at 62% — above 60% benchmark",
+    content: "👋 **Welcome to your Zynthr command center!**\n\nI can help you with:\n• Agent management and deployment\n• Workflow automation\n• Report generation\n• Team coordination\n\nWhat would you like to work on?",
     confidence: 94,
     sources: [
-      { label: 'Entrata Box Score (Feb 28)', url: '#' },
+      { label: 'System Report', url: '#' },
       { label: 'Weekly Leasing Report', url: '#' },
     ],
     freshness: 'verified',
   },
   revenue: {
-    content: "**Revenue Summary — February 2026 (MTD)**\n\n💰 **Total Collected Revenue:** $2,847,320\n• Bartram Park: $1,923,450 (target: $1,950,000 → 98.6%)\n• Prosper On Fayette: $923,870 (target: $890,000 → 103.8%)\n\n📊 **Average Rent:**\n• Bartram 1BR: $1,485 (+2.1% YoY)\n• Bartram 2BR: $1,835 (+1.8% YoY)\n• Prosper 2BR/2BA: $1,250/bed\n\n⚠️ **Delinquency:** 3.2% (↓ from 3.8% last month)\n\n*Note: This data includes projected end-of-month calculations*",
+    content: "📊 **Your organization dashboard is ready!**\n\nYour agents and departments are configured. Here's what you can do next:\n• Deploy agents to handle specific workflows\n• Connect integrations to your existing tools\n• Set up automated reporting schedules\n• Configure notification preferences",
     confidence: 88,
     sources: [
-      { label: 'Entrata Rent Roll (Feb 28)', url: '#' },
+      { label: 'Analytics Report', url: '#' },
       { label: 'Monthly P&L Projection', url: '#' },
     ],
     freshness: 'partial',
@@ -126,7 +126,7 @@ function getSmartResponse(message: string): Message {
     response = {
       content: "**Work Order Summary — This Week**\n\n🔧 **Open:** 23 work orders\n• 🔴 Emergency: 1 (HVAC unit 204 — vendor dispatched)\n• 🟠 Urgent: 4 (plumbing x2, electrical x1, pest x1)\n• 🟢 Standard: 18\n\n📊 **SLA Performance:**\n• Emergency response: 100% within 4 hours ✅\n• Urgent: 87.5% within 24 hours ⚠️\n• Standard: 94% within 72 hours ✅\n\n**Average completion:** 2.3 business days (target: 3.0)\n\n⚠️ Unit 312 has had 3 work orders in 30 days — might want to flag for inspection.",
       confidence: 91,
-      sources: [{ label: 'MoonRISE Service Desk', url: '#' }],
+      sources: [{ label: 'Support Dashboard', url: '#' }],
       freshness: 'verified',
     }
   }
