@@ -118,6 +118,7 @@ RULES:
     ]
 
     const anthropicKey = process.env.ANTHROPIC_API_KEY
+    console.log('ANTHROPIC_KEY exists:', !!anthropicKey, 'length:', anthropicKey?.length || 0)
     if (anthropicKey) {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -133,11 +134,15 @@ RULES:
           messages: messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content })),
         }),
       })
+      const responseText = await res.text()
+      console.log('Anthropic status:', res.status, 'body:', responseText.substring(0, 200))
       if (res.ok) {
-        const data = await res.json()
+        const data = JSON.parse(responseText)
         const reply = data.content?.[0]?.text || "Hmm, I drew a blank there. Try asking differently?"
         return NextResponse.json({ reply })
       }
+      // If Anthropic fails, return the error for debugging
+      return NextResponse.json({ reply: "AI is connecting... (Status: " + res.status + "). Try again in a moment! 🔄" })
     }
 
     return NextResponse.json({
