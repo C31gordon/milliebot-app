@@ -57,8 +57,11 @@ export default function SubdomainPicker({ value, onChange, onValidChange }: Subd
   return (
     <div>
       <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text3)' }}>
-        Choose your URL
+        Workspace URL
       </label>
+      <p className="text-xs mb-2" style={{ color: 'var(--text4)' }}>
+        This is your team&apos;s unique address to access Zynthr. Share it with your team to sign in.
+      </p>
       <div className="flex items-center rounded-lg overflow-hidden" style={{ border: `1px solid ${borderColor}`, background: 'var(--bg)' }}>
         <input
           type="text"
