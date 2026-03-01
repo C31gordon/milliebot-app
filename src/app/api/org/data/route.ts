@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabaseAdmin as any
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get('userId')
@@ -10,12 +10,32 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
   }
 
+  if (!supabaseUrl || !serviceKey) {
+    return NextResponse.json({ 
+      error: 'Missing env vars',
+      hasUrl: !!supabaseUrl,
+      hasKey: !!serviceKey,
+      keyPrefix: serviceKey.substring(0, 10),
+    }, { status: 500 })
+  }
+
+  const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+
   try {
-    const { data: member } = await db
+    // Get org membership
+    const { data: member, error: memberErr } = await db
       .from('org_members')
       .select('org_id, role, permission_tier')
       .eq('user_id', userId)
       .single()
+
+    if (memberErr) {
+      return NextResponse.json({ 
+        error: 'Member query failed', 
+        detail: memberErr.message,
+        org: null, departments: [], agents: [], audit: [] 
+      })
+    }
 
     if (!member?.org_id) {
       return NextResponse.json({ org: null, departments: [], agents: [], audit: [] })
@@ -23,22 +43,32 @@ export async function GET(request: NextRequest) {
 
     const orgId = member.org_id
 
-    const [orgRes, deptsRes, agentsRes, auditRes] = await Promise.all([
+    const [orgRes, deptsRes] = await Promise.all([
       db.from('organizations').select('*').eq('id', orgId).single(),
       db.from('departments').select('*').eq('org_id', orgId),
-      db.from('agents').select('*').eq('org_id', orgId).catch(() => ({ data: [] })),
-      db.from('audit_log').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(10).catch(() => ({ data: [] })),
     ])
+
+    // Agents and audit may not exist, so catch errors
+    let agents: unknown[] = []
+    let audit: unknown[] = []
+    try {
+      const agentsRes = await db.from('agents').select('*').eq('org_id', orgId)
+      agents = agentsRes.data || []
+    } catch { /* table may not exist */ }
+    try {
+      const auditRes = await db.from('audit_log').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(10)
+      audit = auditRes.data || []
+    } catch { /* table may not exist */ }
 
     return NextResponse.json({
       org: orgRes.data,
       membership: member,
       departments: deptsRes.data || [],
-      agents: agentsRes.data || [],
-      audit: auditRes.data || [],
+      agents,
+      audit,
     })
   } catch (error) {
-    console.error('org/data error:', error)
-    return NextResponse.json({ error: 'Failed to load org data' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
