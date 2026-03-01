@@ -749,7 +749,7 @@ function AgreementsSection() {
             </div>
           </div>
           <button className="text-xs px-3 py-1.5 rounded-lg shrink-0 ml-3"
-            style={{ background: 'var(--bg3)', color: 'var(--accent)', cursor: 'pointer', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--bg3)', color: '#559CB5', cursor: 'pointer', border: '1px solid var(--border)' }}
             title={`Download ${item.name}`}
             onClick={() => {
               const loadAndOpen = async () => {

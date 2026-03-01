@@ -225,17 +225,35 @@ export default function AgentsView() {
     }
   }
 
-  function handleCreateBot() {
-    const newBot: LocalBot = {
-      id: 'bot-' + Date.now().toString(),
-      name: botForm.name,
-      description: botForm.description,
-      status: 'active',
-      bot_type: 'support',
-      capabilities: botForm.capabilities,
-      agent_id: botForm.agentId,
+  async function handleCreateBot() {
+    try {
+      const res = await fetch('/api/bots/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          name: botForm.name,
+          description: botForm.description,
+          capabilities: botForm.capabilities,
+          agentId: botForm.agentId,
+        }),
+      })
+      const data = await res.json()
+      if (data.bot) {
+        const newBot: LocalBot = {
+          id: data.bot.id,
+          name: data.bot.name,
+          description: data.bot.description,
+          status: 'active',
+          bot_type: 'support',
+          capabilities: data.bot.capabilities || [],
+          agent_id: data.bot.agent_id,
+        }
+        setLocalBots(prev => [...prev, newBot])
+      }
+    } catch (e) {
+      console.error('Bot creation failed:', e)
     }
-    setLocalBots(prev => [...prev, newBot])
     setShowBotForm(false)
     setBotForm({ name: '', description: '', capabilities: [], agentId: '' })
   }

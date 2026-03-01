@@ -12,11 +12,12 @@ interface OrgData {
   membership: Record<string, unknown> | null
   departments: any[]
   agents: any[]
+  bots: any[]
   audit: any[]
 }
 
 async function fetchOrgData(userId?: string): Promise<OrgData> {
-  if (!userId) return { org: null, membership: null, departments: [], agents: [], audit: [] }
+  if (!userId) return { org: null, membership: null, departments: [], agents: [], bots: [], audit: [] }
 
   const now = Date.now()
   if (orgDataCache.data && now - orgDataCache.fetchedAt < CACHE_TTL) {
@@ -31,7 +32,7 @@ async function fetchOrgData(userId?: string): Promise<OrgData> {
     return data
   } catch (e) {
     console.error('fetchOrgData:', e)
-    return { org: null, membership: null, departments: [], agents: [], audit: [] }
+    return { org: null, membership: null, departments: [], agents: [], bots: [], audit: [] }
   }
 }
 
@@ -48,7 +49,9 @@ export async function getAgents() {
 }
 
 export async function getBots() {
-  return [] // Bots table may not exist yet
+  const userId = await getCurrentUserId()
+  const data = await fetchOrgData(userId || undefined)
+  return data.bots || []
 }
 
 export async function getTickets() {

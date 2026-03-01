@@ -219,7 +219,7 @@ export default function OrgSetupWizardView() {
   }, [enabledDepts, newMember.department])
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 14px', background: 'var(--bg1)', border: '1px solid var(--border)',
+    width: '100%', padding: '10px 14px', background: 'var(--bg)', border: '1px solid var(--border)',
     borderRadius: 8, color: 'var(--text)', fontSize: 14, outline: 'none',
   }
 
@@ -232,7 +232,7 @@ export default function OrgSetupWizardView() {
           <div key={label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <div style={{
               width: '100%', height: 4, borderRadius: 2,
-              background: i <= step ? 'var(--accent)' : 'var(--border)',
+              background: i <= step ? '#559CB5' : 'var(--border)',
               transition: 'background 0.3s',
             }} />
             <span style={{ fontSize: 11, color: i <= step ? 'var(--text)' : 'var(--text4)', fontWeight: i === step ? 700 : 400, whiteSpace: 'nowrap' }}>
@@ -257,7 +257,7 @@ export default function OrgSetupWizardView() {
           disabled={nextDisabled}
           style={{
             padding: '10px 28px', cursor: nextDisabled ? 'not-allowed' : 'pointer',
-            background: nextDisabled ? 'var(--bg3)' : 'var(--accent)', color: nextDisabled ? 'var(--text4)' : '#fff',
+            background: nextDisabled ? 'var(--bg3)' : '#559CB5', color: nextDisabled ? 'var(--text4)' : '#fff',
             border: 'none', borderRadius: 8, fontWeight: 600, opacity: nextDisabled ? 0.5 : 1,
           }}
         >
@@ -291,7 +291,7 @@ export default function OrgSetupWizardView() {
             {SIZES.map(s => (
               <button key={s} onClick={() => setOrg({ ...org, size: s })} style={{
                 padding: '8px 16px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                background: org.size === s ? 'var(--accent)' : 'var(--bg3)',
+                background: org.size === s ? '#559CB5' : 'var(--bg3)',
                 color: org.size === s ? '#fff' : 'var(--text3)',
                 border: org.size === s ? 'none' : '1px solid var(--border)',
               }}>{s}</button>
@@ -344,7 +344,7 @@ export default function OrgSetupWizardView() {
         <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: 'var(--text)' }}>📋 Business Associate Agreement (BAA)</h2>
         <p style={{ color: 'var(--text3)', marginBottom: 20, fontSize: 14 }}>Required for HIPAA compliance when handling Protected Health Information (PHI)</p>
 
-        <div style={{ maxHeight: 300, overflow: 'auto', padding: 16, background: 'var(--bg1)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24, fontSize: 12, lineHeight: 1.7, color: 'var(--text3)', whiteSpace: 'pre-wrap' }}>
+        <div style={{ maxHeight: 300, overflow: 'auto', padding: 16, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24, fontSize: 12, lineHeight: 1.7, color: 'var(--text3)', whiteSpace: 'pre-wrap' }}>
           {BAA_CONTENT}
         </div>
 
@@ -373,7 +373,7 @@ export default function OrgSetupWizardView() {
                     <input style={inputStyle} placeholder="Organization Name" value={baaOrgName || org.name} onChange={e => setBaaOrgName(e.target.value)} />
                     <input style={inputStyle} value={new Date().toLocaleDateString()} disabled />
                     <button onClick={handleDigitalSign} disabled={!baaSignerName.trim() || !baaSignerTitle.trim()}
-                      style={{ padding: '10px 20px', background: baaSignerName.trim() && baaSignerTitle.trim() ? 'var(--accent)' : 'var(--bg3)', color: baaSignerName.trim() && baaSignerTitle.trim() ? '#fff' : 'var(--text4)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: baaSignerName.trim() && baaSignerTitle.trim() ? 'pointer' : 'not-allowed' }}>
+                      style={{ padding: '10px 20px', background: baaSignerName.trim() && baaSignerTitle.trim() ? '#559CB5' : 'var(--bg3)', color: baaSignerName.trim() && baaSignerTitle.trim() ? '#fff' : 'var(--text4)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: baaSignerName.trim() && baaSignerTitle.trim() ? 'pointer' : 'not-allowed' }}>
                       I Accept &amp; Sign
                     </button>
                   </div>
@@ -416,10 +416,10 @@ export default function OrgSetupWizardView() {
           {departments.map(dept => (
             <div key={dept.id} className="glass-card" style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-              background: dept.enabled ? 'var(--bg3)' : 'var(--bg1)', border: '1px solid var(--border)', borderRadius: 10,
+              background: dept.enabled ? 'var(--bg3)' : 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10,
               opacity: dept.enabled ? 1 : 0.5, transition: 'all 0.2s',
             }}>
-              <input type="checkbox" checked={dept.enabled} onChange={() => toggleDept(dept.id)} style={{ width: 18, height: 18, accentColor: 'var(--accent)', cursor: 'pointer' }} />
+              <input type="checkbox" checked={dept.enabled} onChange={() => toggleDept(dept.id)} style={{ width: 18, height: 18, accentColor: '#559CB5', cursor: 'pointer' }} />
               <div style={{ flex: 1 }}>
                 <input value={dept.name} onChange={e => renameDept(dept.id, e.target.value)}
                   style={{ background: 'transparent', border: 'none', color: 'var(--text)', fontWeight: 600, fontSize: 14, outline: 'none', width: '100%' }} />
@@ -430,7 +430,7 @@ export default function OrgSetupWizardView() {
         </div>
         <button onClick={addDept} style={{
           marginTop: 12, padding: '10px 20px', background: 'var(--bg3)', border: '1px dashed var(--border)',
-          borderRadius: 8, color: 'var(--accent)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+          borderRadius: 8, color: '#559CB5', cursor: 'pointer', fontSize: 13, fontWeight: 600,
         }}>+ Add Custom Department</button>
         {navButtons(enabledDepts.length === 0)}
       </div>
@@ -497,7 +497,7 @@ export default function OrgSetupWizardView() {
               {integ.connected ? (
                 <div style={{ fontSize: 13, color: '#2ecc71', fontWeight: 600 }}>✅ Connected</div>
               ) : integ.connecting ? (
-                <div style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 600 }}>⟳ Connecting…</div>
+                <div style={{ fontSize: 13, color: '#559CB5', fontWeight: 600 }}>⟳ Connecting…</div>
               ) : (
                 <button onClick={() => handleConnect(integ.id)} style={{
                   padding: '8px 16px', background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -533,7 +533,7 @@ export default function OrgSetupWizardView() {
             {TIERS.map(t => <option key={t.tier} value={t.tier}>Tier {t.tier} — {t.label}</option>)}
           </select>
           <button onClick={addMember} disabled={!newMember.name || !newMember.email} style={{
-            padding: '10px 20px', background: newMember.name && newMember.email ? 'var(--accent)' : 'var(--bg3)',
+            padding: '10px 20px', background: newMember.name && newMember.email ? '#559CB5' : 'var(--bg3)',
             color: newMember.name && newMember.email ? '#fff' : 'var(--text4)',
             border: 'none', borderRadius: 8, cursor: newMember.name && newMember.email ? 'pointer' : 'not-allowed', fontWeight: 600, fontSize: 13,
           }}>+ Add</button>
@@ -618,7 +618,7 @@ export default function OrgSetupWizardView() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button onClick={() => go('prev')} className="glass-card" style={{ padding: '10px 24px', cursor: 'pointer', background: 'var(--bg3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 8 }}>← Back</button>
           <button onClick={handleLaunch} style={{
-            padding: '16px 40px', background: 'linear-gradient(135deg, var(--accent), #2ecc71)',
+            padding: '16px 40px', background: 'linear-gradient(135deg, #559CB5, #2ecc71)',
             color: '#fff', border: 'none', borderRadius: 12, fontSize: 18, fontWeight: 800, cursor: 'pointer',
             boxShadow: '0 4px 20px rgba(85, 156, 181, 0.4)',
           }}>🚀 Launch Your Organization</button>

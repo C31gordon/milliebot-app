@@ -280,7 +280,7 @@ export default function LoginPage() {
       {/* OAuth Toast */}
       {oauthToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-lg"
-          style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)' }}>
+          style={{ background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)' }}>
           Google & Microsoft sign-in available soon — please use email for now
         </div>
       )}

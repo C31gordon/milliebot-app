@@ -43,9 +43,10 @@ export async function GET(request: NextRequest) {
 
     const orgId = member.org_id
 
-    const [orgRes, deptsRes] = await Promise.all([
+    const [orgRes, deptsRes, botsRes] = await Promise.all([
       db.from('organizations').select('*').eq('id', orgId).single(),
       db.from('departments').select('*').eq('org_id', orgId),
+      db.from('bots').select('*, agent:agents(id, name)').eq('org_id', orgId),
     ])
 
     // Agents and audit may not exist, so catch errors
@@ -65,6 +66,7 @@ export async function GET(request: NextRequest) {
       membership: member,
       departments: deptsRes.data || [],
       agents,
+      bots: botsRes?.data || [],
       audit,
     })
   } catch (error) {
