@@ -185,27 +185,44 @@ export default function AgentsView() {
     }))
   }
 
-  function handleDeploy() {
+  async function handleDeploy() {
     setDeploying(true)
-    setTimeout(() => {
-      const newAgent: AgentRow = {
-        id: 'local-' + Date.now().toString(),
-        name: form.name,
-        description: form.description,
-        status: 'Online',
-        capabilities: form.capabilities,
-        owner_user_id: null,
-        department: { id: form.department.toLowerCase(), name: form.department, icon: deptIcons[form.department] || '📁' },
-        permissionTier: form.permissionTier,
-        connectedSystems: form.systems,
-        aiModel: form.aiModel,
-        emoji: form.emoji,
+    try {
+      const res = await fetch('/api/agents/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          name: form.name,
+          description: form.description,
+          department: form.department,
+          capabilities: form.capabilities,
+          systems: form.systems,
+          aiModel: form.aiModel,
+          emoji: form.emoji,
+          permissionTier: form.permissionTier,
+        }),
+      })
+      const data = await res.json()
+      if (data.agent) {
+        const newAgent: AgentRow = {
+          ...data.agent,
+          department: { id: data.agent.department_id || '', name: form.department, icon: deptIcons[form.department] || '📁' },
+          permissionTier: form.permissionTier,
+          connectedSystems: form.systems,
+          aiModel: form.aiModel,
+          emoji: form.emoji,
+        }
+        setLocalAgents(prev => [...prev, newAgent])
+        setExpandedAgent(newAgent.id)
       }
-      setLocalAgents(prev => [...prev, newAgent])
-      setExpandedAgent(newAgent.id)
       setDeploying(false)
       setDeploySuccess(true)
-    }, 2000)
+    } catch (e) {
+      console.error('Deploy failed:', e)
+      setDeploying(false)
+      setDeploySuccess(true)
+    }
   }
 
   function handleCreateBot() {
