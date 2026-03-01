@@ -119,12 +119,41 @@ const TIERS = [
 ]
 
 const INTEGRATIONS_DATA: Integration[] = [
-  { id: 'm365', name: 'Microsoft 365', icon: '📧', description: 'Email, calendar, and collaboration', connected: false, connecting: false, recommended: ['property', 'healthcare', 'legal', 'finance', 'construction', 'education', 'hospitality', 'other'] },
-  { id: 'google', name: 'Google Workspace', icon: '🔵', description: 'Gmail, Drive, and productivity', connected: false, connecting: false, recommended: ['healthcare', 'education', 'other'] },
+  // Universal
+  { id: 'm365', name: 'Microsoft 365', icon: '📧', description: 'Email, calendar, Teams, and SharePoint', connected: false, connecting: false, recommended: ['property', 'healthcare', 'legal', 'finance', 'construction', 'education', 'hospitality', 'other'] },
+  { id: 'google', name: 'Google Workspace', icon: '🔵', description: 'Gmail, Drive, Calendar, and Docs', connected: false, connecting: false, recommended: ['healthcare', 'education', 'other', 'property'] },
   { id: 'slack', name: 'Slack', icon: '💬', description: 'Team messaging and notifications', connected: false, connecting: false, recommended: ['property', 'healthcare', 'legal', 'finance', 'construction', 'education', 'hospitality', 'other'] },
-  { id: 'stripe', name: 'Stripe', icon: '💳', description: 'Payments and billing', connected: false, connecting: false, recommended: ['healthcare', 'legal', 'finance', 'education', 'other'] },
-  { id: 'docusign', name: 'DocuSign', icon: '✍️', description: 'Document signing and agreements', connected: false, connecting: false, recommended: ['healthcare', 'legal', 'property', 'finance'] },
-  { id: 'quickbooks', name: 'QuickBooks', icon: '📊', description: 'Accounting and bookkeeping', connected: false, connecting: false, recommended: ['healthcare', 'construction', 'other'] },
+  { id: 'teams', name: 'Microsoft Teams', icon: '🟣', description: 'Video, chat, and collaboration', connected: false, connecting: false, recommended: ['property', 'healthcare', 'legal', 'finance', 'construction', 'education', 'hospitality'] },
+  { id: 'docusign', name: 'DocuSign', icon: '✍️', description: 'Document signing and agreements', connected: false, connecting: false, recommended: ['healthcare', 'legal', 'property', 'finance', 'construction'] },
+  // Finance
+  { id: 'stripe', name: 'Stripe', icon: '💳', description: 'Payments, billing, and subscriptions', connected: false, connecting: false, recommended: ['healthcare', 'legal', 'finance', 'education', 'other', 'hospitality'] },
+  { id: 'quickbooks', name: 'QuickBooks', icon: '📊', description: 'Accounting and bookkeeping', connected: false, connecting: false, recommended: ['healthcare', 'construction', 'other', 'property', 'legal'] },
+  { id: 'xero', name: 'Xero', icon: '💰', description: 'Cloud accounting and invoicing', connected: false, connecting: false, recommended: ['healthcare', 'construction', 'other'] },
+  // CRM & Sales
+  { id: 'hubspot', name: 'HubSpot', icon: '🟠', description: 'CRM, marketing, and sales automation', connected: false, connecting: false, recommended: ['other', 'education', 'hospitality', 'construction'] },
+  { id: 'salesforce', name: 'Salesforce', icon: '☁️', description: 'Enterprise CRM and analytics', connected: false, connecting: false, recommended: ['finance', 'legal', 'other'] },
+  // Property Management
+  { id: 'entrata', name: 'Entrata', icon: '🏠', description: 'Property management and leasing', connected: false, connecting: false, recommended: ['property'] },
+  { id: 'yardi', name: 'Yardi Voyager', icon: '🏢', description: 'Real estate management and accounting', connected: false, connecting: false, recommended: ['property'] },
+  { id: 'realpage', name: 'RealPage', icon: '📐', description: 'Revenue management and analytics', connected: false, connecting: false, recommended: ['property'] },
+  { id: 'appfolio', name: 'AppFolio', icon: '🔑', description: 'Property management software', connected: false, connecting: false, recommended: ['property'] },
+  // Healthcare
+  { id: 'drchrono', name: 'DrChrono', icon: '🩺', description: 'EHR, practice management, and billing', connected: false, connecting: false, recommended: ['healthcare'] },
+  { id: 'athenahealth', name: 'athenahealth', icon: '🏥', description: 'Cloud-based EHR and revenue cycle', connected: false, connecting: false, recommended: ['healthcare'] },
+  { id: 'jane', name: 'Jane App', icon: '📋', description: 'Practice management for health practitioners', connected: false, connecting: false, recommended: ['healthcare'] },
+  // HR & Payroll
+  { id: 'paycor', name: 'Paycor', icon: '👥', description: 'HR, payroll, and talent management', connected: false, connecting: false, recommended: ['property', 'healthcare', 'construction', 'hospitality'] },
+  { id: 'gusto', name: 'Gusto', icon: '🤝', description: 'Payroll, benefits, and HR', connected: false, connecting: false, recommended: ['other', 'education', 'healthcare'] },
+  // Construction
+  { id: 'procore', name: 'Procore', icon: '🏗️', description: 'Construction project management', connected: false, connecting: false, recommended: ['construction'] },
+  { id: 'buildertrend', name: 'Buildertrend', icon: '🔨', description: 'Construction management platform', connected: false, connecting: false, recommended: ['construction'] },
+  // File Storage
+  { id: 'dropbox', name: 'Dropbox', icon: '📦', description: 'Cloud file storage and sharing', connected: false, connecting: false, recommended: ['legal', 'other', 'education'] },
+  { id: 'box', name: 'Box', icon: '📁', description: 'Enterprise content management', connected: false, connecting: false, recommended: ['legal', 'finance', 'healthcare'] },
+  // Legal
+  { id: 'clio', name: 'Clio', icon: '⚖️', description: 'Legal practice management', connected: false, connecting: false, recommended: ['legal'] },
+  // Hospitality
+  { id: 'opera', name: 'Oracle OPERA', icon: '🏨', description: 'Hotel property management system', connected: false, connecting: false, recommended: ['hospitality'] },
 ]
 
 const STEP_LABELS_BASE = ['Organization', 'Departments', 'Permissions', 'Integrations', 'Team', 'Review & Launch']
