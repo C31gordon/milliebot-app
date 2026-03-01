@@ -52,12 +52,7 @@ const statusColors: Record<string, string> = {
   error: 'var(--red)',
 }
 
-const pendingDepartments = [
-  { name: 'HR', icon: '👥', owner: 'Brett Johnson', planned: 'Phase 3 (Day 30-60)' },
-  { name: 'Marketing', icon: '📢', owner: 'TBD', planned: 'Phase 3 (Day 30-60)' },
-  { name: 'Finance', icon: '💰', owner: 'TBD', planned: 'Phase 4 (Day 60-90)' },
-  { name: 'IT', icon: '💻', owner: 'Ben McClendon', planned: 'Phase 4 (Day 60-90)' },
-]
+// pendingDepartments now derived from org data
 
 // DEPARTMENTS loaded dynamically from org data
 const PERMISSION_TIERS = ['Tier 1 Owner/Executive', 'Tier 2 Dept Head', 'Tier 3 Manager', 'Tier 4 Specialist']
@@ -580,26 +575,30 @@ export default function AgentsView() {
         </div>
       )}
 
-      {/* Pending Departments */}
-      <div className="glass-card-static rounded-xl overflow-hidden">
-        <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
-          <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🚀 Upcoming Deployments</h3>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>Departments pending agent deployment per 90-day rollout plan</p>
+      {/* Departments */}
+      {orgDepartments.length > 0 && (
+        <div className="glass-card-static rounded-xl overflow-hidden">
+          <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
+            <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🏢 Your Departments</h3>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>Deploy agents to activate each department</p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 divide-x" style={{ borderColor: 'var(--border)' }}>
+            {orgDepartments.map((name, i) => {
+              const hasAgent = allAgents.some((a: any) => a.department === name || a.department_name === name)
+              return (
+                <div key={i} className="p-4 text-center">
+                  <span className="text-2xl">{hasAgent ? '✅' : '⏳'}</span>
+                  <div className="text-sm font-semibold mt-2" style={{ color: 'var(--text)' }}>{name}</div>
+                  <div className="text-[11px] mt-1 px-2.5 py-1 rounded-full inline-block whitespace-nowrap"
+                    style={{ background: hasAgent ? 'rgba(107,164,138,0.15)' : 'var(--bg3)', color: hasAgent ? 'var(--green)' : 'var(--text3)' }}>
+                    {hasAgent ? 'Agent Active' : 'Needs Agent'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x" style={{ borderColor: 'var(--border)' }}>
-          {pendingDepartments.map((dept, i) => (
-            <div key={i} className="p-4 text-center">
-              <span className="text-2xl">{dept.icon}</span>
-              <div className="text-sm font-semibold mt-2" style={{ color: 'var(--text)' }}>{dept.name}</div>
-              <div className="text-[11px] mt-0.5" style={{ color: 'var(--text4)' }}>{dept.owner}</div>
-              <div className="text-[11px] mt-1 px-2.5 py-1 rounded-full inline-block whitespace-nowrap"
-                style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
-                {dept.planned}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* ===== CREATION WIZARD OVERLAY ===== */}
       {showWizard && (
