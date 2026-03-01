@@ -35,6 +35,7 @@ interface Integration {
 interface TeamMember {
   id: string
   name: string
+  title: string
   email: string
   department: string
   tier: number
@@ -155,7 +156,7 @@ export default function OrgSetupWizardView() {
   const [deptInited, setDeptInited] = useState('')
   const [integrations, setIntegrations] = useState<Integration[]>(INTEGRATIONS_DATA)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
-  const [newMember, setNewMember] = useState({ name: '', email: '', department: '', tier: 3 })
+  const [newMember, setNewMember] = useState({ name: '', title: '', email: '', department: '', tier: 3 })
 
   useEffect(() => {
     if (org.industry && org.industry !== deptInited) {
@@ -182,7 +183,7 @@ export default function OrgSetupWizardView() {
   const addMember = () => {
     if (!newMember.name || !newMember.email) return
     setTeamMembers(prev => [...prev, { ...newMember, id: uid() }])
-    setNewMember({ name: '', email: '', department: enabledDepts[0]?.name || '', tier: 3 })
+    setNewMember({ name: '', title: '', email: '', department: enabledDepts[0]?.name || '', tier: 3 })
   }
 
   const handleLaunch = async () => {
@@ -558,6 +559,7 @@ export default function OrgSetupWizardView() {
       <div className="glass-card" style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg3)', marginBottom: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
           <input style={inputStyle} placeholder="Name" value={newMember.name} onChange={e => setNewMember({ ...newMember, name: e.target.value })} />
+          <input style={inputStyle} placeholder="Title / Role (e.g. Office Manager)" value={newMember.title} onChange={e => setNewMember({ ...newMember, title: e.target.value })} />
           <input style={inputStyle} placeholder="Email" type="email" value={newMember.email} onChange={e => setNewMember({ ...newMember, email: e.target.value })} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, alignItems: 'end' }}>
