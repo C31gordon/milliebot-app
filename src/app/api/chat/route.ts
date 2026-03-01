@@ -30,11 +30,10 @@ export async function POST(request: NextRequest) {
       if (member?.org_id) {
         userTier = member.permission_tier || member.role === 'owner' ? 1 : 3
 
-        const [orgRes, deptsRes, agentsRes, userRes] = await Promise.all([
+        const [orgRes, deptsRes, agentsRes] = await Promise.all([
           db.from('organizations').select('name, industry, slug').eq('id', member.org_id).single(),
           db.from('departments').select('id, name').eq('org_id', member.org_id),
           db.from('agents').select('name, status, description, department_id').eq('org_id', member.org_id),
-          db.from('auth.users').select('email, raw_user_meta_data').eq('id', userId).single().catch(() => ({ data: null })),
         ])
 
         const org = orgRes.data
