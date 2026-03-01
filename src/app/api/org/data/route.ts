@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     let agents: unknown[] = []
     let audit: unknown[] = []
     try {
-      const agentsRes = await db.from('agents').select('*').eq('org_id', orgId)
+      const agentsRes = await db.from('agents').select('*, department:departments(id, name)').eq('org_id', orgId)
       agents = agentsRes.data || []
     } catch { /* table may not exist */ }
     try {
