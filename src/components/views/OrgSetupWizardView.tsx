@@ -495,6 +495,7 @@ export default function OrgSetupWizardView() {
               <input type="checkbox" checked={dept.enabled} onChange={() => toggleDept(dept.id)} style={{ width: 18, height: 18, accentColor: '#559CB5', cursor: 'pointer' }} />
               <div style={{ flex: 1 }}>
                 <input value={dept.name} onChange={e => renameDept(dept.id, e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Tab' || e.key === 'Enter') { e.preventDefault(); const next = (e.target as HTMLInputElement).closest('[class*=glass-card]')?.nextElementSibling?.querySelector('input[type="text"], input:not([type="checkbox"])') as HTMLInputElement; if (next) next.focus(); } }}
                   style={{ background: 'transparent', border: 'none', color: 'var(--text)', fontWeight: 600, fontSize: 14, outline: 'none', width: '100%' }} />
                 <div style={{ fontSize: 12, color: 'var(--text4)', marginTop: 2 }}>{dept.description}</div>
               </div>
@@ -617,8 +618,10 @@ export default function OrgSetupWizardView() {
       <p style={{ color: 'var(--text3)', marginBottom: 20, fontSize: 14 }}>Add team members who will use the platform. Invitations will be sent when you complete setup.</p>
       <div className="glass-card" style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg3)', marginBottom: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-          <input style={inputStyle} placeholder="Name" value={newMember.name} onChange={e => setNewMember({ ...newMember, name: e.target.value })} />
-          <input style={inputStyle} placeholder="Title / Role (e.g. Office Manager)" value={newMember.title} onChange={e => setNewMember({ ...newMember, title: e.target.value })} />
+          <input style={inputStyle} placeholder="Name" value={newMember.name} onChange={e => setNewMember({ ...newMember, name: e.target.value })} 
+              onKeyDown={e => { if (e.key === 'Enter') { const next = (e.target as HTMLElement).nextElementSibling as HTMLInputElement; if (next) next.focus() } }} />
+          <input style={inputStyle} placeholder="Title / Role (e.g. Office Manager)" value={newMember.title} onChange={e => setNewMember({ ...newMember, title: e.target.value })}
+              onKeyDown={e => { if (e.key === 'Enter') { const next = (e.target as HTMLElement).nextElementSibling as HTMLInputElement; if (next) next.focus() } }} />
           <input style={inputStyle} placeholder="Email" type="email" value={newMember.email} onChange={e => setNewMember({ ...newMember, email: e.target.value })} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, alignItems: 'end' }}>
