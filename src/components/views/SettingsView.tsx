@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import UsageDashboard from '../UsageDashboard'
 
-type SettingsTab = 'general' | 'departments' | 'users' | 'security' | 'sso' | 'notifications' | 'branding' | 'billing' | 'danger'
+type SettingsTab = 'general' | 'departments' | 'users' | 'security' | 'sso' | 'notifications' | 'branding' | 'usage' | 'billing' | 'danger'
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t) }, [onClose])
@@ -260,6 +261,7 @@ export default function SettingsView() {
     { key: 'sso', label: 'Single Sign-On', icon: '🔑' },
     { key: 'notifications', label: 'Notifications', icon: '🔔' },
     { key: 'branding', label: 'Branding', icon: '🎨' },
+    { key: 'usage', label: 'Usage & Costs', icon: '💰' },
     { key: 'billing', label: 'Billing', icon: '💳' },
     { key: 'danger', label: 'Danger Zone', icon: '⚠️' },
   ]
@@ -289,6 +291,7 @@ export default function SettingsView() {
           {activeTab === 'sso' && <SSOSettings />}
           {activeTab === 'notifications' && <NotificationSettings />}
           {activeTab === 'branding' && <BrandingSettings />}
+          {activeTab === 'usage' && (() => { try { const s = JSON.parse(localStorage.getItem('zynthr_user') || '{}'); return <UsageDashboard userId={s.userId || ''} /> } catch { return <UsageDashboard userId="" /> } })()}
           {activeTab === 'billing' && <BillingSettings />}
           {activeTab === 'danger' && <DangerZone />}
         </div>
