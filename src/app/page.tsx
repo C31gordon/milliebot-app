@@ -81,16 +81,28 @@ export default function Home() {
   // Hard timeout — never show loading for more than 5 seconds
   const [forceLoaded, setForceLoaded] = useState(false)
 
-  // Apply saved brand colors on mount
+  // Apply saved brand colors on mount — localStorage first, then DB
   useEffect(() => {
+    const applyColors = (c: Record<string, string>) => {
+      if (c.primary) document.documentElement.style.setProperty('--blue', c.primary)
+      if (c.accent) document.documentElement.style.setProperty('--purple', c.accent)
+      if (c.success) document.documentElement.style.setProperty('--green', c.success)
+    }
     const stored = localStorage.getItem('zynthr_brand')
-    if (stored) {
-      try {
-        const c = JSON.parse(stored)
-        if (c.primary) document.documentElement.style.setProperty('--blue', c.primary)
-        if (c.accent) document.documentElement.style.setProperty('--purple', c.accent)
-        if (c.success) document.documentElement.style.setProperty('--green', c.success)
-      } catch {}
+    if (stored) { try { applyColors(JSON.parse(stored)) } catch {} }
+    // Also fetch from DB for cross-device sync
+    const user = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    if (user.userId) {
+      fetch(`/api/org/settings?userId=${user.userId}`).then(r => r.json()).then(d => {
+        if (d.settings?.brandColors) {
+          localStorage.setItem('zynthr_brand', JSON.stringify(d.settings.brandColors))
+          applyColors(d.settings.brandColors)
+        }
+        // Load logos from DB too
+        if (d.settings?.logoDark) localStorage.setItem('zynthr_logo_dark', d.settings.logoDark)
+        if (d.settings?.logoLight) localStorage.setItem('zynthr_logo_light', d.settings.logoLight)
+        window.dispatchEvent(new Event('zynthr_brand_updated'))
+      }).catch(() => {})
     }
   }, [])
   useEffect(() => {

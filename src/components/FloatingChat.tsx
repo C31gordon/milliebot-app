@@ -27,6 +27,13 @@ export default function FloatingChat() {
   useEffect(() => { if (open) { setUnread(0); setTimeout(() => inputRef.current?.focus(), 100) } }, [open])
 
   const handleSend = async () => {
+    // Support ticket shortcut
+    if (input.trim() === '🎫 Submit support ticket') {
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user' as const, content: input.trim(), timestamp: new Date() }, { id: (Date.now()+1).toString(), role: 'assistant' as const, content: '📋 **Submit a Support Ticket**\n\nJust describe your issue here and I\'ll create a ticket for you. Start with:\n\n• **What happened?** (describe the issue)\n• **What did you expect?** (expected behavior)\n\nOr type your issue in plain English and I\'ll file it.', timestamp: new Date() }])
+      setInput('')
+      return
+    }
+
     if (!input.trim() || isTyping) return
     const userMsg: Message = { id: 'user-' + Date.now(), role: 'user', content: input.trim(), timestamp: new Date() }
     setMessages(prev => [...prev, userMsg])
@@ -63,7 +70,7 @@ export default function FloatingChat() {
     if (!open) setUnread(prev => prev + 1)
   }
 
-  const quickActions = ['What can you do?', 'Help me set up an agent', 'Explain RKBAC', 'What integrations are available?']
+  const quickActions = ['What can you do?', 'Help me set up an agent', 'Explain RKBAC', 'What integrations are available?', '🎫 Submit support ticket']
 
   return (
     <>

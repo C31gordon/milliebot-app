@@ -165,7 +165,7 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
           </button>
           {showNotifications && (
             <div className="absolute right-0 top-14 rounded-xl overflow-hidden"
-              style={{ background: 'var(--bg2)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)', width: '320px' }}>
+              style={{ background: 'var(--bg2)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)', maxWidth: '320px', width: '90vw' }}>
               <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
                 <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>Notifications</span>
                 <button className="text-xs font-medium" style={{ color: 'var(--blue)' }}>Mark all read</button>

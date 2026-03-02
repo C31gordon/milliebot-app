@@ -139,6 +139,9 @@ export default function LoginPage() {
     if (!signupEmail.trim()) errs.email = 'Email is required'
     else if (!validateEmail(signupEmail)) errs.email = 'Invalid email format'
     if (!signupPassword) errs.password = 'Password is required'
+    // Email domain validation — customers use their own domains
+    const emailDomain = signupEmail.split('@')[1]?.toLowerCase()
+    if (emailDomain === 'zynthr.ai') errs.email = 'Please use your organization email, not @zynthr.ai'
     else if (signupPassword.length < 6) errs.password = 'Password must be at least 6 characters'
     if (signupPassword !== confirmPassword) errs.confirmPassword = 'Passwords do not match'
     if (!orgName.trim()) errs.orgName = 'Organization name is required'

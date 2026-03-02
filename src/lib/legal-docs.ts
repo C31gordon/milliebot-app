@@ -136,7 +136,9 @@ Last Updated: February 28, 2026
 
 2.4 Security. To detect, prevent, and respond to security threats, fraud, and abuse. This includes audit logging, anomaly detection, and access monitoring.
 
-2.5 Communications. To send transactional emails (account verification, password resets, billing), platform updates, and, with your consent, marketing communications.
+2.5 Communications. To send transactional emails (account verification, password resets, billing), SMS/text messages (appointment reminders, security codes, agent notifications), platform updates, and, with your consent, marketing communications.
+
+2.5.1 SMS/Text Messages. By providing your phone number and opting in, you consent to receive transactional and service-related text messages from Zynthr. Message frequency varies. Message and data rates may apply. You may opt out at any time by replying STOP to any message. For help, reply HELP or contact support@zynthr.ai. We comply with the Telephone Consumer Protection Act (TCPA) and applicable state regulations. We will not send marketing texts without your explicit prior written consent.
 
 2.6 Improvement. To analyze usage patterns and improve the Platform features, performance, and reliability.
 
@@ -166,7 +168,7 @@ Last Updated: February 28, 2026
 - AI Model Providers: For powering AI features (Anthropic, OpenAI)
 - Payment Processing: Stripe for subscription billing
 - Analytics: For Platform usage analytics
-- Email: For transactional and communication emails
+- Email: For transactional and communication emails\n- SMS/Voice: For transactional messages, security codes, and agent notifications (Twilio)
 
 4.2 Each third-party provider is bound by data processing agreements that require them to protect your data and use it only for the specified purposes.
 

@@ -12,18 +12,53 @@ const TIER_ACCESS: Record<number, { label: string; canSee: string[]; restricted:
 }
 
 
+// Cost estimates per 1M tokens (input/output)
+const COST_PER_M: Record<string, [number, number]> = {
+  'claude-4-sonnet': [3.00, 15.00],
+  'claude-4-haiku': [0.80, 4.00],
+  'gpt-4.1-mini': [0.40, 1.60],
+  'gpt-4.1': [2.00, 8.00],
+  'gpt-5': [5.00, 20.00],
+  'llama-4-maverick': [0.27, 0.85],
+  'deepseek-v3': [1.25, 1.25],
+  'qwen3-235b': [0.20, 0.60],
+}
+
+async function trackUsage(orgId: string, userId: string, modelKey: string, inputChars: number, outputChars: number) {
+  try {
+    const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+    const estInputTokens = Math.ceil(inputChars / 4)
+    const estOutputTokens = Math.ceil(outputChars / 4)
+    const costs = COST_PER_M[modelKey] || [1.0, 1.0]
+    const costEstimate = (estInputTokens * costs[0] + estOutputTokens * costs[1]) / 1_000_000
+    await db.from('audit_log').insert({
+      org_id: orgId,
+      user_id: userId,
+      action: 'ai_chat',
+      details: { model: modelKey, input_tokens: estInputTokens, output_tokens: estOutputTokens, cost_estimate: costEstimate },
+    })
+  } catch {}
+}
+
 // Model options — org admin selects in settings
-const MODEL_MAP: Record<string, { provider: 'anthropic' | 'openai'; model: string; label: string; costTier: string }> = {
+const MODEL_MAP: Record<string, { provider: 'anthropic' | 'openai' | 'together'; model: string; label: string; costTier: string }> = {
+  // Anthropic
   'claude-4-sonnet': { provider: 'anthropic', model: 'claude-sonnet-4-20250514', label: 'Claude 4 Sonnet', costTier: '$$' },
   'claude-4-haiku': { provider: 'anthropic', model: 'claude-3-5-haiku-latest', label: 'Claude 4 Haiku', costTier: '$' },
+  // OpenAI
   'gpt-4.1-mini': { provider: 'openai', model: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', costTier: '$' },
   'gpt-4.1': { provider: 'openai', model: 'gpt-4.1', label: 'GPT-4.1', costTier: '$$' },
   'gpt-5': { provider: 'openai', model: 'gpt-5', label: 'GPT-5', costTier: '$$$' },
+  // Together AI (open-source — highest margin)
+  'llama-4-maverick': { provider: 'together', model: 'meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8', label: 'Llama 4 Maverick', costTier: '$' },
+  'deepseek-v3': { provider: 'together', model: 'deepseek-ai/DeepSeek-V3-0324', label: 'DeepSeek V3', costTier: '$' },
+  'qwen3-235b': { provider: 'together', model: 'Qwen/Qwen3-235B-A22B-Instruct-2507-FP8', label: 'Qwen3 235B', costTier: '$' },
 }
 const DEFAULT_MODEL = 'claude-4-sonnet'  // Cost-effective default
 
 export async function POST(request: NextRequest) {
   let orgContext = 'New user — no organization set up yet.'
+    let orgId = ''
   let rkbacRules = ''
 
   try {
@@ -37,6 +72,7 @@ export async function POST(request: NextRequest) {
         const { data: member } = await db.from('org_members').select('org_id, role, permission_tier, department').eq('user_id', userId).single()
 
         if (member?.org_id) {
+          orgId = member.org_id
           const userTier = member.role === 'owner' ? 1 : (member.permission_tier <= 4 ? member.permission_tier : 3)
           const tierAccess = TIER_ACCESS[userTier] || TIER_ACCESS[4]
 
@@ -127,6 +163,29 @@ RULES:
     })())
     const selectedModel = MODEL_MAP[orgSettings.chat_model || DEFAULT_MODEL] || MODEL_MAP[DEFAULT_MODEL]
 
+    const togetherKey = process.env.TOGETHER_API_KEY
+    if (selectedModel.provider === 'together' && togetherKey) {
+      try {
+        const res = await fetch('https://api.together.xyz/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + togetherKey },
+          body: JSON.stringify({
+            model: selectedModel.model,
+            max_tokens: 500,
+            messages: [{ role: 'system', content: systemPrompt }, ...chatMessages],
+          }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const reply = data.choices?.[0]?.message?.content || "Try again?"
+          trackUsage(orgId, userId || '', orgSettings.chat_model || DEFAULT_MODEL, message.length, reply.length)
+          return NextResponse.json({ reply, model: selectedModel.label })
+        }
+        const errText = await res.text()
+        console.error('Together AI error:', res.status, errText.substring(0, 200))
+      } catch (apiErr) { console.error('Together AI error:', apiErr) }
+    }
+
     const anthropicKey = process.env.ANTHROPIC_API_KEY
     const openaiKey = process.env.OPENAI_API_KEY
     if (selectedModel.provider === 'openai' && openaiKey) {
@@ -142,7 +201,9 @@ RULES:
         })
         if (res.ok) {
           const data = await res.json()
-          return NextResponse.json({ reply: data.choices?.[0]?.message?.content || "Try again?", model: selectedModel.label })
+          const reply = data.choices?.[0]?.message?.content || "Try again?"
+          trackUsage(orgId, userId || '', orgSettings.chat_model || DEFAULT_MODEL, message.length, reply.length)
+          return NextResponse.json({ reply, model: selectedModel.label })
         }
         const errText = await res.text()
         console.error('OpenAI error:', res.status, errText.substring(0, 200))
@@ -167,7 +228,9 @@ RULES:
         })
         if (res.ok) {
           const data = await res.json()
-          return NextResponse.json({ reply: data.content?.[0]?.text || "Hmm, try asking differently?", model: selectedModel.label })
+          const reply = data.content?.[0]?.text || "Hmm, try asking differently?"
+          trackUsage(orgId, userId || '', orgSettings.chat_model || DEFAULT_MODEL, message.length, reply.length)
+          return NextResponse.json({ reply, model: selectedModel.label })
         }
         const errText = await res.text()
         console.error('Anthropic error:', res.status, errText.substring(0, 200))

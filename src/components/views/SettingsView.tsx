@@ -359,14 +359,17 @@ function GeneralSettings({ showToast }: { showToast: (m: string) => void }) {
         <p className="text-xs mb-3" style={{ color: 'var(--text4)' }}>Choose which AI model powers your organization&apos;s chat assistant. Lower-cost models work great for most tasks.</p>
         <div className="grid gap-2">
           {[
-            { key: 'claude-4-haiku', label: 'Claude 4 Haiku', cost: '$', speed: 'Ultra-fast', desc: 'Best value — fast and capable for everyday questions', rec: true },
+            { key: 'llama-4-maverick', label: 'Llama 4 Maverick', cost: '¢', speed: 'Fast', desc: 'Open-source, highest margin — excellent quality at 10x lower cost', rec: true },
+            { key: 'claude-4-haiku', label: 'Claude 4 Haiku', cost: '$', speed: 'Ultra-fast', desc: 'Fast and capable for everyday questions' },
             { key: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', cost: '$', speed: 'Very fast', desc: 'Lightweight OpenAI model, great at scale' },
+            { key: 'deepseek-v3', label: 'DeepSeek V3', cost: '¢', speed: 'Fast', desc: 'Open-source reasoning model, very cost effective' },
+            { key: 'qwen3-235b', label: 'Qwen3 235B', cost: '¢', speed: 'Fast', desc: 'Open-source, strong multilingual and analytical' },
             { key: 'claude-4-sonnet', label: 'Claude 4 Sonnet', cost: '$$', speed: 'Fast', desc: 'Premium quality for complex reasoning' },
             { key: 'gpt-4.1', label: 'GPT-4.1', cost: '$$', speed: 'Fast', desc: 'Strong general-purpose model' },
             { key: 'gpt-5', label: 'GPT-5', cost: '$$$', speed: 'Moderate', desc: 'Maximum capability for advanced tasks' },
           ].map(m => (
-            <label key={m.key} className="flex items-center gap-3 p-3 rounded-lg cursor-pointer" style={{ border: '1px solid var(--border)', background: m.key === 'claude-4-haiku' ? 'rgba(85,156,181,0.08)' : 'var(--bg)' }}>
-              <input type="radio" name="chatModel" defaultChecked={m.key === 'claude-4-haiku'} style={{ accentColor: '#559CB5' }} />
+            <label key={m.key} className="flex items-center gap-3 p-3 rounded-lg cursor-pointer" style={{ border: '1px solid var(--border)', background: m.key === 'llama-4-maverick' ? 'rgba(85,156,181,0.08)' : 'var(--bg)' }}>
+              <input type="radio" name="chatModel" defaultChecked={m.key === 'llama-4-maverick'} style={{ accentColor: '#559CB5' }} />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{m.label}</span>
@@ -379,7 +382,7 @@ function GeneralSettings({ showToast }: { showToast: (m: string) => void }) {
             </label>
           ))}
         </div>
-        <p className="text-[10px] mt-2" style={{ color: 'var(--text4)' }}>💡 Haiku handles 90% of questions at ~10x lower cost than premium models. Upgrade only if you need deep analysis.</p>
+        <p className="text-[10px] mt-2" style={{ color: 'var(--text4)' }}>💡 Open-source models (¢) run on our infrastructure at 10-20x lower cost. Premium models ($$/$$$) use provider APIs. All models are private and secure.</p>
       </SectionCard>
       <SectionCard title="Data Retention">
         <div className="grid grid-cols-2 gap-4">
