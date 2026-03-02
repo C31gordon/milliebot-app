@@ -9,11 +9,11 @@ export async function POST(req: NextRequest) {
   const { userId } = await req.json()
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
-  const { data: member } = await supabase.from('org_members').select('organization_id, role').eq('user_id', userId).single()
+  const { data: member } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).single()
   if (!member) return NextResponse.json({ error: 'No org found' }, { status: 404 })
 
-  const { data: org } = await supabase.from('organizations').select('*').eq('id', member.organization_id).single()
-  const { data: depts } = await supabase.from('departments').select('name').eq('organization_id', member.organization_id)
+  const { data: org } = await supabase.from('organizations').select('*').eq('id', member.org_id).single()
+  const { data: depts } = await supabase.from('departments').select('name').eq('org_id', member.org_id)
 
   const orgName = org?.name || 'Your Organization'
   const industry = org?.industry || 'general'
