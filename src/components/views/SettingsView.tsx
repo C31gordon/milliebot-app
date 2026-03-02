@@ -153,6 +153,97 @@ const INITIAL_USERS: AppUser[] = [
   {id:'8',name:'Carlos Mendez',email:'cmendez@example.com',department:'Operations',tier:2,status:'Deactivated',lastActive:'Jan 15, 2026'},
 ]
 
+function LogoUploadSection() {
+  const [darkLogo, setDarkLogo] = useState<string | null>(null)
+  const [lightLogo, setLightLogo] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+
+  useEffect(() => {
+    setDarkLogo(localStorage.getItem('zynthr_logo_dark'))
+    setLightLogo(localStorage.getItem('zynthr_logo_light'))
+    // Also try loading from org settings
+    const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    if (stored.userId) {
+      fetch(`/api/org/settings?userId=${stored.userId}`).then(r => r.json()).then(d => {
+        if (d.settings?.logoDark) { setDarkLogo(d.settings.logoDark); localStorage.setItem('zynthr_logo_dark', d.settings.logoDark) }
+        if (d.settings?.logoLight) { setLightLogo(d.settings.logoLight); localStorage.setItem('zynthr_logo_light', d.settings.logoLight) }
+      }).catch(() => {})
+    }
+  }, [])
+
+  const handleUpload = async (file: File, variant: 'dark' | 'light') => {
+    if (file.size > 512000) { alert('Max 500KB'); return }
+    setUploading(true)
+    // Show preview immediately
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      localStorage.setItem('zynthr_logo_' + variant, dataUrl)
+      if (variant === 'dark') setDarkLogo(dataUrl); else setLightLogo(dataUrl)
+      window.dispatchEvent(new Event('zynthr_brand_updated'))
+    }
+    reader.readAsDataURL(file)
+    // Upload to storage
+    const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    if (stored.userId) {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('userId', stored.userId)
+      fd.append('variant', variant)
+      try {
+        const res = await fetch('/api/org/logo', { method: 'POST', body: fd })
+        const data = await res.json()
+        if (data.url) {
+          localStorage.setItem('zynthr_logo_' + variant, data.url)
+          if (variant === 'dark') setDarkLogo(data.url); else setLightLogo(data.url)
+          window.dispatchEvent(new Event('zynthr_brand_updated'))
+        }
+      } catch {}
+    }
+    setUploading(false)
+  }
+
+  const handleRemove = async (variant: 'dark' | 'light') => {
+    localStorage.removeItem('zynthr_logo_' + variant)
+    if (variant === 'dark') setDarkLogo(null); else setLightLogo(null)
+    window.dispatchEvent(new Event('zynthr_brand_updated'))
+    const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    if (stored.userId) {
+      fetch('/api/org/logo', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: stored.userId, variant }) }).catch(() => {})
+    }
+  }
+
+  return (
+    <SectionCard title="Organization Logo" description="Your logo appears in the sidebar, login screen, and reports. Max 500KB, PNG or SVG recommended.">
+      <div className="grid grid-cols-2 gap-4">
+        {(['dark', 'light'] as const).map(mode => {
+          const logo = mode === 'dark' ? darkLogo : lightLogo
+          return (
+            <div key={mode}>
+              <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text2)' }}>
+                {mode === 'dark' ? '🌙 Dark Mode Logo' : '☀️ Light Mode Logo'}
+              </label>
+              <label className="w-full h-28 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all hover:opacity-80"
+                style={{ background: mode === 'dark' ? '#0a0e1a' : '#f8fafc', border: '2px dashed var(--border)', opacity: uploading ? 0.5 : 1 }}>
+                {logo ? (
+                  <img src={logo} alt="Logo" style={{ maxHeight: 60, maxWidth: '80%', objectFit: 'contain' }} />
+                ) : (
+                  <span className="text-sm" style={{ color: mode === 'dark' ? '#666' : '#999' }}>Click to upload</span>
+                )}
+                <input type="file" accept="image/png,image/svg+xml,image/jpeg" onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload(f, mode) }} style={{ display: 'none' }} />
+              </label>
+              {logo && (
+                <button onClick={() => handleRemove(mode)}
+                  className="text-[10px] mt-1" style={{ color: 'var(--red-text, #ff6b7a)', cursor: 'pointer', background: 'none', border: 'none' }}>Remove</button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </SectionCard>
+  )
+}
+
 export default function SettingsView() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general')
   const [toast, setToast] = useState<string | null>(null)
@@ -1035,48 +1126,7 @@ function BrandingSettings() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Organization Logo" description="Your logo appears in the sidebar, login screen, and reports. Max 500KB, PNG or SVG recommended.">
-        <div className="grid grid-cols-2 gap-4">
-          {(['dark', 'light'] as const).map(mode => {
-            const key = 'zynthr_logo_' + mode
-            const [logo, setLogo] = useState<string | null>(null)
-            useEffect(() => { setLogo(localStorage.getItem(key)) }, [])
-            const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-              const file = e.target.files?.[0]
-              if (!file || file.size > 512000) { alert('Max 500KB'); return }
-              const reader = new FileReader()
-              reader.onload = () => {
-                const dataUrl = reader.result as string
-                localStorage.setItem(key, dataUrl)
-                setLogo(dataUrl)
-                // Dispatch event so sidebar picks it up
-                window.dispatchEvent(new Event('zynthr_brand_updated'))
-              }
-              reader.readAsDataURL(file)
-            }
-            return (
-              <div key={mode}>
-                <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text2)' }}>
-                  {mode === 'dark' ? '🌙 Dark Mode Logo' : '☀️ Light Mode Logo'}
-                </label>
-                <label className="w-full h-28 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all hover:opacity-80"
-                  style={{ background: mode === 'dark' ? '#0a0e1a' : '#f8fafc', border: '2px dashed var(--border)' }}>
-                  {logo ? (
-                    <img src={logo} alt="Logo" style={{ maxHeight: 60, maxWidth: '80%', objectFit: 'contain' }} />
-                  ) : (
-                    <span className="text-sm" style={{ color: mode === 'dark' ? '#666' : '#999' }}>Click to upload</span>
-                  )}
-                  <input type="file" accept="image/png,image/svg+xml,image/jpeg" onChange={handleUpload} style={{ display: 'none' }} />
-                </label>
-                {logo && (
-                  <button onClick={() => { localStorage.removeItem(key); setLogo(null); window.dispatchEvent(new Event('zynthr_brand_updated')) }}
-                    className="text-[10px] mt-1" style={{ color: 'var(--red-text, #ff6b7a)', cursor: 'pointer', background: 'none', border: 'none' }}>Remove</button>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </SectionCard>
+      <LogoUploadSection />
 
       <SectionCard title="Custom Domain" description="Point your own domain to this platform">
         <InputField label="Custom Domain" value="" placeholder="agents.yourdomain.com" />
