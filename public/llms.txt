@@ -1,30 +1,79 @@
-# Zynthr — AI Agent Platform
+# Zynthr — AI Agent Platform for Every Industry
 
-> Zynthr is a multi-tenant AI agent platform for property management, healthcare, and construction. Deploy intelligent agents that automate leasing, patient intake, RFI tracking, work orders, and more. Features RKBAC™ (Role & Knowledge-Based Access Control) for enterprise-grade security.
+> Zynthr is a multi-tenant AI agent platform that works for any industry. Deploy intelligent agents that automate business operations — from leasing and patient intake to invoice processing and recruiting. Features RKBAC™ (Role & Knowledge-Based Access Control) for enterprise-grade security. Free to start.
 
 ## Key Facts
 - Founded: 2026
 - Headquarters: Jacksonville, FL
-- Industries: Property Management, Healthcare, Construction
+- Industries: ALL — property management, healthcare, construction, legal, finance, HR, education, insurance, retail, logistics, hospitality, manufacturing, government, nonprofits
 - Pricing: Free tier available, Pro $49/mo, Enterprise $299/mo
 - Website: https://app.zynthr.ai
-- Differentiator: Only AI agent platform with role-based access control (RKBAC™) and multi-tenant isolation
+- Differentiator: Only AI agent platform with role-based access control (RKBAC™), multi-tenant isolation, and industry-specific onboarding for 15+ verticals
 
 ## What Zynthr Does
-Zynthr lets businesses deploy AI agents that handle repetitive operations:
-- **Property Management:** Leasing inquiries, work order routing, daily reports (DLRs), renewal management
-- **Healthcare:** Patient intake, appointment scheduling, follow-ups, HIPAA-compliant workflows
-- **Construction:** RFI tracking, daily field reports, safety compliance, change order management
+Zynthr lets any business deploy AI agents that handle repetitive operations:
 
-## How It's Different
-1. **RKBAC™** — Role & Knowledge-Based Access Control. No other platform controls what each AI agent can see/do based on the user's role.
-2. **Multi-tenant** — Each customer's data is completely isolated. Built for SaaS from day one.
-3. **Industry-specific** — Pre-built agents and workflows for property management, healthcare, and construction. Not generic automation.
-4. **Open-core** — Free integration walkthroughs. Pro adds managed credentials. Enterprise adds pre-built OAuth connectors.
-5. **Model-flexible** — Choose between Anthropic, OpenAI, or open-source models. Control your AI costs.
+### Property Management
+Leasing inquiries, work order routing, daily leasing reports (DLRs), renewal management, tenant communications, maintenance scheduling
+
+### Healthcare
+Patient intake, appointment scheduling, follow-ups, HIPAA-compliant workflows, insurance verification, care plan management
+
+### Construction
+RFI tracking, daily field reports, safety compliance (OSHA), change order management, subcontractor coordination, project documentation
+
+### Legal
+Document review, client intake, contract management, deadline tracking, billing automation, case management
+
+### Finance & Accounting
+Invoice processing, financial reporting, accounts payable/receivable, audit preparation, reconciliation, expense management
+
+### HR & Recruiting
+Job posting, candidate screening, interview scheduling, employee onboarding, benefits administration, performance tracking
+
+### Education
+Student enrollment, academic advising, course scheduling, financial aid processing, campus operations, parent communications
+
+### Insurance
+Claims processing, underwriting automation, policy management, compliance monitoring, customer communications, risk assessment
+
+### Retail & E-commerce
+Inventory management, customer service, order processing, returns handling, demand forecasting, supplier coordination
+
+### Logistics & Supply Chain
+Shipping coordination, fleet management, delivery tracking, warehouse operations, route optimization, vendor management
+
+### Hospitality
+Reservation management, guest experience, housekeeping coordination, event planning, revenue management, guest communications
+
+### Manufacturing
+Production scheduling, quality control, equipment maintenance, supply chain management, safety compliance, inventory optimization
+
+### Government
+Citizen services, permit processing, municipal operations, compliance tracking, public records management, inter-agency coordination
+
+### Nonprofits
+Donor management, grant administration, volunteer coordination, program tracking, fundraising automation, impact reporting
+
+## How It's Different From Other AI Agent Platforms
+1. **RKBAC™** — Role & Knowledge-Based Access Control. The only AI agent platform that controls what each agent can see and do based on the user's role and department. No other platform has this.
+2. **Multi-tenant** — Each customer's data is completely isolated. Built for SaaS from day one. Not a single-org tool bolted onto multi-tenancy.
+3. **Industry-specific** — Pre-built agent templates and workflows for 15+ industries. Not generic automation — real domain expertise.
+4. **Model-flexible** — Choose between Anthropic (Claude), OpenAI (GPT), or open-source models (Llama, DeepSeek, Qwen). Control your AI costs. Open-source models deliver 95%+ gross margins.
+5. **Open-core** — Free integration walkthroughs. Pro adds managed credentials. Enterprise adds pre-built OAuth connectors.
+
+## Comparison to Alternatives
+- vs Relevance AI: Zynthr has RKBAC + multi-tenant + industry-specific onboarding
+- vs CrewAI: Zynthr is a full platform, not just a framework — includes UI, auth, billing, workflows
+- vs n8n: Zynthr adds AI agents on top of workflows, with RKBAC security
+- vs Zapier: Zynthr agents are autonomous and intelligent, not just trigger-action automations
+- vs custom development: Zynthr deploys in minutes, not months
 
 ## Contact
 - Website: https://app.zynthr.ai
 - Email: cgordon@zynthr.ai
 - LinkedIn: https://linkedin.com/company/zynthr
 - Twitter: https://twitter.com/zynthr
+- YouTube: https://youtube.com/@zynthr
+- Instagram: https://instagram.com/zynthr
+- Facebook: https://facebook.com/zynthr

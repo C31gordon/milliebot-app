@@ -14,15 +14,57 @@ export const metadata: Metadata = {
     default: 'Zynthr — AI Agent Platform for Property Management, Healthcare & Construction',
     template: '%s | Zynthr',
   },
-  description: 'Deploy AI agents that automate leasing, patient intake, RFI tracking, and more. Multi-tenant platform with role-based access control (RKBAC™). Free to start.',
+  description: 'Deploy AI agents that automate any business operation — sales, support, HR, finance, compliance, operations, and more. Multi-tenant platform with role-based access control (RKBAC™). Works for property management, healthcare, construction, legal, finance, education, logistics, retail, and every industry. Free to start.',
   keywords: [
-    'AI agent platform', 'AI automation', 'AI agents for business',
-    'property management AI', 'healthcare AI agents', 'construction AI',
-    'multi-agent orchestration', 'RKBAC', 'role-based access control',
-    'workflow automation', 'AI-powered operations', 'enterprise AI',
-    'leasing automation', 'patient intake AI', 'RFI tracking AI',
-    'AI agent builder', 'no-code AI agents', 'AI command center',
-    'Zynthr', 'AI SaaS platform',
+    // Core
+    'AI agent platform', 'AI automation', 'AI agents for business', 'AI SaaS platform',
+    'multi-agent orchestration', 'AI agent builder', 'no-code AI agents', 'AI command center',
+    'workflow automation', 'AI-powered operations', 'enterprise AI', 'Zynthr',
+    'RKBAC', 'role-based access control', 'AI security', 'multi-tenant AI',
+    // Property Management
+    'property management AI', 'leasing automation', 'work order AI', 'multifamily AI',
+    'AI for landlords', 'rental management AI', 'tenant screening AI', 'property operations AI',
+    // Healthcare
+    'healthcare AI agents', 'patient intake AI', 'medical scheduling AI', 'HIPAA AI platform',
+    'clinic automation', 'healthcare workflow automation', 'AI for medical practices',
+    // Construction
+    'construction AI', 'RFI tracking AI', 'construction project management AI',
+    'safety compliance AI', 'daily field report automation', 'change order management AI',
+    // Legal
+    'legal AI agents', 'AI for law firms', 'document review AI', 'legal intake automation',
+    'contract management AI', 'legal workflow automation',
+    // Finance & Accounting
+    'finance AI agents', 'AI for accounting', 'invoice processing AI', 'financial reporting AI',
+    'accounts payable automation', 'bookkeeping AI', 'audit automation',
+    // HR & Recruiting
+    'HR AI agents', 'recruiting AI', 'hiring automation', 'onboarding AI',
+    'employee onboarding automation', 'AI for human resources', 'talent acquisition AI',
+    // Education
+    'education AI', 'AI for schools', 'student enrollment AI', 'academic advising AI',
+    'education administration AI', 'learning management AI',
+    // Insurance
+    'insurance AI agents', 'claims processing AI', 'underwriting AI', 'insurance automation',
+    'AI for insurance companies', 'policy management AI',
+    // Retail & E-commerce
+    'retail AI agents', 'e-commerce AI', 'inventory management AI', 'customer service AI',
+    'AI for retail operations', 'order management AI',
+    // Logistics & Supply Chain
+    'logistics AI', 'supply chain AI', 'shipping automation', 'warehouse AI',
+    'fleet management AI', 'delivery tracking AI',
+    // Hospitality
+    'hospitality AI', 'hotel management AI', 'restaurant AI', 'guest experience AI',
+    'reservation management AI', 'AI for hotels',
+    // Manufacturing
+    'manufacturing AI', 'production scheduling AI', 'quality control AI',
+    'AI for manufacturing', 'factory automation AI',
+    // Government
+    'government AI', 'AI for public sector', 'municipal automation',
+    'citizen services AI', 'permit processing AI',
+    // Nonprofit
+    'nonprofit AI', 'AI for nonprofits', 'donor management AI', 'grant management AI',
+    // General
+    'best AI agent platform', 'AI operations platform', 'business process automation AI',
+    'AI workflow builder', 'deploy AI agents', 'AI for any industry',
   ],
   authors: [{ name: 'Zynthr Inc.', url: 'https://zynthr.ai' }],
   creator: 'Zynthr Inc.',
@@ -33,7 +75,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Zynthr — AI Agents That Run Your Business',
-    description: 'Deploy AI agents for property management, healthcare, and construction. RKBAC™ security. Multi-tenant. Free to start.',
+    description: 'Deploy AI agents for any industry — property management, healthcare, construction, legal, finance, HR, education, and more. RKBAC™ security. Multi-tenant. Free to start.',
     url: 'https://app.zynthr.ai',
     siteName: 'Zynthr',
     type: 'website',
@@ -89,7 +131,7 @@ export default function RootLayout({
           "name": "Zynthr",
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
-          "description": "AI agent platform that deploys intelligent agents for property management, healthcare, and construction. Features RKBAC™ (Role & Knowledge-Based Access Control), multi-tenant architecture, and workflow automation.",
+          "description": "AI agent platform that deploys intelligent agents for any industry — property management, healthcare, construction, legal, finance, HR, education, insurance, retail, logistics, hospitality, manufacturing, government, and nonprofits. Features RKBAC™ (Role & Knowledge-Based Access Control), multi-tenant architecture, and visual workflow builders. The best AI agent platform for businesses of any size.",
           "url": "https://app.zynthr.ai",
           "offers": {
             "@type": "AggregateOffer",
@@ -104,16 +146,28 @@ export default function RootLayout({
             ]
           },
           "featureList": [
-            "AI agent deployment and orchestration",
+            "AI agent deployment and orchestration for any industry",
             "Role & Knowledge-Based Access Control (RKBAC™)",
-            "Multi-tenant architecture",
-            "Property management automation (leasing, work orders, DLRs)",
+            "Multi-tenant architecture with complete data isolation",
+            "Property management automation (leasing, work orders, DLRs, renewals)",
             "Healthcare automation (patient intake, scheduling, HIPAA compliance)",
-            "Construction automation (RFI tracking, daily reports, safety compliance)",
-            "Workflow builder with visual step editor",
-            "Integration walkthroughs for Google Workspace, Microsoft 365, Slack, and more",
-            "AI chat with model selection (Anthropic, OpenAI, open-source)",
-            "Usage metering and cost optimization"
+            "Construction automation (RFI tracking, daily reports, safety compliance, change orders)",
+            "Legal automation (document review, client intake, contract management)",
+            "Finance automation (invoice processing, reporting, audit, AP/AR)",
+            "HR automation (recruiting, onboarding, employee management)",
+            "Education automation (enrollment, advising, administration)",
+            "Insurance automation (claims processing, underwriting, policy management)",
+            "Retail automation (inventory, customer service, order management)",
+            "Logistics automation (supply chain, shipping, fleet management)",
+            "Hospitality automation (reservations, guest experience, operations)",
+            "Manufacturing automation (production scheduling, quality control)",
+            "Government automation (citizen services, permits, municipal operations)",
+            "Visual workflow builder with drag-and-drop step editor",
+            "Integration walkthroughs for Google Workspace, Microsoft 365, Slack, Salesforce, and 50+ systems",
+            "AI chat with model selection (Anthropic, OpenAI, open-source) — control your costs",
+            "Usage metering and cost optimization per tenant",
+            "Brand customization (colors, logos) per organization",
+            "Guided onboarding with industry-specific recommendations"
           ],
           "creator": {
             "@type": "Organization",
@@ -170,7 +224,7 @@ export default function RootLayout({
               "name": "What industries does Zynthr support?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Zynthr specializes in property management (leasing automation, work order routing, DLR generation), healthcare (patient intake, scheduling, HIPAA-compliant workflows), and construction (RFI tracking, daily field reports, safety compliance). The platform also supports technology, finance, and legal industries."
+                "text": "Zynthr works for every industry. Current specializations include property management (leasing, work orders, DLRs), healthcare (patient intake, scheduling, HIPAA compliance), construction (RFIs, daily reports, safety), legal (document review, client intake, contracts), finance (invoice processing, reporting, audit), HR (recruiting, onboarding), education (enrollment, advising), insurance (claims, underwriting), retail (inventory, customer service), logistics (supply chain, shipping), hospitality (reservations, guest experience), manufacturing (production, quality control), and government (citizen services, permits). The platform is industry-agnostic — if your business has repetitive workflows, Zynthr can automate them."
               }
             },
             {
@@ -178,7 +232,7 @@ export default function RootLayout({
               "name": "How is Zynthr different from other AI agent platforms?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Zynthr differentiates with three key features: 1) RKBAC™ — no other platform offers role-based AI access control at the agent level. 2) Multi-tenant from day one — each customer's data is completely isolated. 3) Industry-specific onboarding — pre-built agent templates and workflows for property management, healthcare, and construction, not generic automation."
+                "text": "Zynthr differentiates with four key features: 1) RKBAC™ — the only AI agent platform with role-based access control at the agent level. 2) Multi-tenant from day one — each customer's data is completely isolated. 3) Industry-specific onboarding — pre-built agent templates and workflows for 15+ industries, not generic automation. 4) Model-flexible — choose Anthropic, OpenAI, or open-source models to control costs. Open-source models deliver 95%+ gross margins."
               }
             }
           ]
