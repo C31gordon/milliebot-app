@@ -1,0 +1,34 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /landing
+Disallow: /api/
+Disallow: /onboarding
+
+# AI Crawlers — explicitly allow (GEO)
+User-agent: GPTBot
+Allow: /
+Allow: /landing
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /landing
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /landing
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /landing
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://app.zynthr.ai/sitemap.xml
