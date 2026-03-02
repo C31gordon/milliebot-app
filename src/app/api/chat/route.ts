@@ -11,6 +11,17 @@ const TIER_ACCESS: Record<number, { label: string; canSee: string[]; restricted:
   4: { label: 'Specialist', canSee: ['assigned bot interfaces', 'own tasks'], restricted: ['all agents config', 'all departments', 'financial data', 'billing', 'audit logs', 'integrations', 'team management'] },
 }
 
+
+// Model options — org admin selects in settings
+const MODEL_MAP: Record<string, { provider: 'anthropic' | 'openai'; model: string; label: string; costTier: string }> = {
+  'claude-4-sonnet': { provider: 'anthropic', model: 'claude-sonnet-4-20250514', label: 'Claude 4 Sonnet', costTier: '$$' },
+  'claude-4-haiku': { provider: 'anthropic', model: 'claude-haiku-4-20250514', label: 'Claude 4 Haiku', costTier: '$' },
+  'gpt-4.1-mini': { provider: 'openai', model: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', costTier: '$' },
+  'gpt-4.1': { provider: 'openai', model: 'gpt-4.1', label: 'GPT-4.1', costTier: '$$' },
+  'gpt-5': { provider: 'openai', model: 'gpt-5', label: 'GPT-5', costTier: '$$$' },
+}
+const DEFAULT_MODEL = 'claude-4-haiku'  // Cost-effective default
+
 export async function POST(request: NextRequest) {
   let orgContext = 'New user — no organization set up yet.'
   let rkbacRules = ''
@@ -30,7 +41,7 @@ export async function POST(request: NextRequest) {
           const tierAccess = TIER_ACCESS[userTier] || TIER_ACCESS[4]
 
           const [orgRes, deptsRes, agentsRes] = await Promise.all([
-            db.from('organizations').select('name, industry').eq('id', member.org_id).single(),
+            db.from('organizations').select('name, industry, settings').eq('id', member.org_id).single(),
             db.from('departments').select('id, name').eq('org_id', member.org_id),
             db.from('agents').select('name, status, department_id').eq('org_id', member.org_id),
           ])
@@ -102,8 +113,43 @@ RULES:
       { role: 'user' as const, content: message },
     ]
 
+    // Determine which model to use
+    const orgSettings = (await (async () => {
+      try {
+        const db2 = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+        const { data: m } = await db2.from('org_members').select('org_id').eq('user_id', userId || '').single()
+        if (m?.org_id) {
+          const { data: o } = await db2.from('organizations').select('settings').eq('id', m.org_id).single()
+          return o?.settings || {}
+        }
+        return {}
+      } catch { return {} }
+    })())
+    const selectedModel = MODEL_MAP[orgSettings.chat_model || DEFAULT_MODEL] || MODEL_MAP[DEFAULT_MODEL]
+
     const anthropicKey = process.env.ANTHROPIC_API_KEY
-    if (anthropicKey) {
+    const openaiKey = process.env.OPENAI_API_KEY
+    if (selectedModel.provider === 'openai' && openaiKey) {
+      try {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + openaiKey },
+          body: JSON.stringify({
+            model: selectedModel.model,
+            max_tokens: 500,
+            messages: [{ role: 'system', content: systemPrompt }, ...chatMessages],
+          }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          return NextResponse.json({ reply: data.choices?.[0]?.message?.content || "Try again?", model: selectedModel.label })
+        }
+        const errText = await res.text()
+        console.error('OpenAI error:', res.status, errText.substring(0, 200))
+      } catch (apiErr) { console.error('OpenAI error:', apiErr) }
+    }
+
+    if (selectedModel.provider === 'anthropic' && anthropicKey) {
       try {
         const res = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
@@ -113,7 +159,7 @@ RULES:
             'anthropic-version': '2023-06-01',
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: selectedModel.model,
             max_tokens: 500,
             system: systemPrompt,
             messages: chatMessages,
@@ -121,7 +167,7 @@ RULES:
         })
         if (res.ok) {
           const data = await res.json()
-          return NextResponse.json({ reply: data.content?.[0]?.text || "Hmm, try asking differently?" })
+          return NextResponse.json({ reply: data.content?.[0]?.text || "Hmm, try asking differently?", model: selectedModel.label })
         }
         const errText = await res.text()
         console.error('Anthropic error:', res.status, errText.substring(0, 200))

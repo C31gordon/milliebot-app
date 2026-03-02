@@ -263,6 +263,33 @@ function GeneralSettings({ showToast }: { showToast: (m: string) => void }) {
         <StaticToggle label="Zero Hallucination Mode" description="Block responses when no verified source is available" defaultChecked />
       </SectionCard>
 
+
+      <SectionCard title="Chat AI Model">
+        <p className="text-xs mb-3" style={{ color: 'var(--text4)' }}>Choose which AI model powers your organization&apos;s chat assistant. Lower-cost models work great for most tasks.</p>
+        <div className="grid gap-2">
+          {[
+            { key: 'claude-4-haiku', label: 'Claude 4 Haiku', cost: '$', speed: 'Ultra-fast', desc: 'Best value — fast and capable for everyday questions', rec: true },
+            { key: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', cost: '$', speed: 'Very fast', desc: 'Lightweight OpenAI model, great at scale' },
+            { key: 'claude-4-sonnet', label: 'Claude 4 Sonnet', cost: '$$', speed: 'Fast', desc: 'Premium quality for complex reasoning' },
+            { key: 'gpt-4.1', label: 'GPT-4.1', cost: '$$', speed: 'Fast', desc: 'Strong general-purpose model' },
+            { key: 'gpt-5', label: 'GPT-5', cost: '$$$', speed: 'Moderate', desc: 'Maximum capability for advanced tasks' },
+          ].map(m => (
+            <label key={m.key} className="flex items-center gap-3 p-3 rounded-lg cursor-pointer" style={{ border: '1px solid var(--border)', background: m.key === 'claude-4-haiku' ? 'rgba(85,156,181,0.08)' : 'var(--bg)' }}>
+              <input type="radio" name="chatModel" defaultChecked={m.key === 'claude-4-haiku'} style={{ accentColor: '#559CB5' }} />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{m.label}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>{m.cost}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--bg3)', color: 'var(--text4)' }}>{m.speed}</span>
+                  {m.rec && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(85,156,181,0.15)', color: '#559CB5' }}>Recommended</span>}
+                </div>
+                <div className="text-[11px] mt-0.5" style={{ color: 'var(--text4)' }}>{m.desc}</div>
+              </div>
+            </label>
+          ))}
+        </div>
+        <p className="text-[10px] mt-2" style={{ color: 'var(--text4)' }}>💡 Haiku handles 90% of questions at ~10x lower cost than premium models. Upgrade only if you need deep analysis.</p>
+      </SectionCard>
       <SectionCard title="Data Retention">
         <div className="grid grid-cols-2 gap-4">
           <div>
