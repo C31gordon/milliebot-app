@@ -43,9 +43,12 @@ export async function POST(req: NextRequest) {
       'Use the Compliance agent for regulatory monitoring and reporting',
     ],
     construction: [
-      'Set up a Project Tracking agent to monitor milestones and deliverables',
-      'Deploy automated RFI processing and response routing',
-      'Use the Safety Compliance agent for OSHA reporting workflows',
+      'Set up a Project Tracking agent to monitor milestones, budgets, and deliverables across all active projects',
+      'Deploy automated RFI processing — route to the right subcontractor, track response times, escalate delays',
+      'Use the Safety Compliance agent for OSHA reporting, incident tracking, and toolbox talk scheduling',
+      'Automate daily field reports — photo uploads, weather logs, crew counts, and progress notes',
+      'Set up Change Order workflows with approval chains and cost impact analysis',
+      'Integrate Procore or Buildertrend for real-time project sync and document management',
     ],
   }
 
