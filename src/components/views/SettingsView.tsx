@@ -912,33 +912,145 @@ function NotificationSettings() {
 }
 
 function BrandingSettings() {
+  const [colors, setColors] = useState({
+    primary: '#559CB5',
+    accent: '#8b5cf6',
+    success: '#22c55e',
+  })
+  const [saved, setSaved] = useState(false)
+
+  // Load saved brand colors
+  useEffect(() => {
+    const stored = localStorage.getItem('zynthr_brand')
+    if (stored) {
+      try { setColors(JSON.parse(stored)) } catch {}
+    }
+  }, [])
+
+  const applyColors = (c: typeof colors) => {
+    document.documentElement.style.setProperty('--brand-primary', c.primary)
+    document.documentElement.style.setProperty('--brand-accent', c.accent)
+    document.documentElement.style.setProperty('--brand-success', c.success)
+    // Also override the main blue/purple used throughout
+    document.documentElement.style.setProperty('--blue', c.primary)
+    document.documentElement.style.setProperty('--purple', c.accent)
+    document.documentElement.style.setProperty('--green', c.success)
+  }
+
+  const handleSave = async () => {
+    localStorage.setItem('zynthr_brand', JSON.stringify(colors))
+    applyColors(colors)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+    // Also save to org settings via API
+    try {
+      const { user } = await import('@/lib/auth-context').then(m => ({ user: null })).catch(() => ({ user: null }))
+      // Will persist to DB when org settings API is wired
+    } catch {}
+  }
+
+  // Apply on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('zynthr_brand')
+    if (stored) {
+      try { applyColors(JSON.parse(stored)) } catch {}
+    }
+  }, [])
+
+  const presets = [
+    { name: 'Zynthr Default', primary: '#559CB5', accent: '#8b5cf6', success: '#22c55e' },
+    { name: 'Ocean', primary: '#0ea5e9', accent: '#6366f1', success: '#10b981' },
+    { name: 'Rose', primary: '#e11d48', accent: '#be185d', success: '#22c55e' },
+    { name: 'Forest', primary: '#059669', accent: '#047857', success: '#16a34a' },
+    { name: 'Sunset', primary: '#ea580c', accent: '#dc2626', success: '#65a30d' },
+    { name: 'Midnight', primary: '#3b82f6', accent: '#8b5cf6', success: '#22c55e' },
+  ]
+
   return (
     <>
-      <SectionCard title="Custom Domain" description="Point your own domain to this platform (available after day 15)">
-        <InputField label="Custom Domain" value="" placeholder="agents.yourdomain.com" />
-        <div className="p-3 rounded-lg mt-2" style={{ background: 'var(--bg)', border: '1px dashed var(--border)' }}>
-          <p className="text-xs" style={{ color: 'var(--text4)' }}>Add a CNAME record pointing to <code style={{ color: 'var(--blue)' }}>cname.vercel-dns.com</code> then verify below.</p>
-        </div>
-        <button className="mt-3 px-4 py-2 rounded-lg text-sm" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>Verify Domain</button>
-      </SectionCard>
-      <SectionCard title="Logo & Colors" description="Customize the look of your platform">
-        <div className="grid grid-cols-2 gap-4">
-          {['Logo', 'Favicon'].map(l => (
-            <div key={l}>
-              <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>{l}</label>
-              <div className="w-full h-24 rounded-lg flex items-center justify-center cursor-pointer"
-                style={{ background: 'var(--bg)', border: '2px dashed var(--border)' }}>
-                <span className="text-sm" style={{ color: 'var(--text4)' }}>Click to upload {l.toLowerCase()}</span>
+      <SectionCard title="Brand Colors" description="Your colors apply across the entire platform — dashboard, agents, bots, buttons, and accents">
+        <div className="grid grid-cols-3 gap-4">
+          {([
+            { key: 'primary' as const, label: 'Primary', desc: 'Buttons, links, active states' },
+            { key: 'accent' as const, label: 'Accent', desc: 'Gradients, highlights, badges' },
+            { key: 'success' as const, label: 'Success', desc: 'Confirmations, active status' },
+          ]).map(c => (
+            <div key={c.key}>
+              <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text2)' }}>{c.label}</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={colors[c.key]}
+                  onChange={e => { const newColors = { ...colors, [c.key]: e.target.value }; setColors(newColors); applyColors(newColors) }}
+                  style={{ width: 40, height: 40, borderRadius: 8, border: '2px solid var(--border)', cursor: 'pointer', padding: 0 }} />
+                <div>
+                  <input type="text" value={colors[c.key]}
+                    onChange={e => { const newColors = { ...colors, [c.key]: e.target.value }; setColors(newColors); if (/^#[0-9a-f]{6}$/i.test(e.target.value)) applyColors(newColors) }}
+                    className="text-xs font-mono px-2 py-1 rounded"
+                    style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', width: 80 }} />
+                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--text4)' }}>{c.desc}</div>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          <InputField label="Primary Color" value="#559CB5" />
-          <InputField label="Accent Color" value="#8b5cf6" />
-          <InputField label="Background" value="#0a0e1a" />
+
+        <div className="mt-4">
+          <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--text2)' }}>Presets</label>
+          <div className="flex gap-2 flex-wrap">
+            {presets.map(p => (
+              <button key={p.name} onClick={() => { const c = { primary: p.primary, accent: p.accent, success: p.success }; setColors(c); applyColors(c) }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] transition-all hover:scale-105"
+                style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text3)' }}>
+                <span style={{ width: 12, height: 12, borderRadius: 4, background: p.primary, display: 'inline-block' }} />
+                <span style={{ width: 12, height: 12, borderRadius: 4, background: p.accent, display: 'inline-block' }} />
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <div className="flex-1 rounded-lg p-3" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+            <div className="text-[10px] font-semibold mb-2" style={{ color: 'var(--text4)' }}>PREVIEW</div>
+            <div className="flex items-center gap-2 mb-2">
+              <button className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: colors.primary }}>Primary Button</button>
+              <button className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: `linear-gradient(135deg, ${colors.primary}, ${colors.accent})` }}>Gradient</button>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold text-white" style={{ background: colors.success }}>Active</span>
+            </div>
+            <div className="flex gap-1">
+              <span className="text-xs" style={{ color: colors.primary }}>Link text</span>
+              <span className="text-xs" style={{ color: colors.accent }}>Accent text</span>
+            </div>
+          </div>
+          <button onClick={handleSave}
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105"
+            style={{ background: saved ? colors.success : `linear-gradient(135deg, ${colors.primary}, ${colors.accent})` }}>
+            {saved ? '✓ Saved!' : 'Save Colors'}
+          </button>
         </div>
       </SectionCard>
+
+      <SectionCard title="Logo" description="Upload your organization logo">
+        <div className="grid grid-cols-2 gap-4">
+          {['Logo (Dark Mode)', 'Logo (Light Mode)'].map(l => (
+            <div key={l}>
+              <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>{l}</label>
+              <div className="w-full h-24 rounded-lg flex items-center justify-center cursor-pointer"
+                style={{ background: 'var(--bg)', border: '2px dashed var(--border)' }}>
+                <span className="text-sm" style={{ color: 'var(--text4)' }}>Click to upload</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Custom Domain" description="Point your own domain to this platform">
+        <InputField label="Custom Domain" value="" placeholder="agents.yourdomain.com" />
+        <div className="p-3 rounded-lg mt-2" style={{ background: 'var(--bg)', border: '1px dashed var(--border)' }}>
+          <p className="text-xs" style={{ color: 'var(--text4)' }}>Add a CNAME record pointing to <code style={{ color: colors.primary }}>cname.vercel-dns.com</code> then verify below.</p>
+        </div>
+        <button className="mt-3 px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ background: colors.primary }}>Verify Domain</button>
+      </SectionCard>
+
       <SectionCard title="White Label" description="Remove Zynthr Inc. branding for your tenants">
         <StaticToggle label="Hide 'Powered by Zynthr Inc.'" description="Remove platform attribution from footer and login screen" />
         <StaticToggle label="Custom Email Templates" description="Use your branding in system-sent emails" />

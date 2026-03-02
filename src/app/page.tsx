@@ -80,6 +80,19 @@ export default function Home() {
 
   // Hard timeout — never show loading for more than 5 seconds
   const [forceLoaded, setForceLoaded] = useState(false)
+
+  // Apply saved brand colors on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('zynthr_brand')
+    if (stored) {
+      try {
+        const c = JSON.parse(stored)
+        if (c.primary) document.documentElement.style.setProperty('--blue', c.primary)
+        if (c.accent) document.documentElement.style.setProperty('--purple', c.accent)
+        if (c.success) document.documentElement.style.setProperty('--green', c.success)
+      } catch {}
+    }
+  }, [])
   useEffect(() => {
     const t = setTimeout(() => setForceLoaded(true), 5000)
     return () => clearTimeout(t)
