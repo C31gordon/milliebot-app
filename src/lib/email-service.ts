@@ -1,8 +1,8 @@
 // Email Service for Zynthr
 // Mock provider by default; SendGrid when SENDGRID_API_KEY is set
 
-// import sgMail from '@sendgrid/mail';
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+import sgMail from '@sendgrid/mail';
+if (process.env.SENDGRID_API_KEY) sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 import {
   welcomeEmail,
@@ -33,9 +33,10 @@ export async function sendEmail(
   const from = options?.from ?? DEFAULT_FROM;
 
   if (useSendGrid()) {
-    // Uncomment when SendGrid is wired:
-    // const msg = { to, from, subject, html, ...(options?.replyTo ? { replyTo: options.replyTo } : {}) };
-    // await sgMail.send(msg);
+    const msg: Record<string, unknown> = { to, from, subject, html };
+    if (options?.replyTo) msg.replyTo = options.replyTo;
+    if (options?.attachments) msg.attachments = options.attachments;
+    await sgMail.send(msg as unknown as Parameters<typeof sgMail.send>[0]);
     console.log(`[Email] SendGrid: sent "${subject}" to ${to}`);
     return { success: true };
   }
