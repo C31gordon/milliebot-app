@@ -5,6 +5,17 @@ import { supabase, DEMO_MODE, DEMO_USER } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import type { Organization, OrgMember } from '@/lib/supabase'
 
+interface OrgListItem {
+  id: string
+  name: string
+  industry: string
+  plan: string
+  slug?: string
+  memberCount?: number
+  agentCount?: number
+  role?: string
+}
+
 interface AuthContextType {
   user: User | null
   session: Session | null
@@ -16,6 +27,9 @@ interface AuthContextType {
   userName: string | null
   userEmail: string | null
   orgName: string | null
+  isSuperAdmin: boolean
+  availableOrgs: OrgListItem[]
+  switchOrg: (orgId: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -30,6 +44,9 @@ const AuthContext = createContext<AuthContextType>({
   userName: null,
   userEmail: null,
   orgName: null,
+  isSuperAdmin: false,
+  availableOrgs: [],
+  switchOrg: async () => {},
   signOut: async () => {},
 })
 
@@ -56,6 +73,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [membership, setMembership] = useState<OrgMember | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [availableOrgs, setAvailableOrgs] = useState<OrgListItem[]>([])
+
+  const switchOrg = useCallback(async (orgId: string) => {
+    const uid = user?.id
+    if (!uid) return
+    try {
+      const res = await fetch('/api/org/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: uid, targetOrgId: orgId }),
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.org) {
+        setOrganization(data.org)
+        setMembership(data.role === 'super_admin' 
+          ? { org_id: orgId, role: 'owner', permission_tier: 1 } as OrgMember
+          : { org_id: orgId, role: data.role, permission_tier: data.permissionTier } as OrgMember)
+        localStorage.setItem('zynthr_org', JSON.stringify({ name: data.org.name, industry: data.org.industry, departments: (data.departments || []).map((d: any) => d.name) }))
+        localStorage.setItem('zynthr_active_org', orgId)
+        // Force page refresh to reload all data
+        window.location.reload()
+      }
+    } catch (e) {
+      console.error('Org switch failed:', e)
+    }
+  }, [user])
 
   const handleSignOut = useCallback(async () => {
     if (DEMO_MODE) {
@@ -98,6 +143,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (e) {
           console.error('Failed to load org context:', e)
         }
+      }
+      // Load available orgs for tenant switcher
+      if (s?.user) {
+        fetch(`/api/org/list?userId=${s.user.id}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              setAvailableOrgs(data.orgs || [])
+              setIsSuperAdmin(data.isSuperAdmin || false)
+            }
+          }).catch(() => {})
       }
       setIsLoading(false)
     }).catch(() => setIsLoading(false))
@@ -171,6 +227,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       userName,
       userEmail,
       orgName,
+      isSuperAdmin,
+      availableOrgs,
+      switchOrg,
       signOut: handleSignOut,
     }}>
       {children}

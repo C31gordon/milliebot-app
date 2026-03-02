@@ -27,6 +27,7 @@ interface TopBarProps {
 export default function TopBar({ user, localUser, isAuthenticated, onNavigate, isMobile, onMenuToggle, onTourStart }: TopBarProps) {
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const [showOrgSwitcher, setShowOrgSwitcher] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isDark, setIsDark] = useState(true)
 
@@ -48,12 +49,14 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
   }
   const notifRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
+  const orgRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifications(false)
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setShowProfile(false)
+      if (orgRef.current && !orgRef.current.contains(e.target as Node)) setShowOrgSwitcher(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -67,7 +70,7 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
     }
   }, [searchQuery])
 
-  const { signOut } = useAuth()
+  const { signOut, availableOrgs, switchOrg, isSuperAdmin, organization } = useAuth()
   const handleLogout = () => {
     signOut()
   }
@@ -128,6 +131,70 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
       </form>
 
       <div className="flex items-center gap-3 flex-shrink-0">
+
+        {/* Tenant Switcher — only show if user has access to multiple orgs */}
+        {availableOrgs.length > 1 && (
+          <div className="relative" ref={orgRef}>
+            <button
+              onClick={() => { setShowOrgSwitcher(!showOrgSwitcher); setShowNotifications(false); setShowProfile(false) }}
+              className="h-9 px-3 rounded-lg flex items-center gap-2 transition-all hover:bg-white/5 text-xs font-medium"
+              style={{ border: '1px solid var(--border)', color: 'var(--text3)', background: 'var(--bg2)', maxWidth: '200px' }}
+              title="Switch organization"
+            >
+              <span style={{ fontSize: '14px' }}>🏢</span>
+              <span className="truncate">{displayOrg || 'Select Org'}</span>
+              <span style={{ fontSize: '10px', opacity: 0.5 }}>▼</span>
+              {isSuperAdmin && (
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(124,58,237,0.15)', color: '#a78bfa' }}>ADMIN</span>
+              )}
+            </button>
+            {showOrgSwitcher && (
+              <div className="absolute left-0 top-12 rounded-xl overflow-hidden z-[100]"
+                style={{ background: 'var(--bg2)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)', width: '280px' }}>
+                <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span className="text-xs font-bold" style={{ color: 'var(--text)' }}>
+                    {isSuperAdmin ? '🔑 All Organizations' : 'Your Organizations'}
+                  </span>
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {availableOrgs.map((org) => {
+                    const isActive = organization?.id === org.id
+                    return (
+                      <button
+                        key={org.id}
+                        onClick={() => { if (!isActive) switchOrg(org.id); setShowOrgSwitcher(false) }}
+                        className="w-full text-left px-4 py-3 border-b transition-colors hover:bg-white/5"
+                        style={{ borderColor: 'var(--border)', background: isActive ? 'rgba(85,156,181,0.1)' : 'transparent' }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0">
+                            <div className="text-xs font-semibold truncate" style={{ color: isActive ? 'var(--blue)' : 'var(--text)' }}>
+                              {isActive && '✓ '}{org.name}
+                            </div>
+                            <div className="text-[11px] mt-0.5 flex items-center gap-2" style={{ color: 'var(--text4)' }}>
+                              <span>{org.industry}</span>
+                              <span>·</span>
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium"
+                                style={{ background: org.plan === 'enterprise' ? 'rgba(124,58,237,0.15)' : org.plan === 'pro' ? 'rgba(85,156,181,0.15)' : 'rgba(255,255,255,0.05)', color: org.plan === 'enterprise' ? '#a78bfa' : org.plan === 'pro' ? 'var(--blue)' : 'var(--text4)' }}>
+                                {(org.plan || 'free').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          {isSuperAdmin && (org as any).agentCount !== undefined && (
+                            <div className="text-[10px] text-right flex-shrink-0" style={{ color: 'var(--text4)' }}>
+                              <div>{(org as any).memberCount || 0} users</div>
+                              <div>{(org as any).agentCount || 0} agents</div>
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Take a Tour */}
         <button
