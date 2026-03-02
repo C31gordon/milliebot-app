@@ -20,6 +20,7 @@ function SubdomainBadge() {
 type ViewType = 'dashboard' | 'agents' | 'chat' | 'tickets' | 'suggestions' | 'workflows' | 'policies' | 'audit' | 'settings' | 'onboarding' | 'training' | 'healthcare' | 'setup' | 'birthcenter' | 'patientdash' | 'orgsetup'
 
 interface SidebarProps {
+  orgIndustry?: string
   orgName?: string
   userName?: string
   activeView: ViewType
@@ -97,7 +98,7 @@ function HipaaModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, orgName, userName }: SidebarProps) {
+export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, orgName, userName, orgIndustry }: SidebarProps) {
   const [hipaaOpen, setHipaaOpen] = useState(false)
   const [orgLogo, setOrgLogo] = useState<string | null>(null)
 
@@ -170,7 +171,7 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, o
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2 px-2">
-        {navItems.map((item) => {
+        {navItems.filter(item => item.id !== 'patientdash' || orgIndustry === 'healthcare').map((item) => {
           const showSection = !collapsed && item.section && item.section !== lastSection
           if (item.section) lastSection = item.section
 

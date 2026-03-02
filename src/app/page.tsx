@@ -181,7 +181,7 @@ export default function Home() {
       <div className="transition-transform duration-300"
         style={{ position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 60, transform: isMobile && !mobileMenuOpen ? 'translateX(-100%)' : 'translateX(0)' }}>
         <Sidebar activeView={activeView} onNavigate={handleNavigate} collapsed={isMobile ? false : sidebarCollapsed}
-          onToggle={() => isMobile ? setMobileMenuOpen(false) : setSidebarCollapsed(!sidebarCollapsed)} orgName={auth.orgName ?? undefined} userName={auth.userName ?? undefined} />
+          onToggle={() => isMobile ? setMobileMenuOpen(false) : setSidebarCollapsed(!sidebarCollapsed)} orgName={auth.orgName ?? undefined} userName={auth.userName ?? undefined} orgIndustry={auth.organization?.industry ?? undefined} />
       </div>
       <div className="flex-1 flex flex-col min-h-screen transition-all duration-300" style={{ marginLeft: isMobile ? 0 : sidebarWidth }}>
         <TopBar

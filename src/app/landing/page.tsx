@@ -31,6 +31,21 @@ const tiers = [
   { name: 'Enterprise', price: '$499', period: '/mo', features: ['Everything in Pro', 'White-label option', 'Custom integrations', 'Dedicated CSM', 'SSO + audit logs', 'SLA guarantee'], cta: 'Contact Sales', highlight: false },
 ]
 
+const industryVerticals = [
+  { name: "Property Management", icon: "🏢", useCases: ["Automated DLR generation", "Work order routing \& prioritization", "Lease renewal pipeline management", "Tenant screening \& pre-qualification"] },
+  { name: "Healthcare", icon: "🏥", useCases: ["Patient intake \& registration", "HIPAA-compliant audit logging", "Appointment scheduling \& reminders", "Claims submission \& tracking"] },
+  { name: "Construction", icon: "🏗️", useCases: ["Project milestone tracking", "Safety incident logging", "RFP parsing \& bid analysis", "Subcontractor coordination"] },
+  { name: "Legal", icon: "⚖️", useCases: ["Contract review \& risk flagging", "Case research \& brief compilation", "Client intake \& conflict checks", "Billable hour tracking"] },
+  { name: "Finance", icon: "🏦", useCases: ["Transaction fraud detection", "Portfolio performance reporting", "Regulatory compliance monitoring", "Client service automation"] },
+  { name: "Education", icon: "🎓", useCases: ["Enrollment processing", "Student advising \& scheduling", "Automated grading \& feedback", "Financial aid support"] },
+  { name: "Insurance", icon: "🛡️", useCases: ["Claims intake \& validation", "Underwriting risk assessment", "Policy service automation", "Fraud pattern detection"] },
+  { name: "Retail", icon: "🛍️", useCases: ["Customer service automation", "Inventory management \& alerts", "Marketing campaign optimization", "Pricing \& merchandising analysis"] },
+  { name: "Logistics", icon: "🚛", useCases: ["Route \& dispatch optimization", "Real-time shipment tracking", "Warehouse pick\/pack workflows", "DOT compliance monitoring"] },
+  { name: "Hospitality", icon: "🛎️", useCases: ["Reservation management", "Guest concierge services", "Revenue \& yield management", "Housekeeping coordination"] },
+  { name: "Manufacturing", icon: "⚙️", useCases: ["Production scheduling", "Quality defect tracking", "Supply chain management", "OSHA safety compliance"] },
+  { name: "HR Services", icon: "👥", useCases: ["Resume screening \& interviews", "New hire onboarding", "Benefits enrollment support", "Policy Q\&A automation"] },
+]
+
 export default function LandingPage() {
   return (
     <div style={{ background: '#0a0f1a', color: '#e2e8f0', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -93,6 +108,27 @@ export default function LandingPage() {
               <div style={{ fontSize: 32, marginBottom: 12 }}>{f.icon}</div>
               <h3 style={{ fontSize: 17, fontWeight: 600, marginBottom: 8 }}>{f.title}</h3>
               <p style={{ color: '#94a3b8', fontSize: 14, lineHeight: 1.5 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Industry Verticals */}
+      <section style={{ padding: "80px 20px", maxWidth: 1100, margin: "0 auto" }}>
+        <h2 style={{ textAlign: "center", fontSize: 32, fontWeight: 700, marginBottom: 12 }}>Built for Every Industry</h2>
+        <p style={{ textAlign: "center", color: "#64748b", marginBottom: 48, fontSize: 16 }}>Pre-built agent templates for 12+ verticals. Deploy in minutes, not months.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+          {industryVerticals.map((v, i) => (
+            <div key={i} style={{ background: "rgba(255,255,255,0.03)", borderRadius: 14, padding: 24, border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>{v.icon}</div>
+              <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>{v.name}</h3>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {v.useCases.map((uc, j) => (
+                  <li key={j} style={{ color: "#94a3b8", fontSize: 13, padding: "3px 0", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ color: colors.green, fontSize: 11 }}>✓</span> {uc}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

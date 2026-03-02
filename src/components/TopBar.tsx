@@ -94,13 +94,37 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
   const displayRole = DEMO_MODE && !isAuthenticated ? DEMO_USER.role : (localUser ? 'Member' : '')
 
-  const notifications = [
-    { icon: '🛡️', text: 'Prompt injection attempt blocked from external@example.com', time: '2 min ago', unread: true },
-    { icon: '🎫', text: 'New ticket #TKT-0012 assigned to IT', time: '12 min ago', unread: true },
-    { icon: '🔒', text: 'Access exception expiring in 7 days', time: '1 hour ago', unread: false },
-    { icon: '💡', text: 'Suggestion #SUG-0008 shipped!', time: '3 hours ago', unread: false },
-    { icon: '⚡', text: 'Workflow "Email Cleanup" completed — 8 items', time: '4 hours ago', unread: false },
-  ]
+  const [notifications, setNotifications] = useState<{icon: string; text: string; time: string; unread: boolean}[]>([])
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        const orgId = localStorage.getItem('zynthr_org_id')
+        if (!orgId) return
+        const res = await fetch(`/api/org/data?userId=_&audit=1&orgId=${orgId}`)
+        if (!res.ok) throw new Error('fetch failed')
+        const data = await res.json()
+        if (data.auditLog && Array.isArray(data.auditLog)) {
+          const iconMap: Record<string, string> = { agent_action: '🤖', login: '🔑', setting_change: '⚙️', policy_update: '🔒', ticket_created: '🎫', workflow_run: '⚡', security_alert: '🛡️' }
+          setNotifications(data.auditLog.slice(0, 8).map((entry: any) => {
+            const mins = Math.round((Date.now() - new Date(entry.created_at).getTime()) / 60000)
+            const time = mins < 60 ? `${mins} min ago` : mins < 1440 ? `${Math.round(mins / 60)} hours ago` : `${Math.round(mins / 1440)}d ago`
+            return { icon: iconMap[entry.action] || '📋', text: entry.details?.message || `${entry.action} on ${entry.resource_type || 'system'}`, time, unread: mins < 30 }
+          }))
+        }
+      } catch {
+        // Fallback to demo notifications
+        setNotifications([
+          { icon: '🛡️', text: 'Prompt injection attempt blocked', time: '2 min ago', unread: true },
+          { icon: '🎫', text: 'New ticket assigned to IT', time: '12 min ago', unread: true },
+          { icon: '🔒', text: 'Access exception expiring', time: '1 hour ago', unread: false },
+        ])
+      }
+    }
+    fetchNotifications()
+    const interval = setInterval(fetchNotifications, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   const unreadCount = notifications.filter(n => n.unread).length
 

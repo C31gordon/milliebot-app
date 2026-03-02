@@ -8,10 +8,21 @@ interface WelcomeBannerProps {
 
 export default function WelcomeBanner({ onNavigate }: WelcomeBannerProps) {
   const [dismissed, setDismissed] = useState(true)
+  const [hasDepts, setHasDepts] = useState(false)
+  const [hasAgents, setHasAgents] = useState(false)
 
   useEffect(() => {
     const wasDismissed = localStorage.getItem('zynthr_welcome_dismissed') === 'true'
     setDismissed(wasDismissed)
+    // Check org state from localStorage
+    try {
+      const orgData = JSON.parse(localStorage.getItem('zynthr_org') || '{}')
+      if (orgData.departments && orgData.departments.length > 0) setHasDepts(true)
+    } catch { /* noop */ }
+    try {
+      const agentCount = parseInt(localStorage.getItem('zynthr_agent_count') || '0', 10)
+      if (agentCount > 0) setHasAgents(true)
+    } catch { /* noop */ }
   }, [])
 
   if (dismissed) return null
@@ -22,8 +33,8 @@ export default function WelcomeBanner({ onNavigate }: WelcomeBannerProps) {
   }
 
   const steps = [
-    { emoji: '🏢', label: 'Set Up Your Org', view: 'orgsetup' },
-    { emoji: '🤖', label: 'Deploy Your First Agent', view: 'agents' },
+    ...(!hasDepts ? [{ emoji: '🏢', label: 'Set Up Your Org', view: 'orgsetup' }] : []),
+    ...(!hasAgents ? [{ emoji: '🤖', label: 'Deploy Your First Agent', view: 'agents' }] : []),
     { emoji: '💬', label: 'Try the Chat', view: 'chat' },
   ]
 
