@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         const { data: member } = await db.from('org_members').select('org_id, role, permission_tier, department').eq('user_id', userId).single()
 
         if (member?.org_id) {
-          const userTier = member.permission_tier || (member.role === 'owner' ? 1 : 3)
+          const userTier = member.role === 'owner' ? 1 : (member.permission_tier <= 4 ? member.permission_tier : 3)
           const tierAccess = TIER_ACCESS[userTier] || TIER_ACCESS[4]
 
           const [orgRes, deptsRes, agentsRes] = await Promise.all([
