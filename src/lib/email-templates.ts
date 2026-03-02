@@ -196,3 +196,32 @@ ${p(`Not bad for week one! Here's what most teams do next:`)}
     html: wrapLayout(body, 'Explore Advanced Features', `https://${subdomain}.zynthr.ai/features`),
   };
 }
+
+// === Agent Fleet Shared Utilities ===
+
+export const ZYNTHR_HEADER = `
+<div style="background:linear-gradient(135deg,#003146,#559CB5);padding:24px;border-radius:12px 12px 0 0;text-align:center">
+  <h1 style="color:white;margin:0;font-size:22px">Zynthr</h1>
+</div>`
+
+export const ZYNTHR_FOOTER = `
+<div style="padding:16px;text-align:center;color:#999;font-size:12px">
+  <p>Zynthr Inc. · AI-Powered Operations · <a href="https://app.zynthr.ai" style="color:#559CB5">app.zynthr.ai</a></p>
+  <p><a href="https://app.zynthr.ai/unsubscribe" style="color:#999">Unsubscribe</a></p>
+</div>`
+
+export function wrapEmail(body: string): string {
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto">${ZYNTHR_HEADER}<div style="background:#f8fafc;padding:24px;border:1px solid #e5e7eb;border-top:none">${body}</div>${ZYNTHR_FOOTER}</div>`
+}
+
+export const AGENT_SIGNATURES: Record<string, string> = {
+  scout: '— Scout, Zynthr Sales',
+  sage: '— Sage, Your Zynthr Success Guide',
+  milo: '— Milo, Zynthr Support',
+  echo: '— Echo, Zynthr Marketing',
+  hunter: '— Hunter, Zynthr Outbound',
+  closer: '— Closer, Zynthr Demo Prep',
+  cashflow: '— Cashflow, Zynthr Billing',
+  coach: '— Coach, Zynthr Training',
+  bridge: '— Bridge, Zynthr Partnerships',
+}
