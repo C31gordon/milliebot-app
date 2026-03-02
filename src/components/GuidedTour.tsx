@@ -10,43 +10,63 @@ interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
+    title: 'Welcome to Zynthr! 👋',
+    description: "Let's take a quick tour of your AI command center. This only takes a minute.",
+    selector: '[data-tour="dashboard"]',
+  },
+  {
+    title: 'Search',
+    description: 'Find anything fast — agents, settings, workflows, team members. Just start typing.',
+    selector: '[data-tour="search"]',
+  },
+  {
+    title: 'Day / Night Mode',
+    description: 'Toggle between light and dark themes. Your preference is saved automatically.',
+    selector: '[data-tour="theme-toggle"]',
+  },
+  {
+    title: 'Notifications',
+    description: 'Stay on top of agent alerts, security events, and team activity. Real-time updates appear here.',
+    selector: '[data-tour="notifications"]',
+  },
+  {
+    title: 'Help & Tour',
+    description: 'Need a refresher? Click here anytime to replay this tour or access help resources.',
+    selector: '[data-tour="help"]',
+  },
+  {
     title: 'Dashboard',
-    description: 'This is your command center. See real-time KPIs, security alerts, and department health at a glance.',
+    description: 'Your command center. Real-time KPIs, department health, security alerts, and agent status at a glance.',
     selector: '[data-tour="dashboard"]',
   },
   {
     title: 'Agents & Bots',
-    description: 'Create and manage your AI workers here. Agents handle complex tasks, Bots handle single-function queries.',
+    description: 'Create and manage your AI workers. Agents handle complex multi-step tasks, Bots handle focused queries.',
     selector: '[data-tour="agents"]',
   },
   {
     title: 'Chat',
-    description: "Ask anything in natural language. Start with 'I wish...' for suggestions, 'I need...' for tickets, or 'Build me...' for planning.",
+    description: "Your AI assistant lives here. Ask anything in plain language — it knows your org, departments, and agents.",
     selector: '[data-tour="chat"]',
   },
   {
     title: 'Workflows',
-    description: 'Automate repetitive processes. If-this-then-that logic, scheduled reports, and multi-step automations.',
+    description: 'Automate repetitive processes with if-this-then-that logic, scheduled reports, and multi-step chains.',
     selector: '[data-tour="workflows"]',
   },
   {
-    title: 'Onboarding',
-    description: 'Set up training pathways for your team. Guardian Gates block capabilities until prerequisites are met.',
-    selector: '[data-tour="onboarding"]',
-  },
-  {
     title: 'Security (RKBAC)',
-    description: 'Control who can see and do what. 4-tier permissions ensure every agent respects your org boundaries.',
+    description: 'Role & Knowledge-Based Access Control. 4-tier permissions ensure every user and agent respects your boundaries.',
     selector: '[data-tour="policies"]',
   },
   {
     title: 'Settings',
-    description: 'Configure departments, invite users, connect your systems, and customize the platform.',
+    description: 'Configure your org, manage team access, choose your AI model, and connect integrations.',
     selector: '[data-tour="settings"]',
   },
   {
-    title: 'Org Setup',
-    description: 'Start here! Set up your organization, departments, and integrations in a guided wizard.',
+    title: 'Org Setup Wizard',
+    description: 'First time? Start here to configure your organization, departments, BAA (if healthcare), and invite your team.',
     selector: '[data-tour="orgsetup"]',
   },
 ]

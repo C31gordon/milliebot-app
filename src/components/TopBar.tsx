@@ -134,11 +134,11 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
           onClick={onTourStart}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:bg-white/5"
           style={{ color: "var(--text3)", fontSize: "16px" }}
-          title="Take a Tour"
+          data-tour="help" title="Take a Tour"
         >
           ❓
         </button>
-        <button onClick={toggleTheme}
+        <button data-tour="theme-toggle" onClick={toggleTheme}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:bg-white/5"
           style={{ color: 'var(--text3)', fontSize: '18px' }} title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
           {isDark ? '☀️' : '🌙'}
@@ -152,7 +152,7 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
         )}
 
         <div className="relative" ref={notifRef}>
-          <button onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false) }}
+          <button data-tour="notifications" onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false) }}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors hover:bg-white/5 relative"
             style={{ color: 'var(--text3)' }}>
             🔔
