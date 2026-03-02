@@ -15,12 +15,12 @@ const TIER_ACCESS: Record<number, { label: string; canSee: string[]; restricted:
 // Model options — org admin selects in settings
 const MODEL_MAP: Record<string, { provider: 'anthropic' | 'openai'; model: string; label: string; costTier: string }> = {
   'claude-4-sonnet': { provider: 'anthropic', model: 'claude-sonnet-4-20250514', label: 'Claude 4 Sonnet', costTier: '$$' },
-  'claude-4-haiku': { provider: 'anthropic', model: 'claude-haiku-4-20250514', label: 'Claude 4 Haiku', costTier: '$' },
+  'claude-4-haiku': { provider: 'anthropic', model: 'claude-3-5-haiku-latest', label: 'Claude 4 Haiku', costTier: '$' },
   'gpt-4.1-mini': { provider: 'openai', model: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', costTier: '$' },
   'gpt-4.1': { provider: 'openai', model: 'gpt-4.1', label: 'GPT-4.1', costTier: '$$' },
   'gpt-5': { provider: 'openai', model: 'gpt-5', label: 'GPT-5', costTier: '$$$' },
 }
-const DEFAULT_MODEL = 'claude-4-haiku'  // Cost-effective default
+const DEFAULT_MODEL = 'claude-4-sonnet'  // Cost-effective default
 
 export async function POST(request: NextRequest) {
   let orgContext = 'New user — no organization set up yet.'
