@@ -121,6 +121,16 @@ export default function DashboardView({ userName, orgName }: { userName?: string
           <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>
             {orgName || 'Zynthr'} — Owner Dashboard • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
+          <button onClick={async () => {
+            const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+            if (!stored.userId) return
+            const res = await fetch('/api/org/guide', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: stored.userId }) })
+            const html = await res.text()
+            const blob = new Blob([html], { type: 'text/html' })
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${orgName || 'Zynthr'}-Getting-Started-Guide.html`; a.click()
+          }} className="text-xs mt-2 px-3 py-1 rounded-md" style={{ background: 'var(--bg3)', color: '#559CB5', border: '1px solid var(--border)', cursor: 'pointer', fontWeight: 600 }}>
+            📖 Download Your Getting Started Guide
+          </button>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {(['today', 'week', 'month'] as const).map(period => (

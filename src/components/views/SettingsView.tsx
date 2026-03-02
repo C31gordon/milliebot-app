@@ -942,10 +942,16 @@ function BrandingSettings() {
     applyColors(colors)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
-    // Also save to org settings via API
+    // Persist to DB
     try {
-      const { user } = await import('@/lib/auth-context').then(m => ({ user: null })).catch(() => ({ user: null }))
-      // Will persist to DB when org settings API is wired
+      const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+      if (stored.userId) {
+        await fetch('/api/org/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: stored.userId, settings: { brandColors: colors } })
+        })
+      }
     } catch {}
   }
 

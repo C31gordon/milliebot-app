@@ -15,6 +15,8 @@ interface OrgInfo {
   size: string
   contactName: string
   contactEmail: string
+  contactTitle: string
+  ein: string
 }
 
 interface Department {
@@ -183,7 +185,7 @@ export default function OrgSetupWizardView() {
   const [baaDocuSignSent, setBaaDocuSignSent] = useState(false)
 
   const [subcategory, setSubcategory] = useState('')
-  const [org, setOrg] = useState<OrgInfo>({ name: '', industry: '', size: '', contactName: '', contactEmail: '' })
+  const [org, setOrg] = useState<OrgInfo>({ name: '', industry: '', size: '', contactName: '', contactEmail: '', contactTitle: '', ein: '' })
   const [departments, setDepartments] = useState<Department[]>([])
   const [deptInited, setDeptInited] = useState('')
   const [integrations, setIntegrations] = useState<Integration[]>(INTEGRATIONS_DATA)
@@ -379,6 +381,14 @@ export default function OrgSetupWizardView() {
           <div>
             <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 4, display: 'block' }}>Primary Contact Email</label>
             <input style={inputStyle} value={org.contactEmail} onChange={e => setOrg({ ...org, contactEmail: e.target.value })} placeholder="email@company.com" type="email" />
+          </div>
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 4, display: 'block' }}>Title / Position</label>
+            <input style={inputStyle} value={org.contactTitle} onChange={e => setOrg({ ...org, contactTitle: e.target.value })} placeholder="e.g. Practice Director" />
+          </div>
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 4, display: 'block' }}>EIN <span style={{ fontWeight: 400, color: 'var(--text4)' }}>(optional)</span></label>
+            <input style={inputStyle} value={org.ein} onChange={e => setOrg({ ...org, ein: e.target.value })} placeholder="XX-XXXXXXX" />
           </div>
         </div>
       </div>
