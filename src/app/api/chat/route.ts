@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
     if (userId) {
       try {
         const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
-        const { data: member } = await db.from('org_members').select('org_id, role, permission_tier, department').eq('user_id', userId).single()
+        const { data: chatMembers } = await db.from('org_members').select('org_id, role, permission_tier, department').eq('user_id', userId).order('role', { ascending: true })
+        const member = chatMembers?.find((m: any) => m.role === 'owner') || chatMembers?.[0]
 
         if (member?.org_id) {
           orgId = member.org_id
@@ -163,7 +164,8 @@ RULES:
     const orgSettings = (await (async () => {
       try {
         const db2 = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
-        const { data: m } = await db2.from('org_members').select('org_id').eq('user_id', userId || '').single()
+        const { data: m2 } = await db2.from('org_members').select('org_id').eq('user_id', userId || '').order('role', { ascending: true })
+        const m = m2?.find((x: any) => x.role === 'owner') || m2?.[0]
         if (m?.org_id) {
           const { data: o } = await db2.from('organizations').select('settings').eq('id', m.org_id).single()
           return o?.settings || {}

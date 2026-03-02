@@ -15,7 +15,8 @@ export async function POST(req: NextRequest) {
   if (!file || !userId) return NextResponse.json({ error: 'file and userId required' }, { status: 400 })
 
   // RKBAC: only owner
-  const { data: member } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).single()
+  const { data: members } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).order('role', { ascending: true })
+  const member = members?.find((m: any) => m.role === 'owner') || members?.[0]
   if (!member) return NextResponse.json({ error: 'No org found' }, { status: 404 })
   if (member.role !== 'owner') return NextResponse.json({ error: 'Only owners can upload logos' }, { status: 403 })
 
@@ -49,7 +50,8 @@ export async function DELETE(req: NextRequest) {
   const { userId, variant } = await req.json()
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
-  const { data: member } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).single()
+  const { data: members } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).order('role', { ascending: true })
+  const member = members?.find((m: any) => m.role === 'owner') || members?.[0]
   if (!member) return NextResponse.json({ error: 'No org found' }, { status: 404 })
   if (member.role !== 'owner') return NextResponse.json({ error: 'Only owners can delete logos' }, { status: 403 })
 

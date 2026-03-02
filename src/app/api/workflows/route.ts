@@ -7,7 +7,8 @@ const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 function getDb() { return createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } }) }
 
 async function getOrgId(userId: string) {
-  const { data } = await getDb().from('org_members').select('org_id, role').eq('user_id', userId).single()
+  const { data: wfMembers } = await getDb().from('org_members').select('org_id, role').eq('user_id', userId).order('role', { ascending: true })
+  const data = wfMembers?.find((m: any) => m.role === 'owner') || wfMembers?.[0]
   return data
 }
 

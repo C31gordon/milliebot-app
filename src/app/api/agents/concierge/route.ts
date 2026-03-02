@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
   const { data: org } = await supabase.from('organizations').select('*').eq('id', orgId).single()
   const { data: depts } = await supabase.from('departments').select('name').eq('org_id', orgId)
   const { data: agents } = await supabase.from('agents').select('name, status').eq('org_id', orgId)
-  const { data: member } = await supabase.from('org_members').select('*').eq('user_id', userId).single()
+  const { data: members } = await supabase.from('org_members').select('*').eq('user_id', userId).order('role', { ascending: true })
+  const member = members?.find((m: any) => m.role === 'owner') || members?.[0]
 
   const orgName = org?.name || 'Your Organization'
   const industry = org?.industry || 'general'

@@ -9,7 +9,8 @@ export async function POST(req: NextRequest) {
   const { userId } = await req.json()
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
-  const { data: member } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).single()
+  const { data: members } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).order('role', { ascending: true })
+  const member = members?.find((m: any) => m.role === 'owner') || members?.[0]
   if (!member) return NextResponse.json({ error: 'No org found' }, { status: 404 })
 
   const { data: org } = await supabase.from('organizations').select('*').eq('id', member.org_id).single()

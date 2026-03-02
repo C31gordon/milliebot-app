@@ -9,7 +9,8 @@ export async function POST(req: NextRequest) {
   const { userId, subject, description, category, priority } = await req.json()
   if (!userId || !subject) return NextResponse.json({ error: 'userId and subject required' }, { status: 400 })
 
-  const { data: member } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).single()
+  const { data: members } = await supabase.from('org_members').select('org_id, role').eq('user_id', userId).order('role', { ascending: true })
+  const member = members?.find((m: any) => m.role === 'owner') || members?.[0]
 
   // Log to audit_log as a support ticket
   const { error } = await supabase.from('audit_log').insert({
