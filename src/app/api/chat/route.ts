@@ -54,12 +54,36 @@ const MODEL_MAP: Record<string, { provider: 'anthropic' | 'openai' | 'together';
   'deepseek-v3': { provider: 'together', model: 'deepseek-ai/DeepSeek-V3-0324', label: 'DeepSeek V3', costTier: '$' },
   'qwen3-235b': { provider: 'together', model: 'Qwen/Qwen3-235B-A22B-Instruct-2507-FP8', label: 'Qwen3 235B', costTier: '$' },
 }
-const DEFAULT_MODEL = 'claude-4-sonnet'  // Cost-effective default
+const DEFAULT_MODEL = 'llama-4-maverick'  // Cheapest default — highest margin
+
+// RKBAC Model Access Tiers
+// Tier 1 (Owner/Exec): All models | Tier 2 (Dept Head): ≤$$ | Tier 3 (Manager): ≤$ | Tier 4 (Staff): ¢ only
+const MODEL_TIER_ACCESS: Record<string, number> = {
+  'llama-4-maverick': 4, 'deepseek-v3': 4, 'qwen3-235b': 4,     // ¢ — all tiers
+  'claude-4-haiku': 3, 'gpt-4.1-mini': 3,                        // $ — tier 3+
+  'claude-4-sonnet': 2, 'gpt-4.1': 2,                             // $$ — tier 2+
+  'claude-4-opus': 1, 'gpt-5': 1,                                 // $$$ — tier 1 only
+}
+
+function canAccessModel(modelKey: string, userTier: number, modelLock?: string): boolean {
+  if (modelLock) return modelKey === modelLock
+  const minTier = MODEL_TIER_ACCESS[modelKey]
+  if (minTier === undefined) return false
+  return userTier <= minTier
+}
+
+function getAvailableModelsForTier(userTier: number, modelLock?: string): string[] {
+  if (modelLock) return [modelLock]
+  return Object.entries(MODEL_TIER_ACCESS)
+    .filter(([, minTier]) => userTier <= minTier)
+    .map(([key]) => key)
+}
 
 export async function POST(request: NextRequest) {
   let orgContext = 'New user — no organization set up yet.'
     let orgId = ''
   let rkbacRules = ''
+  let userTier = 4  // Default to staff tier (most restrictive)
 
   try {
     const { userId, message, history } = await request.json()
@@ -74,7 +98,7 @@ export async function POST(request: NextRequest) {
 
         if (member?.org_id) {
           orgId = member.org_id
-          const userTier = member.role === 'owner' ? 1 : (member.permission_tier <= 4 ? member.permission_tier : 3)
+          userTier = member.role === 'owner' ? 1 : (member.permission_tier <= 4 ? member.permission_tier : 3)
           const tierAccess = TIER_ACCESS[userTier] || TIER_ACCESS[4]
 
           const [orgRes, deptsRes, agentsRes] = await Promise.all([
@@ -173,7 +197,19 @@ RULES:
         return {}
       } catch { return {} }
     })())
-    const selectedModel = MODEL_MAP[orgSettings.chat_model || DEFAULT_MODEL] || MODEL_MAP[DEFAULT_MODEL]
+    // RKBAC model enforcement — check user tier vs requested model
+    const modelLock = orgSettings.usageBudget?.modelLock || null
+    const requestedModel = orgSettings.chat_model || DEFAULT_MODEL
+    
+    let effectiveModel = requestedModel
+    if (!canAccessModel(requestedModel, userTier, modelLock)) {
+      // User doesn't have permission for this model — downgrade to their best available
+      const available = getAvailableModelsForTier(userTier, modelLock)
+      effectiveModel = available[0] || DEFAULT_MODEL
+    }
+    
+    const selectedModel = MODEL_MAP[effectiveModel] || MODEL_MAP[DEFAULT_MODEL]
+    const availableModels = getAvailableModelsForTier(userTier, modelLock)
 
     const togetherKey = process.env.TOGETHER_API_KEY
     if (selectedModel.provider === 'together' && togetherKey) {
@@ -191,7 +227,7 @@ RULES:
           const data = await res.json()
           const reply = data.choices?.[0]?.message?.content || "Try again?"
           trackUsage(orgId, userId || '', orgSettings.chat_model || DEFAULT_MODEL, message.length, reply.length)
-          return NextResponse.json({ reply, model: selectedModel.label })
+          return NextResponse.json({ reply, model: selectedModel.label, tier: userTier, availableModels })
         }
         const errText = await res.text()
         console.error('Together AI error:', res.status, errText.substring(0, 200))
@@ -215,7 +251,7 @@ RULES:
           const data = await res.json()
           const reply = data.choices?.[0]?.message?.content || "Try again?"
           trackUsage(orgId, userId || '', orgSettings.chat_model || DEFAULT_MODEL, message.length, reply.length)
-          return NextResponse.json({ reply, model: selectedModel.label })
+          return NextResponse.json({ reply, model: selectedModel.label, tier: userTier, availableModels })
         }
         const errText = await res.text()
         console.error('OpenAI error:', res.status, errText.substring(0, 200))
@@ -242,7 +278,7 @@ RULES:
           const data = await res.json()
           const reply = data.content?.[0]?.text || "Hmm, try asking differently?"
           trackUsage(orgId, userId || '', orgSettings.chat_model || DEFAULT_MODEL, message.length, reply.length)
-          return NextResponse.json({ reply, model: selectedModel.label })
+          return NextResponse.json({ reply, model: selectedModel.label, tier: userTier, availableModels })
         }
         const errText = await res.text()
         console.error('Anthropic error:', res.status, errText.substring(0, 200))
