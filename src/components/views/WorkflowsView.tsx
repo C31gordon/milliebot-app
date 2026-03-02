@@ -1,13 +1,14 @@
 'use client'
+import WorkflowStepBuilder, { type WorkflowStep as BuilderStep } from '@/components/WorkflowStepBuilder'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type WorkflowStatus = 'active' | 'paused' | 'draft' | 'error'
 type TriggerType = 'schedule' | 'event' | 'manual' | 'webhook'
 
 interface WorkflowStep {
   id: string
-  type: 'trigger' | 'condition' | 'action' | 'notification'
+  type: 'trigger' | 'condition' | 'action' | 'notification' | 'delay'
   label: string
   config: string
 }
@@ -26,7 +27,7 @@ interface Workflow {
   runsToday: number
   successRate: number
   createdBy: string
-  complexity: 'simple' | 'complex'
+  complexity: 'simple' | 'moderate' | 'complex'
 }
 
 const workflows: Workflow[] = [
@@ -193,6 +194,95 @@ export default function WorkflowsView() {
   const [filter, setFilter] = useState<'all' | WorkflowStatus>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
+  const [dbWorkflows, setDbWorkflows] = useState<Workflow[]>([])
+  const [createForm, setCreateForm] = useState({ name: '', description: '', department: '', triggerType: 'manual' as TriggerType })
+  const [builderSteps, setBuilderSteps] = useState<BuilderStep[]>([])
+  const [saving, setSaving] = useState(false)
+
+  // Load workflows from DB on mount
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    if (stored.userId) {
+      fetch(`/api/workflows?userId=${stored.userId}`).then(r => r.json()).then(d => {
+        if (d.workflows?.length) {
+          setDbWorkflows(d.workflows.map((wf: Record<string, unknown>) => ({
+            id: wf.id as string,
+            name: wf.name as string,
+            description: (wf.description || '') as string,
+            department: (wf.department || '') as string,
+            status: (wf.status || 'draft') as WorkflowStatus,
+            trigger: (wf.triggerType || 'manual') as TriggerType,
+            triggerDetail: (wf.triggerConfig || '') as string,
+            steps: ((wf.steps || []) as BuilderStep[]).map(s => ({ id: s.id, type: s.type, label: s.label, config: s.config })),
+            lastRun: 'Never',
+            nextRun: wf.status === 'active' ? 'Pending' : '—',
+            runsToday: (wf.runsToday || 0) as number,
+            successRate: (wf.successRate || 100) as number,
+            createdBy: 'You',
+            complexity: ((wf.steps as BuilderStep[])?.length > 5 ? 'complex' : (wf.steps as BuilderStep[])?.length > 3 ? 'moderate' : 'simple') as 'simple' | 'moderate' | 'complex',
+          })))
+        }
+      }).catch(() => {})
+    }
+  }, [])
+
+  const handleCreateWorkflow = async () => {
+    if (!createForm.name) return
+    setSaving(true)
+    const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    try {
+      const res = await fetch('/api/workflows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: stored.userId,
+          workflow: {
+            name: createForm.name,
+            description: createForm.description,
+            department: createForm.department,
+            triggerType: createForm.triggerType,
+            triggerConfig: '',
+            steps: builderSteps,
+          }
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        // Add to local state
+        const newWf: Workflow = {
+          id: String(data.workflow.id),
+          name: String(data.workflow.name),
+          description: String(data.workflow.description || ''),
+          department: String(data.workflow.department || ''),
+          status: 'draft',
+          trigger: (data.workflow.triggerType || 'manual') as TriggerType,
+          triggerDetail: '',
+          steps: builderSteps.map(s => ({ id: s.id, type: s.type as WorkflowStep['type'], label: s.label, config: s.config })),
+          lastRun: 'Never',
+          nextRun: '—',
+          runsToday: 0,
+          successRate: 100,
+          createdBy: 'You',
+          complexity: builderSteps.length > 5 ? 'complex' : builderSteps.length > 3 ? 'moderate' : 'simple',
+        }
+        setDbWorkflows(prev => [...prev, newWf])
+        setShowCreate(false)
+        setCreateForm({ name: '', description: '', department: '', triggerType: 'manual' })
+        setBuilderSteps([])
+      }
+    } catch {}
+    setSaving(false)
+  }
+
+  const handleDeleteWorkflow = async (wfId: string) => {
+    const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+    await fetch('/api/workflows', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: stored.userId, workflowId: wfId })
+    })
+    setDbWorkflows(prev => prev.filter(w => w.id !== wfId))
+  }
 
   const filtered = filter === 'all' ? workflows : workflows.filter(w => w.status === filter)
 
@@ -265,59 +355,57 @@ export default function WorkflowsView() {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Workflow Name</label>
-              <input
-                type="text"
-                placeholder="e.g., Monthly Rent Roll Report"
+              <input type="text" placeholder="e.g., Patient Intake Automation"
+                value={createForm.name} onChange={e => setCreateForm({ ...createForm, name: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg text-sm"
-                style={{ background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }}
-              />
+                style={{ background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }} />
             </div>
             <div>
               <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Department</label>
-              <select
+              <input type="text" placeholder="e.g., Operations"
+                value={createForm.department} onChange={e => setCreateForm({ ...createForm, department: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg text-sm"
-                style={{ background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }}
-              >
-                <option>Operations</option>
-                <option>HR</option>
-                <option>Finance</option>
-                <option>Maintenance</option>
-                <option>Training</option>
-                <option>Marketing</option>
-                <option>IT</option>
-              </select>
+                style={{ background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }} />
             </div>
           </div>
           <div className="mb-4">
             <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Description</label>
-            <textarea
-              placeholder="What should this workflow do?"
-              rows={2}
+            <textarea placeholder="What should this workflow do?" rows={2}
+              value={createForm.description} onChange={e => setCreateForm({ ...createForm, description: e.target.value })}
               className="w-full px-3 py-2 rounded-lg text-sm"
-              style={{ background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }}
-            />
+              style={{ background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }} />
           </div>
           <div className="mb-4">
             <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>Trigger Type</label>
             <div className="flex gap-2">
               {(['schedule', 'event', 'webhook', 'manual'] as TriggerType[]).map(t => (
-                <button key={t} className="px-3 py-2 rounded-lg text-sm flex items-center gap-1"
-                  style={{ background: 'var(--bg3)', color: 'var(--text2)' }}>
+                <button key={t} onClick={() => setCreateForm({ ...createForm, triggerType: t })}
+                  className="px-3 py-2 rounded-lg text-sm flex items-center gap-1"
+                  style={{ background: createForm.triggerType === t ? '#559CB5' : 'var(--bg3)', color: createForm.triggerType === t ? 'white' : 'var(--text2)', cursor: 'pointer', border: 'none' }}>
                   {triggerIcons[t]} {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
               ))}
             </div>
           </div>
-          <div className="p-4 rounded-lg mb-4" style={{ background: 'var(--bg)', border: '1px dashed var(--border)' }}>
-            <p className="text-sm text-center" style={{ color: 'var(--text4)' }}>
-              ⚠️ Complex workflows (multiple conditions, external APIs) will be handed off to n8n with an auto-generated node diagram sent to IT for review.
-            </p>
+          <div className="mb-4">
+            <label className="block text-xs mb-2 font-semibold" style={{ color: 'var(--text2)' }}>Workflow Steps</label>
+            <WorkflowStepBuilder steps={builderSteps} onChange={setBuilderSteps} />
           </div>
+          {builderSteps.length > 5 && (
+            <div className="p-3 rounded-lg mb-4" style={{ background: 'rgba(245,158,11,0.1)', border: '1px dashed #f59e0b' }}>
+              <p className="text-xs" style={{ color: '#f59e0b' }}>
+                ⚡ Complex workflow detected — will generate an n8n node diagram for IT review upon activation.
+              </p>
+            </div>
+          )}
           <div className="flex gap-2 justify-end">
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg text-sm"
-              style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>Cancel</button>
-            <button className="px-4 py-2 rounded-lg text-sm font-medium"
-              style={{ background: 'var(--blue)', color: 'white' }}>Create Workflow</button>
+            <button onClick={() => { setShowCreate(false); setBuilderSteps([]) }} className="px-4 py-2 rounded-lg text-sm"
+              style={{ background: 'var(--bg3)', color: 'var(--text3)', cursor: 'pointer', border: 'none' }}>Cancel</button>
+            <button onClick={handleCreateWorkflow} disabled={!createForm.name || saving}
+              className="px-4 py-2 rounded-lg text-sm font-medium"
+              style={{ background: !createForm.name ? 'var(--bg3)' : '#559CB5', color: !createForm.name ? 'var(--text4)' : 'white', cursor: createForm.name ? 'pointer' : 'default', border: 'none' }}>
+              {saving ? 'Saving...' : `Create Workflow${builderSteps.length ? ` (${builderSteps.length} steps)` : ''}`}
+            </button>
           </div>
         </div>
       )}
