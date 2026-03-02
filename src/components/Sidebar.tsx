@@ -99,6 +99,20 @@ function HipaaModal({ onClose }: { onClose: () => void }) {
 
 export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, orgName, userName }: SidebarProps) {
   const [hipaaOpen, setHipaaOpen] = useState(false)
+  const [orgLogo, setOrgLogo] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadLogo = () => {
+      const isDark = !document.documentElement.getAttribute('data-theme') || document.documentElement.getAttribute('data-theme') === 'dark'
+      const logo = localStorage.getItem(isDark ? 'zynthr_logo_dark' : 'zynthr_logo_light') || localStorage.getItem('zynthr_logo_dark')
+      setOrgLogo(logo)
+    }
+    loadLogo()
+    window.addEventListener('zynthr_brand_updated', loadLogo)
+    const observer = new MutationObserver(loadLogo)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => { window.removeEventListener('zynthr_brand_updated', loadLogo); observer.disconnect() }
+  }, [])
   const [baaPending, setBaaPending] = useState(false)
 
   useEffect(() => {
@@ -127,12 +141,16 @@ export default function Sidebar({ activeView, onNavigate, collapsed, onToggle, o
       <div className="flex items-center gap-3 p-4 border-b" style={{ borderColor: 'var(--border)' }}>
         <div
           className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #003146, #559CB5)' }}
+          style={{ background: orgLogo ? 'transparent' : 'linear-gradient(135deg, #003146, #559CB5)', overflow: 'hidden' }}
         >
-          <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-            <rect x="8" y="8" width="16" height="16" rx="2" transform="rotate(45 16 16)" fill="white" opacity="0.9"/>
-            <circle cx="16" cy="16" r="3.5" fill="#003146"/>
-          </svg>
+          {orgLogo ? (
+            <img src={orgLogo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 2 }} />
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+              <rect x="8" y="8" width="16" height="16" rx="2" transform="rotate(45 16 16)" fill="white" opacity="0.9"/>
+              <circle cx="16" cy="16" r="3.5" fill="#003146"/>
+            </svg>
+          )}
         </div>
         {!collapsed && (
           <div className="flex-1 min-w-0">

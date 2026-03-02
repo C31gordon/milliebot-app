@@ -1029,17 +1029,46 @@ function BrandingSettings() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Logo" description="Upload your organization logo">
+      <SectionCard title="Organization Logo" description="Your logo appears in the sidebar, login screen, and reports. Max 500KB, PNG or SVG recommended.">
         <div className="grid grid-cols-2 gap-4">
-          {['Logo (Dark Mode)', 'Logo (Light Mode)'].map(l => (
-            <div key={l}>
-              <label className="block text-xs mb-1" style={{ color: 'var(--text3)' }}>{l}</label>
-              <div className="w-full h-24 rounded-lg flex items-center justify-center cursor-pointer"
-                style={{ background: 'var(--bg)', border: '2px dashed var(--border)' }}>
-                <span className="text-sm" style={{ color: 'var(--text4)' }}>Click to upload</span>
+          {(['dark', 'light'] as const).map(mode => {
+            const key = 'zynthr_logo_' + mode
+            const [logo, setLogo] = useState<string | null>(null)
+            useEffect(() => { setLogo(localStorage.getItem(key)) }, [])
+            const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+              const file = e.target.files?.[0]
+              if (!file || file.size > 512000) { alert('Max 500KB'); return }
+              const reader = new FileReader()
+              reader.onload = () => {
+                const dataUrl = reader.result as string
+                localStorage.setItem(key, dataUrl)
+                setLogo(dataUrl)
+                // Dispatch event so sidebar picks it up
+                window.dispatchEvent(new Event('zynthr_brand_updated'))
+              }
+              reader.readAsDataURL(file)
+            }
+            return (
+              <div key={mode}>
+                <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text2)' }}>
+                  {mode === 'dark' ? '🌙 Dark Mode Logo' : '☀️ Light Mode Logo'}
+                </label>
+                <label className="w-full h-28 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all hover:opacity-80"
+                  style={{ background: mode === 'dark' ? '#0a0e1a' : '#f8fafc', border: '2px dashed var(--border)' }}>
+                  {logo ? (
+                    <img src={logo} alt="Logo" style={{ maxHeight: 60, maxWidth: '80%', objectFit: 'contain' }} />
+                  ) : (
+                    <span className="text-sm" style={{ color: mode === 'dark' ? '#666' : '#999' }}>Click to upload</span>
+                  )}
+                  <input type="file" accept="image/png,image/svg+xml,image/jpeg" onChange={handleUpload} style={{ display: 'none' }} />
+                </label>
+                {logo && (
+                  <button onClick={() => { localStorage.removeItem(key); setLogo(null); window.dispatchEvent(new Event('zynthr_brand_updated')) }}
+                    className="text-[10px] mt-1" style={{ color: 'var(--red-text, #ff6b7a)', cursor: 'pointer', background: 'none', border: 'none' }}>Remove</button>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </SectionCard>
 
