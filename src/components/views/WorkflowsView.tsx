@@ -325,7 +325,7 @@ export default function WorkflowsView() {
       {/* Workflow Cards */}
       <div className="space-y-4">
         {filtered.map(wf => (
-          <div key={wf.id} className="glass-card rounded-xl overflow-hidden">
+          <div key={wf.id} className="glass-card rounded-xl overflow-hidden" style={{ padding: 0 }}>
             {/* Card Header */}
             <div
               className="p-4 cursor-pointer hover:opacity-90 transition-all"

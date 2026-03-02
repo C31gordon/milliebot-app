@@ -158,7 +158,7 @@ export default function PoliciesView() {
             const tier = policyTypeToTier[policy.policy_type] || 'manager'
             const isImmutable = policy.policy_type === 'owner_only'
             return (
-              <div key={policy.id} className="glass-card rounded-xl overflow-hidden">
+              <div key={policy.id} className="glass-card rounded-xl overflow-hidden" style={{ padding: 0 }}>
                 <div className="p-4 cursor-pointer hover:opacity-90 transition-all"
                   onClick={() => setExpandedPolicy(expandedPolicy === policy.id ? null : policy.id)}>
                   <div className="flex items-center justify-between">

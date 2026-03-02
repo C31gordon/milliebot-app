@@ -418,7 +418,7 @@ function DepartmentsSettings({ departments, setDepartments, showToast }: {
 
       <div className="space-y-3">
         {departments.map(dept => (
-          <div key={dept.id} className="glass-card rounded-xl overflow-hidden">
+          <div key={dept.id} className="glass-card rounded-xl overflow-hidden" style={{ padding: 0 }}>
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 cursor-pointer min-w-0" onClick={() => setExpandedId(expandedId === dept.id ? null : dept.id)}>
@@ -584,7 +584,7 @@ function UsersSettings({ users, setUsers, departments, showToast }: {
         <button onClick={() => setShowInvite(true)} className="px-4 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--blue)', color: '#fff' }}>+ Invite User</button>
       </div>
 
-      <div className="glass-card rounded-xl overflow-hidden">
+      <div className="glass-card rounded-xl overflow-hidden" style={{ padding: 0 }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm" style={{ minWidth: 640 }}>
             <thead>

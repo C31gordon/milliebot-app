@@ -450,3 +450,21 @@ html[data-theme="light"] table tbody tr:hover {
   background: #ffffff;
   color: #1a1a2e;
 }
+
+/* Fix text clipping at rounded corners */
+/* Glass cards default to visible overflow unless explicitly hidden */
+.glass-card:not(.overflow-hidden),
+.glass-card-static:not(.overflow-hidden) {
+  overflow: visible;
+}
+
+/* Ensure rounded containers have adequate inner padding */
+.rounded-xl > :first-child,
+.rounded-2xl > :first-child {
+  padding-left: max(0px, calc(var(--tw-padding, 0px)));
+}
+
+/* Pill/tag minimum padding for rounded-full */
+.pill-tag {
+  padding: 4px 12px !important;
+}

@@ -16,7 +16,7 @@ export function CardSkeleton({ count = 4 }: { count?: number }) {
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="glass-card rounded-xl overflow-hidden">
+    <div className="glass-card rounded-xl overflow-hidden" style={{ padding: 0 }}>
       <div className="p-4 flex gap-4" style={{ borderBottom: '1px solid var(--border)' }}>
         {Array.from({ length: cols }).map((_, i) => (
           <div key={i} className="shimmer h-3 flex-1" />

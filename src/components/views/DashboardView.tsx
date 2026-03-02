@@ -186,7 +186,7 @@ export default function DashboardView({ userName, orgName }: { userName?: string
         </div>
 
         {/* Security Alerts */}
-        <div className="glass-card-static rounded-xl overflow-hidden">
+        <div className="glass-card-static rounded-xl">
           <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
             <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🛡️ Security Alerts</h3>
             <span className="text-[11px] px-2.5 py-1 rounded-full whitespace-nowrap" style={{ background: 'rgba(174,19,42,0.15)', color: 'var(--red)' }}>
@@ -213,7 +213,7 @@ export default function DashboardView({ userName, orgName }: { userName?: string
       </div>
 
       {/* Department Health */}
-      <div className="glass-card-static rounded-xl overflow-hidden">
+      <div className="glass-card-static rounded-xl">
         <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
           <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>Department Health</h3>
           <span className="text-xs" style={{ color: 'var(--text4)' }}>

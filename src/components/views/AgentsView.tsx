@@ -322,12 +322,12 @@ export default function AgentsView() {
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 6 }}>Agent Name</label>
             <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               placeholder="e.g. Ops Commander"
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }} />
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }} />
           </div>
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 6 }}>Department</label>
             <select value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
               {orgDepartments.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
@@ -336,12 +336,12 @@ export default function AgentsView() {
             <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Describe what this agent does in plain language"
               rows={3}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14, resize: 'vertical' }} />
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14, resize: 'vertical' }} />
           </div>
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 6 }}>Permission Tier</label>
             <select value={form.permissionTier} onChange={e => setForm(f => ({ ...f, permissionTier: e.target.value }))}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
               {PERMISSION_TIERS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
@@ -379,7 +379,7 @@ export default function AgentsView() {
           </div>
           {CAPABILITIES.map(cap => (
             <label key={cap.key} style={{
-              display: 'flex', gap: 12, padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
+              display: 'flex', gap: 12, padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
               border: '1px solid var(--border)', background: form.capabilities.includes(cap.key) ? 'rgba(59,130,246,0.08)' : 'var(--bg)',
               transition: 'background 0.15s',
             }}>
@@ -443,7 +443,7 @@ export default function AgentsView() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{m.label}</span>
-                  {m.tag && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 9999, background: m.tag === 'Recommended' ? 'var(--blue)' : 'var(--purple)', color: 'white', fontWeight: 600 }}>{m.tag}</span>}
+                  {m.tag && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 9999, background: m.tag === 'Recommended' ? 'var(--blue)' : 'var(--purple)', color: 'white', fontWeight: 600 }}>{m.tag}</span>}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text4)', marginTop: 4 }}>{m.desc}</div>
                 <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 11 }}>
@@ -474,7 +474,7 @@ export default function AgentsView() {
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text4)', textTransform: 'uppercase' as const, marginBottom: 6 }}>Capabilities</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {form.capabilities.length === 0 && <span style={{ fontSize: 12, color: 'var(--text4)' }}>None selected</span>}
-                {form.capabilities.map(c => <span key={c} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 9999, background: 'var(--bg3)', color: 'var(--text3)' }}>{c.replace(/_/g, ' ')}</span>)}
+                {form.capabilities.map(c => <span key={c} style={{ fontSize: 11, padding: '4px 12px', borderRadius: 9999, background: 'var(--bg3)', color: 'var(--text3)' }}>{c.replace(/_/g, ' ')}</span>)}
               </div>
             </div>
 
@@ -484,7 +484,7 @@ export default function AgentsView() {
                 {form.systems.length === 0 && <span style={{ fontSize: 12, color: 'var(--text4)' }}>None selected</span>}
                 {form.systems.map(s => {
                   const found = SYSTEMS.find(x => x.key === s)
-                  return <span key={s} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 9999, background: 'var(--bg3)', color: 'var(--text3)' }}>{found ? found.label : s}</span>
+                  return <span key={s} style={{ fontSize: 11, padding: '4px 12px', borderRadius: 9999, background: 'var(--bg3)', color: 'var(--text3)' }}>{found ? found.label : s}</span>
                 })}
               </div>
             </div>
@@ -644,7 +644,7 @@ export default function AgentsView() {
 
       {/* Departments */}
       {orgDepartments.length > 0 && (
-        <div className="glass-card-static rounded-xl overflow-hidden">
+        <div className="glass-card-static rounded-xl">
           <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
             <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🏢 Your Departments</h3>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>Deploy agents to activate each department</p>
@@ -749,7 +749,7 @@ export default function AgentsView() {
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 6 }}>Bot Name</label>
               <input value={botForm.name} onChange={e => setBotForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. Report Generator"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }} />
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }} />
             </div>
 
             <div style={{ marginBottom: 12 }}>
@@ -757,13 +757,13 @@ export default function AgentsView() {
               <textarea value={botForm.description} onChange={e => setBotForm(f => ({ ...f, description: e.target.value }))}
                 placeholder="What does this bot do?"
                 rows={2}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14, resize: 'vertical' }} />
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14, resize: 'vertical' }} />
             </div>
 
             <div style={{ marginBottom: 12 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 6 }}>Assign to Agent</label>
               <select value={botForm.agentId} onChange={e => setBotForm(f => ({ ...f, agentId: e.target.value }))}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}>
                 <option value="">Select an agent...</option>
                 {allAgents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
@@ -787,10 +787,10 @@ export default function AgentsView() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <button onClick={() => setShowBotForm(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text3)', fontSize: 13, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setShowBotForm(false)} style={{ padding: '10px 18px', borderRadius: 8, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text3)', fontSize: 13, cursor: 'pointer' }}>Cancel</button>
               <button onClick={handleCreateBot} disabled={!botForm.name.trim() || !botForm.agentId}
                 style={{
-                  padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  padding: '10px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
                   background: (!botForm.name.trim() || !botForm.agentId) ? 'var(--bg3)' : 'var(--blue)',
                   color: 'white', fontSize: 13, fontWeight: 600,
                   opacity: (!botForm.name.trim() || !botForm.agentId) ? 0.5 : 1,

@@ -363,7 +363,7 @@ export default function OrgSetupWizardView() {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {SIZES.map(s => (
               <button key={s} onClick={() => setOrg({ ...org, size: s })} style={{
-                padding: '8px 16px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                padding: '10px 18px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600,
                 background: org.size === s ? '#559CB5' : 'var(--bg3)',
                 color: org.size === s ? '#fff' : 'var(--text3)',
                 border: org.size === s ? 'none' : '1px solid var(--border)',
@@ -519,7 +519,7 @@ export default function OrgSetupWizardView() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
         {TIERS.map((t, i) => (
           <div key={t.tier} style={{ flex: 1, minWidth: 140 }}>
-            <div className="glass-card" style={{ padding: '14px 12px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg3)', textAlign: 'center' }}>
+            <div className="glass-card" style={{ padding: '14px 16px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg3)', textAlign: 'center' }}>
               <div style={{ fontSize: 24, marginBottom: 4 }}>{['👑', '🎯', '📋', '⚡'][i]}</div>
               <div style={{ fontWeight: 700, fontSize: 13, color: t.color }}>Tier {t.tier}</div>
               <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text)' }}>{t.label}</div>
@@ -576,7 +576,7 @@ export default function OrgSetupWizardView() {
               opacity: tierGated ? 0.5 : 1,
             }}>
               {recommended && (
-                <span style={{ position: 'absolute', top: 8, right: 8, fontSize: 10, background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Recommended</span>
+                <span style={{ position: 'absolute', top: 8, right: 8, fontSize: 10, background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', padding: '3px 10px', borderRadius: 10, fontWeight: 600 }}>Recommended</span>
               )}
               <div style={{ fontSize: 28, marginBottom: 8 }}>{integ.icon}</div>
               <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{integ.name}</div>
@@ -587,7 +587,7 @@ export default function OrgSetupWizardView() {
                 <span style={{ fontSize: 12, color: 'var(--text4)' }}>Requires admin access</span>
               ) : (
                 <button onClick={() => handleConnect(integ.id)} style={{
-                  padding: '8px 16px', background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                  padding: '10px 18px', background: 'linear-gradient(135deg, #559CB5, #7c3aed)', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600,
                 }}>Connect</button>
               )}
             </div>
@@ -603,7 +603,7 @@ export default function OrgSetupWizardView() {
       )}
       <div style={{ marginTop: 16 }}>
         <button onClick={() => go('next')} style={{
-          padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text3)', cursor: 'pointer', fontSize: 13,
+          padding: '10px 18px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text3)', cursor: 'pointer', fontSize: 13,
         }}>Skip for now — I&apos;ll connect later</button>
       </div>
       {navButtons()}
@@ -649,7 +649,7 @@ export default function OrgSetupWizardView() {
         </div>
       )}
       <button onClick={() => go('next')} style={{
-        padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text3)', cursor: 'pointer', fontSize: 13,
+        padding: '10px 18px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text3)', cursor: 'pointer', fontSize: 13,
       }}>Skip — I&apos;ll do this later</button>
       {navButtons()}
     </div>
