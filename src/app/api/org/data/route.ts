@@ -22,19 +22,53 @@ export async function GET(request: NextRequest) {
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
 
   try {
-    // Get org membership
-    const { data: member, error: memberErr } = await db
-      .from('org_members')
-      .select('org_id, role, permission_tier')
-      .eq('user_id', userId)
-      .single()
-
-    if (memberErr) {
-      return NextResponse.json({ 
-        error: 'Member query failed', 
-        detail: memberErr.message,
-        org: null, departments: [], agents: [], audit: [] 
-      })
+    // Get org membership — user may belong to multiple orgs
+    // If orgId is provided (from tenant switcher), use that; otherwise pick first membership
+    const requestedOrgId = request.nextUrl.searchParams.get('orgId')
+    
+    let member: { org_id: string; role: string; permission_tier: number } | null = null
+    
+    if (requestedOrgId) {
+      // Specific org requested (tenant switch)
+      const { data, error } = await db
+        .from('org_members')
+        .select('org_id, role, permission_tier')
+        .eq('user_id', userId)
+        .eq('org_id', requestedOrgId)
+        .single()
+      if (error || !data) {
+        // Not a member — check if super-admin (owner of Zynthr org)
+        const { data: zOrg } = await db
+          .from('organizations')
+          .select('owner_id')
+          .eq('id', '69645b48-7bc8-4982-b228-5e7eed93d7a2')
+          .single()
+        if (zOrg?.owner_id === userId) {
+          member = { org_id: requestedOrgId, role: 'owner', permission_tier: 1 }
+        } else {
+          return NextResponse.json({ error: 'Not a member of this org', org: null, departments: [], agents: [], audit: [] })
+        }
+      } else {
+        member = data
+      }
+    } else {
+      // No specific org — get all memberships, pick the one where user is owner first
+      const { data: members, error: memberErr } = await db
+        .from('org_members')
+        .select('org_id, role, permission_tier')
+        .eq('user_id', userId)
+        .order('role', { ascending: true }) // 'owner' sorts before others
+      
+      if (memberErr || !members || members.length === 0) {
+        return NextResponse.json({ 
+          error: members ? 'No memberships found' : 'Member query failed', 
+          detail: memberErr?.message,
+          org: null, departments: [], agents: [], audit: [] 
+        })
+      }
+      
+      // Prefer the org where the user is owner, then fall back to first
+      member = members.find(m => m.role === 'owner') || members[0]
     }
 
     if (!member?.org_id) {
