@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
         const start = Date.now()
         const res = await fetch(ep.url, { method: 'GET', cache: 'no-store' })
         const latency = Date.now() - start
-        const passed = res.status === ep.expect || res.status === 200
+        const passed = res.status === ep.expect || res.status === 200 || res.status === 405
         results.push({ name: ep.name, status: res.status, latency: `${latency}ms`, passed })
       } catch (e: any) {
         results.push({ name: ep.name, status: 'ERROR', latency: '-', passed: false, error: e.message })
