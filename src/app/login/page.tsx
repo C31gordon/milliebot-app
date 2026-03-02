@@ -243,6 +243,27 @@ export default function LoginPage() {
       if (memberError) {
         console.error('Member creation error:', memberError)
       }
+
+      // 🎯 Trigger Scout (SDR) — welcome email + lead classification
+      fetch('/api/agents/sdr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          email: signupEmail.trim(),
+          orgName: orgName.trim(),
+          industry: '',
+          size: '',
+          firstName: firstName.trim(),
+        }),
+      }).catch(console.error)
+
+      // 🧭 Trigger Sage (Onboarding Concierge)
+      fetch('/api/agents/concierge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, orgId: orgData.id }),
+      }).catch(console.error)
     }
 
     window.location.href = '/'

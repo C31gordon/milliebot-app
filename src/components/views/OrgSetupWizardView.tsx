@@ -269,6 +269,16 @@ export default function OrgSetupWizardView() {
         departments: enabledDepts.map(d => d.name),
       }))
 
+      // 🧭 Trigger Sage (Onboarding Concierge) — guide + milestone tracking
+      const stored = JSON.parse(localStorage.getItem('zynthr_user') || '{}')
+      if (stored.userId) {
+        fetch('/api/agents/concierge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: stored.userId, orgId: stored.orgId || '' }),
+        }).catch(console.error)
+      }
+
       setLaunching(false)
       setLaunched(true)
     } catch (e) {
