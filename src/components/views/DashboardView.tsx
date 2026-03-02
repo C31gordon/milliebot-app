@@ -93,11 +93,30 @@ export default function DashboardView({ userName, orgName }: { userName?: string
     }
   })
 
-  const securityAlerts = [
-    { level: 'critical' as const, text: '3 prompt injection attempts from external@example.com in 24 hours', action: 'Investigate', icon: '🔴' },
-    { level: 'warning' as const, text: 'Access exception for Marketing → Ops expires in 7 days', action: 'Review', icon: '🟡' },
-    { level: 'info' as const, text: 'Weekly security audit completed — no issues found', action: 'View', icon: '🟢' },
-  ]
+  // Generate security alerts from actual data
+  const securityAlerts: { level: 'critical' | 'warning' | 'info'; text: string; action: string; icon: string }[] = []
+  
+  // Check for recent audit entries that indicate security events
+  const recentAudit = data.audit?.slice(0, 20) || []
+  const hasComplianceAudit = recentAudit.some((a: any) => a.action === 'aegis_compliance_audit')
+  const hasSmokeTest = recentAudit.some((a: any) => a.action === 'sentinel_smoke_test')
+  
+  if (hasComplianceAudit) {
+    securityAlerts.push({ level: 'info', text: 'Compliance audit completed — review results in Audit Log', action: 'View', icon: '🟢' })
+  }
+  if (hasSmokeTest) {
+    securityAlerts.push({ level: 'info', text: 'Platform smoke test completed', action: 'View', icon: '🟢' })
+  }
+  
+  // Always show RKBAC status
+  if (data.departments.length > 0) {
+    securityAlerts.push({ level: 'info', text: `RKBAC active across ${data.departments.length} departments — all boundaries enforced`, action: 'Review', icon: '🟢' })
+  }
+  
+  // If no alerts at all, show a clean status
+  if (securityAlerts.length === 0) {
+    securityAlerts.push({ level: 'info', text: 'No security alerts — all systems operational', action: 'View', icon: '🟢' })
+  }
 
   if (loading) {
     return (

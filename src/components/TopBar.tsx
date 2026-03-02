@@ -99,32 +99,60 @@ export default function TopBar({ user, localUser, isAuthenticated, onNavigate, i
   useEffect(() => {
     async function fetchNotifications() {
       try {
-        const orgId = localStorage.getItem('zynthr_org_id')
-        if (!orgId) return
-        const res = await fetch(`/api/org/data?userId=_&audit=1&orgId=${orgId}`)
+        // Get userId from auth context user or Supabase session
+        const uid = user?.id
+        if (!uid) return
+        const res = await fetch(`/api/org/data?userId=${uid}`)
         if (!res.ok) throw new Error('fetch failed')
         const data = await res.json()
-        if (data.auditLog && Array.isArray(data.auditLog)) {
-          const iconMap: Record<string, string> = { agent_action: '🤖', login: '🔑', setting_change: '⚙️', policy_update: '🔒', ticket_created: '🎫', workflow_run: '⚡', security_alert: '🛡️' }
-          setNotifications(data.auditLog.slice(0, 8).map((entry: any) => {
+        // audit_log comes back as data.audit from our API
+        const auditEntries = data.audit || data.auditLog || []
+        if (Array.isArray(auditEntries) && auditEntries.length > 0) {
+          const iconMap: Record<string, string> = {
+            sdr_lead_classified: '🎯', sdr_outreach: '🎯', sdr_sequence_scheduled: '🎯',
+            concierge_onboarding_check: '🧭', chat_query: '🛟',
+            echo_weekly_plan: '📣', hunter_research: '🏹', hunter_outreach_queued: '🏹',
+            closer_demo_prep: '💎', sentinel_smoke_test: '🔬', sentinel_api_test: '🔬',
+            aegis_compliance_audit: '🛡️', aegis_rkbac_audit: '🛡️',
+            forge_feature_spec: '🧪', radar_weekly_briefing: '🔭',
+            oracle_dashboard: '📊', pulse_weekly_scan: '🌐',
+            coach_learning_path: '🎓', bridge_partner_pipeline: '🤝',
+            architect_design: '🏗️', cashflow_usage: '💰',
+            agent_action: '🤖', login: '🔑', setting_change: '⚙️',
+            policy_update: '🔒', ticket_created: '🎫', workflow_run: '⚡',
+          }
+          setNotifications(auditEntries.slice(0, 8).map((entry: any) => {
             const mins = Math.round((Date.now() - new Date(entry.created_at).getTime()) / 60000)
             const time = mins < 60 ? `${mins} min ago` : mins < 1440 ? `${Math.round(mins / 60)} hours ago` : `${Math.round(mins / 1440)}d ago`
-            return { icon: iconMap[entry.action] || '📋', text: entry.details?.message || `${entry.action} on ${entry.resource_type || 'system'}`, time, unread: mins < 30 }
+            const action = entry.action || 'system'
+            const detail = entry.details
+            let text = action.replace(/_/g, ' ')
+            // Make notifications human-readable
+            if (action === 'sdr_lead_classified') text = `New lead classified: ${detail?.tier || 'unknown'} tier`
+            else if (action === 'concierge_onboarding_check') text = `Onboarding check: ${detail?.orgName || 'org'} — ${detail?.completionPct || 0}% complete`
+            else if (action === 'sentinel_smoke_test') text = `Smoke test: ${detail?.allPassed ? '✅ all passed' : '⚠️ failures detected'}`
+            else if (action === 'closer_demo_prep') text = `Demo prep ready for ${detail?.prospectCompany || 'prospect'}`
+            else if (action === 'echo_weekly_plan') text = 'Weekly content plan generated'
+            else if (action === 'radar_weekly_briefing') text = 'Competitor briefing ready'
+            else if (action === 'forge_feature_spec') text = `Feature request: ${detail?.featureRequest || ''}`
+            else if (action === 'hunter_research') text = `Prospect research: ${detail?.industry || ''}`
+            else if (action === 'aegis_compliance_audit') text = 'Compliance audit completed'
+            else if (action === 'architect_design') text = `Solution design: ${detail?.industry || ''}`
+            return { icon: iconMap[action] || '📋', text, time, unread: mins < 60 }
           }))
+        } else {
+          // No audit entries yet — show empty state
+          setNotifications([{ icon: '✨', text: 'No recent activity — your agents are standing by', time: 'now', unread: false }])
         }
       } catch {
-        // Fallback to demo notifications
-        setNotifications([
-          { icon: '🛡️', text: 'Prompt injection attempt blocked', time: '2 min ago', unread: true },
-          { icon: '🎫', text: 'New ticket assigned to IT', time: '12 min ago', unread: true },
-          { icon: '🔒', text: 'Access exception expiring', time: '1 hour ago', unread: false },
-        ])
+        // Network error — show empty gracefully, NOT fake demo data
+        setNotifications([{ icon: '📡', text: 'Unable to load notifications', time: 'now', unread: false }])
       }
     }
     fetchNotifications()
     const interval = setInterval(fetchNotifications, 60000)
     return () => clearInterval(interval)
-  }, [])
+  }, [user])
 
   const unreadCount = notifications.filter(n => n.unread).length
 
