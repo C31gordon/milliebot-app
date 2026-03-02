@@ -511,12 +511,54 @@ export default function AgentsView() {
             {allAgents.length} active agents • {allBots.length} bots deployed
           </p>
         </div>
-        {allAgents.length > 0 && (
+        <div className="flex gap-2">
+          {allAgents.length > 0 && (
+            <button onClick={() => { setBotForm({ name: '', description: '', capabilities: [], agentId: allAgents[0]?.id || '' }); setShowBotForm(true) }}
+              className="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
+              style={{ background: 'var(--bg3)', color: 'var(--text2)', border: '1px solid var(--border)' }}>
+              🤖 Create Bot
+            </button>
+          )}
           <button onClick={openWizard} className="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
             style={{ background: 'var(--blue)', color: 'white' }}>
             + Create New Agent
           </button>
-        )}
+        </div>
+      </div>
+
+      {/* Skills Library */}
+      <div className="glass-card rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>🧠 Skills Library</h3>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text4)' }}>Pre-built capabilities you can assign to any agent</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {[
+            { icon: '📧', name: 'Email Drafting', desc: 'Compose and reply to emails' },
+            { icon: '📄', name: 'Document Analysis', desc: 'Read and summarize documents' },
+            { icon: '📅', name: 'Scheduling', desc: 'Book meetings and manage calendars' },
+            { icon: '📊', name: 'Report Generation', desc: 'Build charts and dashboards' },
+            { icon: '🔍', name: 'Data Lookup', desc: 'Query databases and CRMs' },
+            { icon: '💬', name: 'Chat Support', desc: 'Answer customer questions' },
+            { icon: '📝', name: 'Form Processing', desc: 'Fill and validate intake forms' },
+            { icon: '🔔', name: 'Alerts & Notifications', desc: 'Monitor and notify on events' },
+            { icon: '🧾', name: 'Invoice Processing', desc: 'Read and route invoices' },
+            { icon: '📋', name: 'Compliance Checks', desc: 'Audit against policy rules' },
+            { icon: '🤝', name: 'CRM Updates', desc: 'Log interactions and notes' },
+            { icon: '🔄', name: 'Workflow Triggers', desc: 'Kick off multi-step automations' },
+          ].map(skill => (
+            <div key={skill.name} className="p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+              style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">{skill.icon}</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{skill.name}</span>
+              </div>
+              <div className="text-[10px]" style={{ color: 'var(--text4)' }}>{skill.desc}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Agent Cards */}
